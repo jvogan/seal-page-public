@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">SEAL</title>
+  <rect width="64" height="64" rx="14" fill="#171b20"/>
+  <path d="M11 36c2-13 10-22 22-22 8 0 14 4 19 10-6-2-11-1-15 2-4 3-7 8-9 14-4 0-8-1-11-2-2 0-4-1-6-2Z" fill="#0aa3e8"/>
+  <path d="M53 28c-2 13-10 22-22 22-8 0-14-4-19-10 6 2 11 1 15-2 4-3 7-8 9-14 4 0 8 1 11 2 2 0 4 1 6 2Z" fill="#f7f8fa"/>
+  <circle cx="46" cy="27" r="1.2" fill="#171b20"/>
+  <circle cx="18" cy="37" r="1.2" fill="#171b20"/>
+</svg>

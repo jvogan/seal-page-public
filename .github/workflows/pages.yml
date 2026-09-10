@@ -1,0 +1,82 @@
+name: Publish GitHub Pages
+
+on:
+  workflow_dispatch:
+    inputs:
+      repository_url:
+        description: SEAL app repository URL (optional)
+        required: false
+        type: string
+      release_url:
+        description: SEAL app release or downloads URL (optional)
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Check the site and maintenance tools
+        run: |
+          python3 -B scripts/check-site.py
+          python3 -B -m unittest discover -s scripts -p 'test_*.py'
+          node --test docs/assets/build-search-index.test.mjs
+      - name: Read the Pages address
+        id: pages
+        uses: actions/configure-pages@v5
+      - name: Prepare the static export
+        env:
+          SITE_URL: ${{ steps.pages.outputs.base_url }}
+          REPOSITORY_URL: ${{ inputs.repository_url }}
+          RELEASE_URL: ${{ inputs.release_url }}
+        run: |
+          python3 -B - <<'PY'
+          import os
+          import subprocess
+
+          command = [
+              'python3', '-B', 'scripts/prepare-pages.py',
+              '--out', os.path.join(os.environ['RUNNER_TEMP'], 'seal-pages-export'),
+              '--site-url', os.environ['SITE_URL'],
+          ]
+          for flag, name in (
+              ('--repository-url', 'REPOSITORY_URL'),
+              ('--release-url', 'RELEASE_URL'),
+          ):
+              if os.environ.get(name):
+                  command.extend([flag, os.environ[name]])
+          subprocess.run(command, check=True)
+          PY
+      - name: Upload the checked export
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ${{ runner.temp }}/seal-pages-export
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish the checked export
+        id: deployment
+        uses: actions/deploy-pages@v4

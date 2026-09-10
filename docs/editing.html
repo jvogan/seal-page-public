@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Editing and annotation · SEAL docs</title>
+  <meta name="description" content="Edit bases, add features, and annotate selections in the desktop app and from the seal CLI." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Editing and annotation" />
+  <meta property="og:description" content="Edit bases, add features, and annotate selections in the desktop app and from the seal CLI." />
+
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>Editing and annotation</h1>
+    <p class="edition-note" data-edition-note>Screenshots and recordings show the direct edition. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">Edit bases, add features, and annotate selections. Work on a block in the desktop app, or use the Rust and TypeScript CLIs against the shared workspace.</p>
+
+    <p>A sequence in SEAL is a block: a named record with bases, a topology, a type, and a list of features. The desktop app and the CLI read and write the same blocks, so an edit made one way is visible the other way. Set <code>SEAL_DB_PATH</code> to the active path from Agent Setup before running workspace commands. Replace the example block and checkpoint IDs with values from your workspace. See the <a href="cli.html">CLI reference</a> for how the database path is resolved, and <a href="concepts.html">Core concepts</a> for the block model.</p>
+
+    <h2>Edit a sequence</h2>
+    <p>In the desktop app, open a block and edit its bases directly. You can also select a range to extract it, annotate it, or run a bench tool. Activity records each change with its time and source.</p>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/base-edit.png" alt="A sequence block in the workspace with a hint reading: click any base to position the cursor, type to substitute, toggle INS for insert mode." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">Click a base to place the cursor, then type to substitute or toggle insert mode to add bases. The Inspector tracks the block as you edit.</figcaption>
+    </figure>
+    <p>Before a larger edit, save a checkpoint so you can restore the block if you need to step back.</p>
+    <div class="docs-code" data-lang="bash" data-title="Checkpoint a block before editing">
+<pre><code>seal checkpoints save --block seal-synthetic-backbone --label "before BamHI digest"
+seal checkpoints list --block seal-synthetic-backbone
+seal checkpoints restore --block seal-synthetic-backbone --checkpoint-id cp-abc</code></pre>
+    </div>
+    <p>In the desktop app, restoring a checkpoint asks you to confirm first, and it captures the current state as a "Before restore:" checkpoint before applying the older one, so a restore is itself reversible. The CLI <code>checkpoints restore</code> above runs in a single transaction and does not prompt for confirmation. It records a "Before CLI checkpoint restore:" checkpoint before applying the older one, so a CLI restore is reversible too.</p>
+
+    <h2>Add and edit features</h2>
+    <p>A feature marks a region of a block: a gene, a CDS, a promoter, a tag. Add one from a feature template, or write the fields yourself.</p>
+    <p>SEAL ships 84 built-in feature templates, covering reporters, UTRs, recombination sites, sequencing primers, affinity tags, and Kozak context. Each template carries its sequence type, and you can save your own selection as a template from the desktop app.</p>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/feature-templates.png" alt="The Feature Templates dialog with category filters (promoters, terminators, tags, reporters, and more) on the left, a list of templates such as T7 promoter and lac promoter, and a detail panel for the selected template." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">The feature template library groups standard parts by category, so you can insert a promoter, terminator, tag, or reporter as an annotation.</figcaption>
+    </figure>
+    <p>From the CLI, add a feature to a block with <code>features add</code>. The feature JSON requires <code>type</code>, <code>name</code>, <code>start</code>, and <code>end</code>; <code>id</code> is generated if you omit it.</p>
+    <div class="docs-code" data-lang="bash" data-title="Add and update a feature">
+<pre><code>seal features add --block block-id-abc \
+  --feature-json '{"id":"feat-reporter","type":"gene","name":"Synthetic Reporter DNA","start":0,"end":720}'
+
+seal features update --block block-id-abc --feature-id feat-reporter \
+  --patch-json '{"color":"#0000ff"}'
+
+seal features list --block block-id-abc</code></pre>
+    </div>
+    <p>Positions are 0-indexed: <code>start</code> is inclusive, <code>end</code> is exclusive. On a linear block, <code>start</code> is at most <code>end</code> and both fall in <code>[0, block_length]</code>. On a circular block, a wrap-around is allowed, so <code>start</code> may be greater than <code>end</code>.</p>
+
+    <h2>Annotate a selection</h2>
+    <p>To annotate a specific range in one step, use <code>blocks annotate-selection</code>. The outer <code>--start</code> and <code>--end</code> flags set the position, and the <code>--feature-json</code> argument supplies at least the <code>type</code> and <code>name</code>. Any <code>start</code> or <code>end</code> inside the JSON is overridden by the outer flags.</p>
+    <div class="docs-code" data-lang="bash" data-title="Annotate positions 0-720 as a CDS">
+<pre><code>seal blocks annotate-selection --block insert1 --start 0 --end 720 \
+  --feature-json '{"type":"CDS","name":"Synthetic Reporter DNA"}'</code></pre>
+    </div>
+    <div class="docs-code" data-lang="json" data-title="blocks annotate-selection output">
+<pre><code>{
+  "ok": true,
+  "feature": { "id": "feat-...", "type": "CDS", "name": "Synthetic Reporter DNA", "start": 0, "end": 720 },
+  "totalFeatures": 1
+}</code></pre>
+    </div>
+
+    <h2>Extract a selection into a new block</h2>
+    <p>Use <code>blocks extract-selection</code> to slice a range out of a block into a new child block. The new block keeps a link to its source through <code>parentId</code>. Pass <code>--start</code> greater than <code>--end</code> to wrap around the origin on a circular block.</p>
+    <div class="docs-code" data-lang="bash" data-title="Extract bases 100-400 into a child block">
+<pre><code>seal blocks extract-selection --block seal-synthetic-backbone --start 100 --end 400 \
+  --new-name "MCS region"</code></pre>
+    </div>
+    <div class="docs-code" data-lang="json" data-title="blocks extract-selection output">
+<pre><code>{
+  "ok": true,
+  "id": "a1b2c3d4-...",
+  "name": "MCS region",
+  "length": 300,
+  "parentId": "seal-synthetic-backbone-block-id"
+}</code></pre>
+    </div>
+    <p><code>extract-selection</code> only slices a substring of an existing block. To materialize a free-form computed sequence instead, use the TypeScript <code>blocks add</code> command.</p>
+
+    <h2 id="materialize-a-computed-sequence-as-a-block">Save a computed sequence as a block</h2>
+    <p>The TypeScript <code>blocks add</code> command saves a raw sequence or supported sequence file as a workspace block. Prepare the <a href="cli.html">TypeScript CLI</a> in your checkout first. The Rust translation command prints a plain protein sequence, which you can pipe into it:</p>
+    <div class="docs-code" data-lang="bash" data-title="Materialize a computed sequence">
+<pre><code>seal translate ATGAAATAG | npm --silent run dev:cli -- blocks add --type protein --name "peptide"</code></pre>
+    </div>
+    <p>Set <code>--type</code> to override the detector with <code>dna</code>, <code>rna</code>, or <code>protein</code>, <code>--topology</code> for <code>linear</code> or <code>circular</code>, and <code>--parent</code> to nest the new block under an existing one. With <code>--parent</code> set, the new block inherits the parent's conversation.</p>
+
+    <h2>Nest a translated protein under a CDS</h2>
+    <p>The TypeScript <code>blocks translate</code> command translates a CDS block and adds the protein as a nested child, with <code>type=protein</code>, the CDS as its parent, and <code>manipulation=translate</code>. The trailing stop codon is stripped for a complete CDS, and an internal stop raises a warning.</p>
+    <div class="docs-code" data-lang="bash" data-title="Translate a CDS into a nested protein block">
+<pre><code>npm --silent run dev:cli -- blocks translate --block insert1 --from-atg --new-name "Synthetic Reporter Protein"</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--block &lt;name|id&gt;</code></td><td>required</td><td>Source DNA or RNA block to translate. Rejects a protein block.</td></tr>
+          <tr><td><code>--strand &lt;1|-1&gt;</code></td><td>coding feature, else forward</td><td>Translate the forward strand or reverse complement. By default, use the strand of a coding feature covering the block.</td></tr>
+          <tr><td><code>--from-atg</code></td><td>off</td><td>Translate from the first ATG or AUG instead of a fixed frame.</td></tr>
+          <tr><td><code>--frame &lt;n&gt;</code></td><td>0</td><td>Reading frame offset (0, 1, or 2). Ignored when <code>--from-atg</code> is set.</td></tr>
+          <tr><td><code>--new-name &lt;n&gt;</code></td><td><code>Translation &lt;block&gt;</code></td><td>Name for the protein child.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Record assembly lineage</h2>
+    <p>A construct assembled from several parts, such as a Gibson or Golden Gate build, cannot be expressed by a single parent link. The TypeScript <code>blocks link-parts</code> command records the lineage: it writes a lineage edge, so the desktop app can show "assembled from N source blocks", and stamps the construct's <code>manipulation</code>. Pair it with <code>blocks add</code> to materialize the construct.</p>
+    <div class="docs-code" data-lang="bash" data-title="Link a construct to its source parts">
+<pre><code>npm --silent run dev:cli -- blocks link-parts --construct vector-insert \
+  --parts insert1,vector1 --manipulation gibson_assembly</code></pre>
+    </div>
+    <p><code>--manipulation</code> is one of <code>gibson_assembly</code>, <code>golden_gate_assembly</code>, <code>ligate</code>, or <code>vector_insert</code>, and defaults to <code>gibson_assembly</code>. All parts must live in the same conversation. For the assembly workflow that produces the construct sequence, see <a href="cloning.html">Cloning and assembly</a>.</p>
+
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>To carry features and lineage through a save and reload, export to GenBank or GFF3. See <a href="import-export.html">Import and export</a>.</p>
+      </div>
+    </div>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

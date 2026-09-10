@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CRISPR guide design · SEAL docs</title>
+  <meta name="description" content="Scan a sequence or a selected region for SpCas9 guide candidates, read the ranked list, and run a local off-target scan against a reference you choose." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="CRISPR guide design" />
+  <meta property="og:description" content="Scan a sequence for SpCas9 guide candidates and run a local off-target scan against a reference you choose." />
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>CRISPR guide design</h1>
+    <p class="edition-note" data-edition-note>This guide includes source and direct-edition features. Check the edition comparison for the first Store release. Screenshots and recordings show the direct edition. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">Design CRISPR Guides scans a sequence, or a region you select inside it, for SpCas9 sites with an NGG PAM. It returns a ranked list of 20 nt protospacers with position, cut site, GC content, and composition flags, and it can scan a reference you choose for other sites the same spacer could bind.</p>
+
+    <h2>Design guides for a region</h2>
+    <p>Open a DNA or RNA block, select the region you want to target, then choose <strong>Actions</strong>, <strong>Transform</strong>, <strong>Design CRISPR Guides</strong>. The dialog scans the block and lists candidates straight away.</p>
+    <p>With no selection the scan covers the whole sequence, and the callout at the top of the dialog says so. With a selection the callout reports the scoped range and its length in bases, and the region rule decides which guides qualify.</p>
+    <p>The nuclease parameters are fixed, and the dialog states them along with what the quality value is: SpCas9 &middot; PAM NGG &middot; 20 nt guide &middot; Quality is a sequence-only heuristic. An RNA block is read as DNA for the scan, with U treated as T.</p>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/guide-design.png" alt="The Design CRISPR Guides dialog over an 80 nt Cas9 sgRNA scaffold block. A callout says the whole sequence is being scanned. The PAM strand toggle is set to Both, the region rule is Cut site in region, and a parameter line reads SpCas9, PAM NGG, 20 nt guide, quality is a sequence-only heuristic. Four ranked rows show spacer, strand, position, cut, GC percent, quality, and flags including homopolymer, low gc, and poly t. Below them an Off-target analysis panel shows a Not run chip, a Reference scope select holding the same block at 80 bp, a maximum mismatches select set to 3, and an Analyze selected guide button. The footer reads 4 guides found, 5 PAM sites, 80 bp." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">One scan of an 80 nt scaffold block, with four ranked candidates and their flags, and the off-target panel below the list waiting at Not run until you pick a reference scope and run it.</figcaption>
+    </figure>
+
+    <h2>Guide anatomy</h2>
+    <p>The scan matches a PAM first, then takes the 20 bases immediately 5' of it as the protospacer. SpCas9 makes a blunt double-strand break 3 bp from the PAM, and the same geometry applies on both strands.</p>
+
+    <figure class="docs-figure">
+      <div class="docs-figure-head">
+        <p class="docs-figure-title">Protospacer, PAM, and cut site</p>
+        <span class="docs-figure-mark">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 7q5 5 0 10 M16 7q-5 5 0 10"/></svg>
+        </span>
+      </div>
+      <svg viewBox="0 0 900 380" role="img" aria-label="Diagram: for a top-strand PAM the 20 nt protospacer sits immediately left of an NGG PAM and the blunt cut falls 3 bp from the PAM. For a bottom-strand PAM the arrangement is mirrored, the PAM reads CCN on the top strand, and the spacer reads in the opposite direction.">
+        <defs>
+          <marker id="d-arrow" markerWidth="10" markerHeight="10" refX="6.5" refY="4.5" orient="auto-start-reverse">
+            <path d="M1 1.5 L6.5 4.5 L1 7.5" fill="none" stroke="currentColor" stroke-width="1.4" />
+          </marker>
+        </defs>
+
+        <!-- Top-strand PAM -->
+        <rect class="d-group" x="32" y="36" width="836" height="152" rx="16" />
+        <text class="d-grouplabel" x="52" y="62">Top-strand PAM</text>
+
+        <rect class="d-box" x="210" y="84" width="360" height="52" rx="10" />
+        <text class="d-label" x="390" y="108" text-anchor="middle">protospacer</text>
+        <text class="d-cap" x="390" y="126" text-anchor="middle">20 nt</text>
+
+        <rect class="d-box d-fill-cream" x="570" y="84" width="120" height="52" rx="10" />
+        <text class="d-label d-on-fill" x="630" y="108" text-anchor="middle">PAM</text>
+        <text class="d-cap d-on-fill-cap" x="630" y="126" text-anchor="middle">NGG</text>
+
+        <path class="d-line-dim" d="M516 72 L516 148" />
+        <text class="d-cap" x="524" y="78" text-anchor="start">cut, 3 bp from the PAM</text>
+
+        <path class="d-line" d="M216 162 L564 162" marker-end="url(#d-arrow)" />
+        <text class="d-cap" x="390" y="180" text-anchor="middle">spacer reads 5' to 3'</text>
+
+        <!-- Bottom-strand PAM -->
+        <rect class="d-group" x="32" y="208" width="836" height="152" rx="16" />
+        <text class="d-grouplabel" x="52" y="234">Bottom-strand PAM</text>
+
+        <rect class="d-box d-fill-cream" x="210" y="256" width="120" height="52" rx="10" />
+        <text class="d-label d-on-fill" x="270" y="280" text-anchor="middle">PAM</text>
+        <text class="d-cap d-on-fill-cap" x="270" y="298" text-anchor="middle">CCN</text>
+
+        <rect class="d-box" x="330" y="256" width="360" height="52" rx="10" />
+        <text class="d-label" x="510" y="280" text-anchor="middle">protospacer</text>
+        <text class="d-cap" x="510" y="298" text-anchor="middle">20 nt</text>
+
+        <path class="d-line-dim" d="M384 244 L384 320" />
+        <text class="d-cap" x="392" y="250" text-anchor="start">cut, 3 bp from the PAM</text>
+
+        <path class="d-line" d="M684 334 L336 334" marker-end="url(#d-arrow)" />
+        <text class="d-cap" x="510" y="352" text-anchor="middle">spacer reads 5' to 3'</text>
+      </svg>
+      <figcaption class="docs-figcaption">The protospacer sits immediately 5' of the PAM on the strand the guide reads, and the blunt cut falls 3 bp from the PAM on both strands. A bottom-strand PAM reads CCN when you read the top strand, and the spacer is the reverse complement of the top-strand bases. Every position the list reports is a top-strand position.</figcaption>
+    </figure>
+
+    <h2>Region rules and strand</h2>
+    <p>Two controls sit above the results. <strong>PAM strand</strong> chooses which strands to scan: Both (the default), Forward, or Reverse. <strong>Region rule</strong> decides which guides a selection keeps.</p>
+
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Region rule</th><th>Keeps a guide when</th></tr></thead>
+        <tbody>
+          <tr><td>Cut site in region</td><td>The cut site falls inside the selection. This is the default, and it is the rule to use for a knockout at a chosen position.</td></tr>
+          <tr><td>Protospacer inside</td><td>The whole 20 nt protospacer lies inside the selection.</td></tr>
+          <tr><td>Overlaps region</td><td>The protospacer overlaps the selection at all.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>A collapsed or inverted selection is treated as no selection, so the scan falls back to the whole sequence and every guide qualifies.</p>
+
+    <h2>The guide list</h2>
+    <p>Rows sort by quality, highest first, then by position. Click a row to select it.</p>
+
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Column</th><th>What it shows</th></tr></thead>
+        <tbody>
+          <tr><td><code>#</code></td><td>Rank in the list.</td></tr>
+          <tr><td><code>Spacer</code></td><td>The protospacer, 5' to 3' on the guide strand, with the PAM shown after it.</td></tr>
+          <tr><td><code>Strand</code></td><td>Plus for a top-strand PAM, minus for a bottom-strand PAM.</td></tr>
+          <tr><td><code>Position</code></td><td>The protospacer span in 1-based coordinates.</td></tr>
+          <tr><td><code>Cut</code></td><td>The cut position. A value of N means the break falls between base N and base N+1.</td></tr>
+          <tr><td><code>GC%</code></td><td>GC content of the spacer, rounded, measured over ACGT bases only.</td></tr>
+          <tr><td><code>Quality</code></td><td>The composition heuristic below, rounded. A value of 70 or above is shown in the accent color.</td></tr>
+          <tr><td><code>Flags</code></td><td>One chip for each check the spacer failed, plus an Added chip once the guide is annotated.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>The list returns up to 200 ranked guides. The footer reports three separate numbers: how many guides the list holds, how many PAM sites the scan matched on the strands you selected before the region rule and the sequence-end check removed candidates, and the length of the block in bases.</p>
+
+    <h2>The quality heuristic</h2>
+    <p>Quality starts at 100 and subtracts a penalty for each composition problem in the spacer. Every penalty maps to a flag on the row, so any value can be explained by reading its flags. The result is clamped to the range 0 to 100.</p>
+
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Check</th><th>Flag</th><th>Penalty</th></tr></thead>
+        <tbody>
+          <tr><td>GC outside 40 to 65 percent, and within 30 to 70</td><td><code>low_gc</code> or <code>high_gc</code></td><td>10</td></tr>
+          <tr><td>GC outside 30 to 70 percent, and within 20 to 80</td><td><code>low_gc</code> or <code>high_gc</code></td><td>25</td></tr>
+          <tr><td>GC below 20 or above 80 percent</td><td><code>low_gc</code> or <code>high_gc</code></td><td>40</td></tr>
+          <tr><td>A run of exactly four T bases</td><td><code>poly_t</code></td><td>30</td></tr>
+          <tr><td>A run of five or more T bases</td><td><code>poly_t</code></td><td>50</td></tr>
+          <tr><td>A run of five or more A, G, or C bases</td><td><code>homopolymer</code></td><td>15</td></tr>
+          <tr><td>A base outside A, C, G, T</td><td><code>ambiguous_base</code></td><td>15</td></tr>
+          <tr><td>Spacer equal to its own reverse complement</td><td><code>self_complementary</code></td><td>20</td></tr>
+          <tr><td>Cut site away from the center of a selected region</td><td>none</td><td>up to 10</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Poly-T carries the largest penalty because a run of four or more T bases can terminate Pol III transcription from a U6 or H1 promoter. GC content is measured over ACGT bases only, so an ambiguous base is excluded from the denominator and flagged separately. The centrality term applies only when you scope the scan to a region.</p>
+
+    <p>Quality is a sequence-composition heuristic and nothing more. It reads the bases of the spacer, plus how central the cut site is in a region you selected. It is not a measure of editing efficiency, and it is not evidence about where else a spacer could bind. Two guides with the same quality value can behave very differently in an experiment. The dialog says as much on the parameter line above the list, and the value is stored on an annotation under a named model, <code>seal-sequence-heuristic-v1</code>, so it stays attributable.</p>
+
+    <h2>What the guide scan covers</h2>
+    <p>The guide scan covers the sequence in the block you opened it on, and the region you select inside that block. It enumerates candidate sites there and scores their composition. To look for other places a spacer could bind, run the off-target analysis below.</p>
+    <p>The scan reads the sequence from the first base to the last. On a circular block that covers the sequence as stored, so a site spanning the join between the last base and the first is outside the scan.</p>
+    <p>A PAM is called only on confirmed A, C, G, or T bases. An ambiguous base anywhere in the PAM window, including the N position of NGG, leaves that site uncounted rather than guessed.</p>
+    <p>When nothing matches, the dialog reports that no NGG PAM sites were found in the selected region, and suggests widening the selection or switching strands. If the selection is shorter than 20 nt it says so too. Read an empty list the way you would read any scan result: no sites found under these parameters and reference scope.</p>
+
+    <h2>Off-target analysis</h2>
+    <p>Selecting a guide opens an <strong>Off-target analysis</strong> panel below the list. It searches a reference sequence you choose for other sites the same spacer could bind. The panel header names the engine and its scope: SEAL local sequence scan, current sequence only, runs on this device.</p>
+
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Control</th><th>What it sets</th></tr></thead>
+        <tbody>
+          <tr><td>Reference scope</td><td>The sequence to search. It defaults to the block you opened the dialog on. Any other DNA block in the workspace, up to 5,000,000 bases, can be chosen instead, and each option is listed with its length.</td></tr>
+          <tr><td>Maximum mismatches</td><td>The inclusive mismatch ceiling, from 0 to 6. The panel opens at 3.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Choose <strong>Analyze selected guide</strong> to run. The scan runs in a worker, so the dialog stays usable while it works, and the button becomes Cancel for the duration. A spacer containing an ambiguous base cannot be analyzed, and the panel asks for an A/C/G/T-only guide instead.</p>
+
+    <h3>Result states</h3>
+    <p>The chip in the panel header always reports one of six states.</p>
+
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>State</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>Not run</td><td>No analysis has run for this guide, reference, and mismatch ceiling.</td></tr>
+          <tr><td>Running</td><td>A scan is in progress and can be canceled.</td></tr>
+          <tr><td>Complete</td><td>The scan finished and every site it found is in the result.</td></tr>
+          <tr><td>Incomplete</td><td>The scan finished, and the retained hit list reached its 100-site cap. The counts still cover every site found.</td></tr>
+          <tr><td>Stale</td><td>The mismatch ceiling changed, or a run was canceled, after a result already existed. Run again before storing the evidence with a guide.</td></tr>
+          <tr><td>Failed</td><td>The run returned an error, which the panel shows in full.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Reading a result</h3>
+    <p>A finished run reports the total number of sequence-local sites, a breakdown by mismatch count, and how many intended targets it excluded. When the reference is the block the guide came from, the guide's own site is validated against the reference and excluded from the count, so the total covers other sites only. Choosing a different reference means the source coordinates no longer apply, and nothing is excluded.</p>
+    <p>Sites are listed by position, strand, mismatch count, and PAM, sorted by mismatch count and then position, with the first eight shown and a line reporting how many of the total are on screen. Where the reference has unknown or degenerate bases inside a site, the panel says so, and the mismatch count for that site is the minimum number of known mismatches.</p>
+    <p>When a run finds nothing, the panel reports no sequence-local sites under these parameters. Read that as: no sites found under these parameters and reference scope. It is a statement about the reference you chose and the ceiling you set, and it holds for those.</p>
+
+    <h3>What the analysis covers</h3>
+    <p>The scan is mismatch-only, it reads both strands, and it runs as a linear scan. DNA and RNA bulges, variants, circular-junction sites, and the rest of a genome are not included. To search another locus or construct, import it as a DNA block and choose it under Reference scope. Whole-genome references need a genome-grade adapter.</p>
+    <p>The analysis reads a reference of up to 5,000,000 bases, which covers constructs and locus-sized blocks. Longer blocks are left out of the Reference scope list. The block you opened the dialog on is always listed, so if that block is itself over the limit, the run reports that analysis is limited to 5,000,000 bases and the chip goes to Failed.</p>
+    <p>Like the guide scan, the analysis reads the reference from its first base to its last, so a site spanning the join of a circular sequence sits outside it.</p>
+    <p>A result describes the reference you chose, at the mismatch ceiling you set, at the moment it ran. Rerun it whenever the guide, the reference, or the ceiling changes.</p>
+
+    <div class="docs-note is-warn">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>SEAL is research software. A guide list and a scan result are starting points for design work and for your own validation, and they are not clinical guidance.</p>
+      </div>
+    </div>
+
+    <h2>Annotate a guide</h2>
+    <p>Select a row and choose <strong>Add Guide as Feature</strong>. SEAL adds a <code>misc_feature</code> spanning the protospacer, on the strand the guide reads, named for the strand and the 1-based start position. The spacer, the PAM, the PAM span, the cut site, the GC content, the quality value and its model name, and the flags are stored on the feature, so the numbers travel with the annotation.</p>
+    <p>If the selected guide has a finished off-target run against the current reference, a compact summary goes on the feature too: the engine and its version, the nuclease profile, the reference identity, length, and fingerprint, the mismatch ceiling, the total sites and their breakdown by mismatch count, and when the run completed. The full hit list stays with the run rather than the annotation, so sequence documents stay small.</p>
+    <p>The dialog stays open after an add, so you can annotate several guides from one scan. A guide already annotated at the same position with the same spacer is skipped rather than duplicated, and its row shows an Added chip.</p>
+    <p>Each add writes a Guide Design event to the Activity trail, titled for the block and carrying a count of the annotations added. See <a href="editing.html">Editing and annotation</a> for how features behave once they are on a block.</p>
+
+    <h2>Copy guides out</h2>
+    <p><strong>Copy all as FASTA</strong> copies every guide in the list, in list order. Each header carries the block name, the rank, the strand, and the 1-based protospacer start.</p>
+
+    <div class="docs-code" data-lang="text" data-title="Copied FASTA">
+<pre><code>&gt;seal-synthetic-backbone_sgRNA_1_forward_position_412
+GACCGTACGTACGTACGTCA
+&gt;seal-synthetic-backbone_sgRNA_2_reverse_position_688
+TGACGTACGTACGTACGTAC</code></pre>
+    </div>
+
+    <p>The copy button on a row copies that spacer on its own, with no PAM and no header, ready to paste into an order form.</p>
+
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>Guide design and off-target analysis run in the desktop app. There is no <code>seal</code> command and no MCP tool that runs either scan, so an agent reads guides through the annotations you keep, with <code>feature_list</code>. See the <a href="mcp-reference.html">MCP tool reference</a>.</p>
+      </div>
+    </div>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MCP setup · SEAL docs</title>
+  <meta name="description" content="Run the SEAL MCP server over stdio and point a client at your local SQLite workspace." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="MCP setup" />
+  <meta property="og:description" content="Run the SEAL MCP server over stdio and point a client at your local SQLite workspace." />
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>MCP setup</h1>
+    <p class="edition-note" data-edition-note>This guide covers source and direct-edition tools. These tools are not bundled with the first Store release. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">Connect an MCP client to the workspace you use in SEAL. The client runs a local server from your source checkout.</p>
+
+    <p>MCP is optional. <a href="install.html">Install SEAL</a> and open the app before connecting a client.</p>
+
+    <h2>Prepare the checkout</h2>
+    <p>Use a SEAL checkout from a repository you have access to. Select the Node.js version in <code>.nvmrc</code>, then install the locked dependencies:</p>
+    <div class="docs-code" data-lang="bash" data-title="Prepare the MCP checkout">
+<pre><code>cd /absolute/path/to/seal
+npm ci
+npm run agent:doctor</code></pre>
+    </div>
+    <p>The installed app does not bundle the source MCP runtime. Your client starts <code>mcp/server.ts</code> through the checkout's <code>node_modules/.bin/tsx</code>. The server communicates over stdio.</p>
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>If the server fails to start, run <code>npm ci</code> in the source checkout and verify both absolute paths. Avoid <code>npx</code> so startup never depends on registry resolution or an unpinned download.</p>
+      </div>
+    </div>
+
+    <h2>Configure a client</h2>
+    <p>A client launches the server itself, so the configuration is a command plus its arguments and environment. The JSON configuration is what Claude Code (in <code>.mcp.json</code>) and Gemini CLI (in <code>~/.gemini/settings.json</code>) use: a <code>seal-bio</code> entry under <code>mcpServers</code> that points at your checkout and sets <code>SEAL_DB_PATH</code> to the database you want the agent to share. Codex takes the same command, arguments, and environment, but as a TOML <code>[mcp_servers.seal-bio]</code> table. The per-client pages give the exact file and the <code>mcp add</code> command for each tool.</p>
+    <div class="docs-code" data-lang="json" data-title="mcpServers entry">
+<pre><code>{
+  "mcpServers": {
+    "seal-bio": {
+      "command": "/absolute/path/to/seal/node_modules/.bin/tsx",
+      "args": ["/absolute/path/to/seal/mcp/server.ts"],
+      "env": {
+        "SEAL_DB_PATH": "/absolute/path/to/active/seal.db"
+      }
+    }
+  }
+}</code></pre>
+    </div>
+    <p>Replace <code>/absolute/path/to/seal</code> with your checkout path and <code>/absolute/path/to/active/seal.db</code> with the active path from SEAL. The app's Agent Setup panel can copy a configuration with the database path filled in. For the exact config file and per-client steps, see <a href="agents-claude-code.html">Connect Claude Code</a>, <a href="agents-codex.html">Connect Codex</a>, and <a href="agents-gemini-cli.html">Connect Gemini CLI</a>.</p>
+
+    <h2>Share a workspace</h2>
+    <p>The server resolves its SQLite database path in this order:</p>
+    <ol>
+      <li><code>SEAL_DB_PATH</code> if set. Use this in scripts and config files.</li>
+      <li>A repo-local <code>.seal/seal.db</code>, found by walking up from the working directory to the nearest <code>package.json</code> or <code>.git</code>.</li>
+      <li>The OS application-data directory, such as <code>~/Library/Application Support/io.github.jvogan.seal/seal.db</code> on macOS.</li>
+    </ol>
+    <p>To share data with the running app, copy its active database path from <strong>Agent Setup</strong> into <code>SEAL_DB_PATH</code>. Set that path in every MCP or CLI process that uses the workspace. The app watches the database and refreshes after external writes.</p>
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>Setting <code>SEAL_DB_PATH</code> explicitly keeps a client from writing to a repo-local development database while the installed app reads the app-data database. See <a href="architecture.html">Architecture</a> for how the workspace is shared across surfaces.</p>
+      </div>
+    </div>
+
+    <h2>Verify</h2>
+    <p>In SEAL, run <strong>Agent Doctor</strong> from Agent Setup or the command palette. It confirms the active database path, file watcher, schema, and Activity hydration. A missing database path blocks setup. No recent external write is expected until the first MCP write.</p>
+    <p>Open a client session and ask it to call <code>block_list</code>. Compare the returned blocks with SEAL. This tool reads blocks across shared projects and Entries; <code>workspace_list</code> lists only MCP Scratch records.</p>
+    <div class="docs-code" data-lang="text" data-title="First request">
+<pre><code>Use block_list to list the sequence blocks in my SEAL workspace, with type and length. Do not change any data.</code></pre>
+    </div>
+
+    <h2>Next steps</h2>
+    <ul>
+      <li><a href="mcp-reference.html">MCP tool reference</a> for every tool, its arguments, and example invocations.</li>
+      <li><a href="agents-claude-code.html">Connect Claude Code</a>, <a href="agents-codex.html">Connect Codex</a>, and <a href="agents-gemini-cli.html">Connect Gemini CLI</a> for per-client configuration.</li>
+      <li><a href="agents.html">Agent control plane</a> for how external agents read and write the same local workspace.</li>
+    </ul>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

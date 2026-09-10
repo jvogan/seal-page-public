@@ -1,0 +1,72 @@
+WEBVTT
+
+1
+00:00:00.390 --> 00:00:04.850
+This exercise adds a short synthetic DNA
+record to a new Entry.
+
+2
+00:00:04.880 --> 00:00:07.480
+In the sidebar, click New entry.
+
+3
+00:00:07.510 --> 00:00:11.400
+Type FASTA practice in the name field and
+press Enter.
+
+4
+00:00:11.430 --> 00:00:15.640
+Click Paste a sequence and paste the
+complete example from the guide.
+
+5
+00:00:15.670 --> 00:00:18.680
+Include the first line beginning with a
+greater-than sign.
+
+6
+00:00:18.710 --> 00:00:23.320
+That line supplies the name; the four
+sequence lines supply eighty bases.
+
+7
+00:00:23.350 --> 00:00:25.280
+Check the preview before submitting.
+
+8
+00:00:25.310 --> 00:00:28.040
+It says FASTA and eighty base pairs.
+
+9
+00:00:28.070 --> 00:00:32.360
+The upward-arrow button now says Add FASTA,
+eighty base pairs.
+
+10
+00:00:32.390 --> 00:00:36.840
+Click it once. The new block is named SEAL
+beginner practice.
+
+11
+00:00:36.870 --> 00:00:40.200
+Its header identifies DNA and eighty base
+pairs.
+
+12
+00:00:40.230 --> 00:00:43.400
+Select the block and open Overview in the
+Inspector.
+
+13
+00:00:43.430 --> 00:00:45.730
+Check the same name and length there.
+
+14
+00:00:45.760 --> 00:00:49.680
+The example has no ambiguous bases and no
+feature annotations.
+
+15
+00:00:49.710 --> 00:00:53.802
+If your length differs, compare your input
+with the guide before continuing.

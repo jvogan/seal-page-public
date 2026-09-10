@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SEAL documentation</title>
+  <meta name="description" content="Documentation for SEAL, a local-first workbench for sequences and lab records on macOS. Install, core concepts, sequence workflows, ESM design, agents over MCP, and the CLI and MCP reference." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="SEAL documentation" />
+  <meta property="og:description" content="Install, concepts, sequence workflows, ESM design, agents over MCP, and the full CLI and MCP reference for SEAL." />
+
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body class="docs-landing">
+  <article class="docs-article">
+
+    <div class="docs-hero">
+      <h1>SEAL documentation</h1>
+    <p class="edition-note" data-edition-note>This guide includes source and direct-edition features. Check the edition comparison for the first Store release. <a href="editions.html">Compare editions</a>.</p>
+      <p>Edit and analyze DNA, RNA, and protein in a local macOS workspace. These guides cover sequence tools, cloning, alignments, Notebook, and connecting your coding agent.</p>
+      <p>For the product tour, see the <a href="../index.html">overview</a>, the <a href="../workflows.html">workflows</a>, and the <a href="../try.html">worked examples</a>.</p>
+    </div>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/workbench.png" alt="The SEAL desktop app with Sample Lab projects and Entries on the left, a synthetic sequence block in the center, and the Inspector on the right showing metrics, quality, composition, provenance, and features." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">The SEAL workspace: projects and Entries on the left, the sequence stack in the center, and the Inspector on the right.</figcaption>
+    </figure>
+
+    <div class="docs-quickstart">
+      <div class="docs-quickstart-copy">
+        <h2>Quickstart</h2>
+        <p>Inspect the release-test Synthetic Reporter fixture, map cut sites, and scan its reading frames from the command line.</p>
+        <div class="docs-quickstart-actions">
+          <a class="docs-btn docs-btn-primary" href="quickstart.html">Start the quickstart</a>
+          <a class="docs-btn docs-btn-ghost" href="install.html">Install SEAL</a>
+        </div>
+      </div>
+      <div class="docs-code" data-lang="bash" data-title="Map cut sites in three commands">
+<pre><code># From a SEAL source checkout
+FIXTURE=tests/fixtures/release-bio/seal-synthetic-reporter.gb
+
+# Map restriction sites across 154 enzymes
+seal digest "$FIXTURE" --enzymes EcoRI,BamHI
+
+# Translate frames and scan open reading frames
+seal analyze "$FIXTURE" --min-orf-aa 50</code></pre>
+      </div>
+    </div>
+
+    <div class="docs-sectionhead">Get started</div>
+    <div class="docs-cardgrid">
+      <a class="docs-card" href="tutorials.html"><h3>Video tutorials</h3><p>Follow the app on screen, with captions and written steps for each lesson.</p></a>
+      <a class="docs-card" href="first-workspace.html"><h3>Your first workspace</h3><p>Learn where to find sequences, maps, the Inspector, and lab notes.</p></a>
+      <a class="docs-card" href="install.html">
+        <h3>Install SEAL</h3>
+        <p>Build from an authorized source checkout, review the planned GitHub DMG, and learn about the future Mac App Store edition.</p>
+      </a>
+      <a class="docs-card" href="quickstart.html">
+        <h3 id="quickstart-card">Quickstart</h3>
+        <p>Go from a pasted sequence to a first analysis in a few minutes.</p>
+      </a>
+      <a class="docs-card" href="concepts.html">
+        <h3>Core concepts</h3>
+        <p>Workspaces, Entries, stable conversation API names, blocks, features, and the sequence model.</p>
+      </a>
+      <a class="docs-card" href="sequence-sources.html">
+        <h3>Sequence sources</h3>
+        <p>Where sequences come from and which formats SEAL reads.</p>
+      </a>
+    </div>
+
+    <div class="docs-sectionhead">Sequence workflows</div>
+    <div class="docs-cardgrid">
+      <a class="docs-card" href="restriction-digest.html">
+        <h3>Restriction digest</h3>
+        <p>Map and simulate cuts across 154 enzymes, linear or circular.</p>
+      </a>
+      <a class="docs-card" href="primer-design.html">
+        <h3>Primer design</h3>
+        <p>Design and rank PCR primers with Tm, GC, and 3' clamp checks.</p>
+      </a>
+      <a class="docs-card" href="cloning.html">
+        <h3>Cloning and assembly</h3>
+        <p>Plan Gibson, Golden Gate, GoldenBraid, MoClo, ligation, and guided clone builds.</p>
+      </a>
+      <a class="docs-card" href="alignment.html">
+        <h3>Sequence alignment</h3>
+        <p>Pairwise and multiple alignment with selectable engines.</p>
+      </a>
+      <a class="docs-card" href="translation.html">
+        <h3>Translation and ORFs</h3>
+        <p>Use live selection translation, all six frames, reverse-translation drafts, and ORF review.</p>
+      </a>
+      <a class="docs-card" href="reports.html">
+        <h3>Reports and packages</h3>
+        <p>Export reports and zipped packages.</p>
+      </a>
+    </div>
+
+    <div class="docs-sectionhead">Design and generation</div>
+    <div class="docs-cardgrid">
+      <a class="docs-card" href="esm-design.html">
+        <h3>ESM design</h3>
+        <p>Generate, insert, and mutate sequences with the biohub.ai ESM engine.</p>
+      </a>
+      <a class="docs-card" href="codon-optimizers.html">
+        <h3>Codon optimizers</h3>
+        <p>Optimize coding sequences with pluggable host profiles.</p>
+      </a>
+      <a class="docs-card" href="notebook.html">
+        <h3>Notebook</h3>
+        <p>A persistent, live-syncing lab notebook with sequence references.</p>
+      </a>
+    </div>
+
+    <div class="docs-sectionhead">Agents</div>
+    <div class="docs-cardgrid">
+      <a class="docs-card" href="agents.html">
+        <h3>Agent control plane</h3>
+        <p>How external agents read and write the same local workspace.</p>
+      </a>
+      <a class="docs-card" href="agents-claude-code.html">
+        <h3>Connect Claude Code</h3>
+        <p>Point Claude Code at SEAL over MCP with one config.</p>
+      </a>
+      <a class="docs-card" href="terminal-dock.html">
+        <h3>Terminal dock</h3>
+        <p>Launch a local agent CLI from inside SEAL.</p>
+      </a>
+      <a class="docs-card" href="agent-prompts.html">
+        <h3>Prompts and safety</h3>
+        <p>Safety prompts and review patterns for agent edits.</p>
+      </a>
+    </div>
+
+    <div class="docs-sectionhead">Reference</div>
+    <div class="docs-cardgrid">
+      <a class="docs-card" href="cli.html">
+        <h3>CLI reference</h3>
+        <p>Every seal command and flag, with examples.</p>
+      </a>
+      <a class="docs-card" href="mcp-setup.html">
+        <h3>MCP setup</h3>
+        <p>Run the MCP server and point a client at it.</p>
+      </a>
+      <a class="docs-card" href="mcp-reference.html">
+        <h3>MCP tool reference</h3>
+        <p>All 61 MCP tools, grouped by module.</p>
+      </a>
+      <a class="docs-card" href="architecture.html">
+        <h3>Architecture</h3>
+        <p>Electron and SQLite with TypeScript app/MCP operations, a Rust CLI, and bounded native Rust commands.</p>
+      </a>
+    </div>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

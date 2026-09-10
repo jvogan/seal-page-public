@@ -1,0 +1,1082 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CLI reference · SEAL docs</title>
+  <meta name="description" content="Every seal command, argument, flag, and default, from sequence analysis to the shared-workspace commands that read and write your SQLite database." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="CLI reference" />
+  <meta property="og:description" content="Every seal command, argument, flag, and default, from sequence analysis to the shared-workspace commands." />
+
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>CLI reference</h1>
+    <p class="edition-note" data-edition-note>This guide covers source and direct-edition tools. These tools are not bundled with the first Store release. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">The Rust <code>seal</code> CLI runs sequence analysis and selected workspace commands. The source checkout also provides a TypeScript CLI with additional block commands.</p>
+
+    <p>Sequence commands generally accept a sequence via a positional argument (a raw string, a file path, or a library name) or stdin. Most commands support <code>--json</code> for machine-readable output and work well in pipelines.</p>
+
+    <h2>Running the CLI</h2>
+    <p>The desktop installer does not install the CLI. Examples beginning with <code>seal</code> use the Rust binary. Commands beginning with <code>npm --silent run dev:cli --</code> use the TypeScript implementation.</p>
+
+    <h3>Install the Rust CLI</h3>
+    <p>Use a SEAL source checkout and a stable Rust toolchain. On macOS, install Xcode Command Line Tools for the native compiler. From the checkout root, build and install the binary:</p>
+    <div class="docs-code" data-lang="bash" data-title="Install the Rust binary">
+<pre><code>cargo install --path rust/crates/seal-cli --locked
+export PATH="${CARGO_HOME:-$HOME/.cargo}/bin:$PATH"
+seal --help
+seal analyze ATGAAAGAATTCTAA</code></pre>
+    </div>
+    <p><code>cargo install</code> places the binary in Cargo's <code>bin</code> directory. The <code>PATH</code> setting applies to this shell; add it to your shell configuration to use <code>seal</code> in later sessions.</p>
+    <p>To build a binary in the checkout instead of installing it, use:</p>
+    <div class="docs-code" data-lang="bash" data-title="Build without installing">
+<pre><code>cargo build --manifest-path rust/Cargo.toml -p seal-cli --release --locked
+./rust/target/release/seal --help</code></pre>
+    </div>
+    <p>The path shown is Cargo's default output location. If you set <code>CARGO_TARGET_DIR</code>, use that directory instead. The Rust CLI builds independently of the desktop app and Node.js dependencies.</p>
+
+    <h3>Run the TypeScript CLI</h3>
+    <p>From your source checkout, select the Node.js version in <code>.nvmrc</code>, then install the locked dependencies:</p>
+    <div class="docs-code" data-lang="bash" data-title="Prepare the TypeScript CLI">
+<pre><code>npm ci
+npm --silent run dev:cli -- --help
+npm --silent run dev:cli -- analyze ATGAAAGAATTCTAA</code></pre>
+    </div>
+    <p>The TypeScript CLI runs through the checkout's Node.js runtime and native SQLite dependency. It does not require the Rust <code>seal</code> binary. Use the repository's setup instructions if native dependencies need compilation.</p>
+    <p>Use <code>npm --silent</code> when capturing output or using a pipeline so npm's script banner stays out of the result. For a machine-readable response, also select the command's <code>--json</code> option.</p>
+    <p><code>blocks add</code>, <code>blocks translate</code>, and <code>blocks link-parts</code> are available through the TypeScript CLI. Both implementations can use the desktop workspace when you set the active database path.</p>
+
+    <h3 id="differences-between-the-rust-and-typescript-clis">Differences between the Rust and TypeScript CLIs</h3>
+    <p>A few flags are specific to one CLI:</p>
+    <ul>
+      <li>TypeScript <code>fetch</code> uses <code>--database</code> and <code>--json</code>. The <code>--format genbank</code> option is Rust-only.</li>
+      <li>TypeScript <code>import</code> supports <code>--conversation-id</code>, <code>--dry-run</code>, and <code>--json</code>. Recursive import, repair mode, and structured workspace-export filters are Rust-only.</li>
+    </ul>
+
+    <h2 id="database-path-resolution">Database path resolution</h2>
+    <p>The shared-database commands (<code>blocks</code>, <code>checkpoints</code>, <code>conversations</code>, <code>export</code>, <code>features</code>, <code>import</code>, <code>projects</code>) read and write a shared SQLite database. The database path is resolved in this order:</p>
+    <ol>
+      <li><code>SEAL_DB_PATH</code> environment variable, as an absolute path.</li>
+      <li>A repo-local <code>.seal/seal.db</code> inside the nearest parent directory that contains <code>package.json</code> or <code>.git</code>.</li>
+      <li>The platform app-data directory, such as <code>~/Library/Application Support/io.github.jvogan.seal/seal.db</code> on macOS.</li>
+    </ol>
+    <p>To work with the desktop workspace, open SEAL and copy the active database path from <strong>Agent Setup</strong>. Set that path before running a workspace command:</p>
+    <div class="docs-code" data-lang="bash" data-title="Use the desktop workspace">
+<pre><code>export SEAL_DB_PATH="/absolute/path/to/active/seal.db"</code></pre>
+    </div>
+    <p>Replace the placeholder with the path supplied by SEAL. File names, block IDs, Entry IDs, and checkpoint IDs in the examples also need to match your workspace.</p>
+
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>When <code>SEAL_DB_PATH</code> is unset, the TypeScript CLI writes the repo-local <code>.seal/seal.db</code> and prints a stderr notice. Set it to a scratch file to isolate agent or test work from your live workspace.</p>
+      </div>
+    </div>
+
+    <h2>Analysis and sequence commands</h2>
+    <p>These commands are stateless. They read a sequence, compute a result, and print it. They do not touch the shared database. Pass a raw sequence or supported sequence file to the TypeScript <a href="#blocks"><code>blocks add</code></a> command to save a result. For reports containing labels or tables, use JSON output and extract the sequence first.</p>
+
+    <h3>align</h3>
+    <p>Align 2 to 10 sequences as a compact multiple sequence alignment.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal align &lt;seq1&gt; &lt;seq2&gt; [...seqN] [--format clustal|fasta] [--json]</code></pre>
+    </div>
+    <p>The Rust binary renders a progressive alignment as CLUSTAL or FASTA. The TypeScript CLI adds an <code>--engine</code> selector (<code>seal-progressive</code>, <code>muscle</code>, or <code>clustal-omega</code>). The external engines run their real binary, resolved on <code>PATH</code>. A missing, invalid, or wrong-version binary returns an error and a nonzero exit rather than substituting the built-in aligner, so a result labelled MUSCLE was produced by MUSCLE.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--format &lt;fmt&gt;</code></td><td>clustal</td><td>Output format: <code>clustal</code> or <code>fasta</code>.</td></tr>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON output.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal align ATGCGT ATGCAT
+seal align seq1.fa seq2.fa seq3.fa --format fasta</code></pre>
+    </div>
+
+    <h3>analyze</h3>
+    <p>Run a comprehensive sequence analysis: composition, GC content, molecular weight, melting temperature, ORFs, and restriction sites, all in one call.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal analyze [&lt;input&gt;] [--min-orf-aa &lt;n&gt;] [--json]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--min-orf-aa &lt;n&gt;</code></td><td>30</td><td>Minimum ORF length in amino acids.</td></tr>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON matching the MCP schema.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal analyze ATGAAAGAATTCTAA
+seal analyze myseq.fa --min-orf-aa 50 --json</code></pre>
+    </div>
+
+    <h3>batch</h3>
+    <p>Run a command on every sequence in a multi-FASTA file and collect results.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal batch --file &lt;path&gt; --cmd &lt;subcommand&gt; [--json]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--file &lt;path&gt;</code></td><td>required</td><td>Multi-FASTA input file (required).</td></tr>
+          <tr><td><code>--cmd &lt;name&gt;</code></td><td>required</td><td>Subcommand to run on each sequence (required).</td></tr>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON for all results.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal batch --file seqs.fa --cmd info
+seal batch --file seqs.fa --cmd orfs --json</code></pre>
+    </div>
+
+    <h3>codons</h3>
+    <p>Codon usage analysis: count each codon and compute per-amino-acid frequencies. Always reads frame 0 from the start of the sequence. Output is grouped by amino acid, most-used codons first per AA, with stop codons reported last.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal codons [&lt;input&gt;] [--file &lt;path&gt;] [--format table|json|tsv]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>&lt;input&gt;</code></td><td>stdin</td><td>Inline DNA/RNA sequence or file path.</td></tr>
+          <tr><td><code>--file &lt;path&gt;</code></td><td>none</td><td>File path (overrides the positional argument).</td></tr>
+          <tr><td><code>--format &lt;fmt&gt;</code></td><td>table</td><td>Output format: <code>table</code>, <code>json</code>, or <code>tsv</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Output formats:</p>
+    <ul>
+      <li><code>table</code>: human-readable, grouped by amino acid with a <code>#</code>-bar showing relative frequency.</li>
+      <li><code>json</code>: structured JSON with <code>totalCodons</code> and a <code>codons</code> array. Each entry has <code>codon</code>, <code>aminoAcid</code>, <code>count</code>, and <code>fraction</code>.</li>
+      <li><code>tsv</code>: tab-separated with columns <code>codon</code>, <code>amino_acid</code>, <code>count</code>, <code>fraction</code>, including a header row.</li>
+    </ul>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal codons ATGAAATAG
+echo ATGAAATAG | seal codons
+seal codons ATGAAATAG --format json</code></pre>
+    </div>
+
+    <h3>convert</h3>
+    <p>Convert a sequence between formats (FASTA, GenBank, raw).</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal convert [&lt;input&gt;] --to fasta|genbank|raw [--save &lt;path&gt;]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--to &lt;format&gt;</code></td><td>required</td><td>Target format: <code>fasta</code>, <code>genbank</code>, or <code>raw</code> (required).</td></tr>
+          <tr><td><code>--save &lt;path&gt;</code></td><td>none</td><td>Write rendered output to a file instead of stdout (Rust CLI; the TypeScript <code>convert</code> writes to stdout only).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal convert myseq.gb --to fasta
+seal convert myseq.fa --to raw</code></pre>
+    </div>
+
+    <h3>degenerate</h3>
+    <p>Reverse-translate a protein sequence into a degenerate DNA sequence written with IUPAC ambiguity codes. Pass <code>--organism</code> to minimize degeneracy by choosing high-frequency codons for that host.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal degenerate &lt;protein&gt; [--organism ecoli|human|yeast] [--coverage &lt;fraction&gt;] [--json]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>&lt;protein&gt;</code></td><td>required</td><td>Protein sequence or file path (required).</td></tr>
+          <tr><td><code>--organism &lt;name&gt;</code></td><td>none</td><td>Minimize degeneracy for this host: <code>ecoli</code>, <code>human</code>, or <code>yeast</code>.</td></tr>
+          <tr><td><code>--coverage &lt;fraction&gt;</code></td><td>0.9</td><td>Cumulative codon-frequency coverage used during minimization.</td></tr>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON output.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal degenerate MKVLA
+seal degenerate MKVLA --organism ecoli --coverage 0.95 --json</code></pre>
+    </div>
+
+    <h3>diff</h3>
+    <p>Compare two sequences and report mismatches, insertions, and deletions.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal diff &lt;seq1&gt; &lt;seq2&gt; [--json] [--save &lt;path&gt;]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON diff output.</td></tr>
+          <tr><td><code>--save &lt;path&gt;</code></td><td>none</td><td>Write output to a file.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal diff ATGCGT ATGCAT
+seal diff seq1.fa seq2.fa --json</code></pre>
+    </div>
+
+    <h3>digest</h3>
+    <p>Simulate a restriction enzyme digest and return the resulting fragment sequences. Supports both linear and circular topology. Use <code>--preview</code> for a dry-run that shows cut positions and fragment sizes without emitting full sequences, which is useful for planning a digest before committing to it.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal digest [&lt;input&gt;] --enzymes &lt;list&gt; [--topology linear|circular]
+                [--preview] [--json]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>&lt;input&gt;</code></td><td>stdin</td><td>Sequence text or file path.</td></tr>
+          <tr><td><code>--enzymes &lt;list&gt;</code></td><td>required</td><td>Comma-delimited enzyme names (required).</td></tr>
+          <tr><td><code>--topology linear|circular</code></td><td>linear</td><td>Sequence topology.</td></tr>
+          <tr><td><code>--preview</code></td><td>false</td><td>Show cut positions and fragment sizes only (dry-run).</td></tr>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON output.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>When <code>--preview</code> is set, the command prints the enzyme name and cut position for each recognition site found, plus the resulting fragment size list in base pairs. No fragment sequences are emitted. Combine with <code>--json</code> to get a <code>DigestPreviewOutput</code> object with <code>cuts</code>, <code>fragmentSizes</code>, and <code>fragmentCount</code> fields.</p>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal digest ATGAAAGAATTCGGATCC --enzymes EcoRI
+seal digest myseq.fa --enzymes EcoRI,BamHI
+seal digest ATGAAAGAATTCGGATCC --enzymes EcoRI --topology circular
+seal digest ATGAAAGAATTCGGATCC --enzymes EcoRI,BamHI --preview --json</code></pre>
+    </div>
+
+    <h3>fetch</h3>
+    <p>Fetch a sequence record from NCBI E-Utilities by accession number. Queries NCBI's nuccore (nucleotide) or protein database via the efetch API. Output defaults to GenBank flat-file text.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal fetch &lt;accession&gt; [--db nuccore|protein] [--format genbank|fasta|json]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>&lt;accession&gt;</code></td><td>required</td><td>GenBank/RefSeq accession (required).</td></tr>
+          <tr><td><code>--db nuccore|protein</code></td><td>nuccore</td><td>NCBI database to query. Auto-detected for proteins.</td></tr>
+          <tr><td><code>--format genbank|fasta|json</code></td><td>genbank</td><td>Output format.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Output formats:</p>
+    <ul>
+      <li><code>genbank</code> (default): full GenBank flat-file text as returned by NCBI.</li>
+      <li><code>fasta</code>: FASTA text as returned by NCBI.</li>
+      <li><code>json</code>: parsed JSON object with fields <code>accession</code>, <code>name</code>, <code>definition</code>, <code>organism</code>, <code>length</code>, <code>sequence</code>, and <code>db</code>.</li>
+    </ul>
+    <p>When <code>--db</code> is left at the default (<code>nuccore</code>), the accession prefix is inspected. Accessions starting with <code>NP_</code>, <code>XP_</code>, <code>YP_</code>, <code>WP_</code>, or <code>AP_</code> are silently upgraded to the protein database. NCBI may return HTTP 429 (rate limit, wait and retry), HTTP 400/404 or an empty body (accession not found), or a 200 with an error message body for an unknown accession, which is detected and reported as a clear error.</p>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal fetch NM_000518
+seal fetch NM_000518 --format json
+seal fetch NP_001234 --db protein</code></pre>
+    </div>
+
+    <h3>frames</h3>
+    <p>Translate a sequence in all six reading frames.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal frames [&lt;input&gt;] [--json]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON output.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal frames ATGAAATAG
+seal frames myseq.fa --json</code></pre>
+    </div>
+
+    <h3>gel</h3>
+    <p>Simulate an agarose gel electrophoresis image from a list of fragment sizes.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal gel --sizes &lt;list&gt; [--json]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--sizes &lt;list&gt;</code></td><td>required</td><td>Comma-delimited fragment sizes in bp (required).</td></tr>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON output.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal gel --sizes 500,1200,3000
+seal gel --sizes 200,800,2500 --json</code></pre>
+    </div>
+
+    <h3>gibson</h3>
+    <p>Simulate Gibson Assembly of two or more overlapping fragments.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal gibson &lt;frag1&gt; &lt;frag2&gt; [&lt;fragN&gt;...] [--min-overlap &lt;n&gt;] [--max-overlap &lt;n&gt;] [--circular] [--validate] [--json]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--min-overlap &lt;n&gt;</code></td><td>15</td><td>Minimum homology-arm overlap in bp. An overlap shorter than this fails.</td></tr>
+          <tr><td><code>--max-overlap &lt;n&gt;</code></td><td>100</td><td>Maximum overlap length to search.</td></tr>
+          <tr><td><code>--circular</code></td><td>false</td><td>Circular assembly. The last fragment must also overlap the first (closing seam).</td></tr>
+          <tr><td><code>--validate</code></td><td>false</td><td>Validate overlaps only; do not assemble.</td></tr>
+          <tr><td><code>--save &lt;name&gt;</code></td><td>none</td><td>Save the assembled sequence to the local library.</td></tr>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON output.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The product length is <code>sum(fragment lengths) - sum(overlap lengths)</code>; each overlap appears exactly once. With <code>--circular</code> the closing overlap (last to first) is required, and a missing one is a hard error, not a silently-linear product.</p>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal gibson insert.fa vector.fa --min-overlap 25
+seal gibson part1.fa part2.fa part3.fa --circular --json
+seal gibson a.fa b.fa --validate --min-overlap 30</code></pre>
+    </div>
+
+    <h3>golden-gate</h3>
+    <p>Design Golden Gate Assembly overhangs for a set of fragments.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal golden-gate &lt;seq1&gt; &lt;seq2&gt; [&lt;seqN&gt;...] [--enzyme BsaI|BbsI|BsmBI] [--check] [--domesticate] [--json] [--save &lt;path&gt;]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--enzyme BsaI|BbsI|BsmBI</code></td><td>BsaI</td><td>Type IIS enzyme to use for the assembly.</td></tr>
+          <tr><td><code>--check</code></td><td>false</td><td>Report internal Type IIS sites without assembly.</td></tr>
+          <tr><td><code>--domesticate</code></td><td>false</td><td>Mutate internal recognition sites before output.</td></tr>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON output.</td></tr>
+          <tr><td><code>--save &lt;path&gt;</code></td><td>none</td><td>Write output to a file.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal golden-gate part1.fa part2.fa part3.fa
+seal golden-gate part1.fa part2.fa --enzyme BsmBI --json
+seal golden-gate part1.fa part2.fa --check</code></pre>
+    </div>
+
+    <h3>info</h3>
+    <p>Report basic metadata about a sequence: name, type, length, GC content, format, and validation status.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal info [&lt;input&gt;] [--json] [--save &lt;path&gt;]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON output.</td></tr>
+          <tr><td><code>--save &lt;path&gt;</code></td><td>none</td><td>Write output to a file.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal info ATGCGT
+seal info myseq.fa --json</code></pre>
+    </div>
+
+    <h3>lib</h3>
+    <p>Manage the local sequence library: initialize it, add and resolve named sequences, tag and annotate them, search, and report statistics. The library is a <code>library/</code> folder of sequence files plus an <code>index.json</code>, resolved beside the nearest <code>package.json</code> or <code>.git</code>. It is separate from the SQLite workspace the desktop app and MCP server share.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal lib &lt;subcommand&gt; [args]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Subcommand</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>init</code></td><td>Create the library folder and an empty index. Pass <code>--force</code> to reinitialize.</td></tr>
+          <tr><td><code>add</code></td><td>Add a sequence from text or a file. Flags: <code>--name</code>, <code>--tags</code>, <code>--topology</code>, <code>--notes</code>, <code>--json</code>.</td></tr>
+          <tr><td><code>list</code></td><td>List entries. Flags: <code>--type</code>, <code>--tags</code>, <code>--sort name|date|length</code>, <code>--json</code>.</td></tr>
+          <tr><td><code>get</code></td><td>Print one entry and its metadata. Add <code>--json</code> for structured output.</td></tr>
+          <tr><td><code>search</code></td><td>Rank entries by name, tag, type, topology, notes, or derivation. Add <code>--json</code>.</td></tr>
+          <tr><td><code>tag</code></td><td>Add or remove tags on an entry with <code>--add</code> and <code>--remove</code>.</td></tr>
+          <tr><td><code>note</code></td><td>Set the note on an entry with <code>--set</code>.</td></tr>
+          <tr><td><code>stats</code></td><td>Report totals by type and topology, plus the most-used tags. Add <code>--json</code>.</td></tr>
+          <tr><td><code>export</code></td><td>Print an entry as <code>--format fasta|genbank|markdown</code> (default fasta).</td></tr>
+          <tr><td><code>import-dir</code></td><td>Import every supported file in a directory. Add <code>--recursive</code>.</td></tr>
+          <tr><td><code>remove</code></td><td>Remove a named entry and its sequence file.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal lib init
+seal lib add seal-synthetic-backbone.fa --name seal-synthetic-backbone --tags vector,cloning
+seal lib list --type dna --sort length
+seal lib search reporter --json
+seal lib tag seal-synthetic-backbone --add verified --remove draft
+seal lib note seal-synthetic-backbone --set "Sequenced 2026-06-01, matches reference"
+seal lib get seal-synthetic-backbone
+seal lib export seal-synthetic-backbone --format genbank &gt; seal-synthetic-backbone.gb
+seal lib import-dir ./sequences --recursive
+seal lib stats</code></pre>
+    </div>
+
+    <h3>map</h3>
+    <p>Print an annotated feature map for a sequence (GenBank features).</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal map [&lt;input&gt;] [--json] [--save &lt;path&gt;]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON output.</td></tr>
+          <tr><td><code>--save &lt;path&gt;</code></td><td>none</td><td>Write output to a file.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal map myseq.gb
+seal map myseq.gb --json</code></pre>
+    </div>
+
+    <h3>optimize</h3>
+    <p>Codon-optimize a coding sequence for expression in a target organism.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal optimize [&lt;input&gt;] [--organism &lt;name&gt;] [--json]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--organism &lt;name&gt;</code></td><td>ecoli</td><td>Target organism for codon optimization.</td></tr>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON output.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal optimize ATGAAATAG --organism human
+seal optimize cds.fa --json</code></pre>
+    </div>
+
+    <h3>orfs</h3>
+    <p>Detect open reading frames in all six frames of a DNA sequence.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal orfs [&lt;input&gt;] [--min-aa &lt;n&gt;] [--json]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--min-aa &lt;n&gt;</code></td><td>30</td><td>Minimum ORF length in amino acids.</td></tr>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON output.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal orfs ATGAAAGAATTCTAA
+seal orfs myseq.fa --min-aa 50 --json</code></pre>
+    </div>
+
+    <h3>pcr</h3>
+    <p>Simulate a PCR reaction given a template and forward/reverse primers.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal pcr &lt;template&gt; --fwd &lt;primer&gt; --rev &lt;primer&gt; [--json]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--fwd &lt;primer&gt;</code></td><td>required</td><td>Forward primer sequence (required).</td></tr>
+          <tr><td><code>--rev &lt;primer&gt;</code></td><td>required</td><td>Reverse primer sequence (required).</td></tr>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON output.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal pcr template.fa --fwd ATGCGT --rev ACGCAT
+seal pcr ATGCGTACGCAT --fwd ATGCGT --rev ACGCAT --json</code></pre>
+    </div>
+
+    <h3>primers</h3>
+    <p>Design PCR primers flanking a target region in a template sequence.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal primers [&lt;input&gt;] --start &lt;n&gt; --end &lt;n&gt; [--tm &lt;t&gt;]
+                 [--min-length &lt;n&gt;] [--max-length &lt;n&gt;] [--json]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--start &lt;n&gt;</code></td><td>required</td><td>Target region start position, 0-indexed (required).</td></tr>
+          <tr><td><code>--end &lt;n&gt;</code></td><td>required</td><td>Target region end position, 0-indexed exclusive (required).</td></tr>
+          <tr><td><code>--tm &lt;t&gt;</code></td><td>60.0</td><td>Target melting temperature in °C.</td></tr>
+          <tr><td><code>--min-length &lt;n&gt;</code></td><td>18</td><td>Minimum primer length in bases.</td></tr>
+          <tr><td><code>--max-length &lt;n&gt;</code></td><td>28</td><td>Maximum primer length in bases.</td></tr>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON output.</td></tr>
+          <tr><td><code>--save &lt;path&gt;</code></td><td>none</td><td>Write output to a file.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal primers myseq.fa --start 100 --end 400
+seal primers myseq.fa --start 100 --end 400 --tm 62 --json</code></pre>
+    </div>
+
+    <h3>protein-features</h3>
+    <p>Identify protein domains, signal peptides, and other functional features in an amino acid sequence.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal protein-features [&lt;input&gt;] [--json]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON output.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal protein-features MKVLWAALLVTFLAGCQA
+seal protein-features protein.fa --json</code></pre>
+    </div>
+
+    <h3>quality</h3>
+    <p>Compute quality metrics for a sequence: length, GC content, complexity score, homopolymer runs, direct and inverted repeats, and a windowed GC profile.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal quality [&lt;input&gt;] [--json]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON output.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal quality ATGCGTNNATG
+seal quality myseq.fa --json</code></pre>
+    </div>
+
+    <h3>rc</h3>
+    <p>Compute the reverse complement of a DNA or RNA sequence.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal rc [&lt;input&gt;] [--rna] [--json]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--rna</code></td><td>false</td><td>Treat input as RNA; complement uses <code>U</code>.</td></tr>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON output.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal rc ATGCGT
+echo ATGCGT | seal rc
+seal rc AUGCGU --rna --json</code></pre>
+    </div>
+
+    <h3>search</h3>
+    <p>Search a sequence for all occurrences of an IUPAC motif pattern.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal search [&lt;input&gt;] --pattern &lt;motif&gt; [--json] [--save &lt;path&gt;]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--pattern &lt;m&gt;</code></td><td>required</td><td>IUPAC motif to search for (required).</td></tr>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON output.</td></tr>
+          <tr><td><code>--save &lt;path&gt;</code></td><td>none</td><td>Write output to a file.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal search ATGAAAGAATTC --pattern GAATTC
+seal search myseq.fa --pattern RGATCY --json</code></pre>
+    </div>
+
+    <h3>sites</h3>
+    <p>Find restriction enzyme recognition sites in a DNA sequence. Scans the built-in default enzyme panel unless <code>--enzymes</code> restricts the set. Use <code>--unique</code> to keep only enzymes that cut exactly once (useful for directional cloning). Use <code>--non-cutter</code> to invert the output and list enzymes that have no recognition site in the sequence.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal sites [&lt;input&gt;] [--enzymes &lt;list&gt;] [--unique] [--non-cutter] [--json]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>&lt;input&gt;</code></td><td>stdin</td><td>Sequence text or file path.</td></tr>
+          <tr><td><code>--enzymes &lt;list&gt;</code></td><td>default panel</td><td>Comma-delimited enzyme names to check.</td></tr>
+          <tr><td><code>--unique</code></td><td>false</td><td>Only report enzymes that cut exactly once.</td></tr>
+          <tr><td><code>--non-cutter</code></td><td>false</td><td>List enzymes with no recognition site (inverted output).</td></tr>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON output.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>When <code>--non-cutter</code> is set, the command prints the names of enzymes from the selected panel that have no recognition site in the sequence, rather than the list of cut positions. Combine with <code>--enzymes</code> to check whether a specific set of enzymes can be used to linearize a construct without cutting it unexpectedly. With <code>--json</code> the output is a <code>NonCutterOutput</code> object with <code>enzymes</code> (string array) and <code>count</code> fields.</p>
+    <p>Curated presets and <code>--list-presets</code> are available through the TypeScript CLI.</p>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal sites ATGAAAGAATTCGGATCC --enzymes EcoRI,BamHI
+npm --silent run dev:cli -- sites myseq.gb --preset golden-gate-type-iis --non-cutter
+npm --silent run dev:cli -- sites myseq.gb --preset common-mcs --unique --json</code></pre>
+    </div>
+
+    <h3>tm</h3>
+    <p>Calculate the melting temperature of a DNA oligo.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal tm [&lt;input&gt;] [--json]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON output.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal tm ATGCGTACGCAT
+seal tm GCGCGCGCGCGC --json</code></pre>
+    </div>
+
+    <h3>translate</h3>
+    <p>Translate a DNA sequence to protein using the standard genetic code.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal translate [&lt;input&gt;] [--frame &lt;0|1|2&gt;] [--json]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--frame &lt;n&gt;</code></td><td>0</td><td>Translation frame offset (0, 1, or 2).</td></tr>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON output.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal translate ATGAAATAG
+seal translate ATGAAATAG --frame 0 --json
+echo ATGAAATAG | seal translate</code></pre>
+    </div>
+
+    <h3>vectors</h3>
+    <p>List or inspect the five deterministic fixtures in the built-in vector library. These project-authored synthetic records include illustrative features, topology, and provenance for software demonstrations.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal vectors &lt;subcommand&gt; [args]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Subcommand</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>list</code></td><td>Print all available vector records.</td></tr>
+          <tr><td><code>get &lt;name&gt;</code></td><td>Show details for a specific vector.</td></tr>
+          <tr><td><code>add &lt;name&gt;</code></td><td>Add a pre-loaded vector to the local sequence library.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>All subcommands support <code>--json</code> where structured output is available.</p>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal vectors list
+seal vectors get "SEAL Synthetic Cloning Backbone" --json
+seal vectors add "SEAL Synthetic Cloning Backbone"</code></pre>
+    </div>
+
+    <h2>Shared-database commands</h2>
+    <p>These commands read and write the shared SQLite database described in <a href="#database-path-resolution">Database path resolution</a>. They require the SEAL app to have been launched at least once, or a <code>SEAL_DB_PATH</code> pointing to an already-initialised database file.</p>
+
+    <h3 id="blocks">blocks</h3>
+    <p>Block manipulation: materialize a computed sequence as a block, turn a CDS block into its protein translation, reorder blocks, extract a sub-sequence into a new child block, or annotate a selection with a feature.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal blocks &lt;subcommand&gt; [args]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Subcommand</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>add</code></td><td>Materialize a sequence (arg, <code>--file</code>, or stdin) as a new block; <code>--parent</code> nests it.</td></tr>
+          <tr><td><code>translate</code></td><td>Translate a CDS block to protein and add it as a nested child.</td></tr>
+          <tr><td><code>link-parts</code></td><td>Record assembly provenance: a construct was assembled from its source part blocks.</td></tr>
+          <tr><td><code>reorder</code></td><td>Reassign positions for all blocks in a conversation.</td></tr>
+          <tr><td><code>extract-selection</code></td><td>Extract a sub-sequence range into a new child block.</td></tr>
+          <tr><td><code>annotate-selection</code></td><td>Add a feature annotation at a specific range on a block.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p><code>blocks add</code>, <code>translate</code>, and <code>link-parts</code> run through the TypeScript CLI.</p>
+
+    <h4>blocks add</h4>
+    <p>Materialize any sequence, a translation, a digest fragment, a PCR amplicon, or an assembled construct, as a workspace block. This is the bridge from the stateless analysis commands (which only print) into the workspace: pipe their output here. <code>extract-selection</code> only slices a substring of an existing block; <code>add</code> accepts a free-form sequence and can set an arbitrary <code>--type</code> and <code>--parent</code>.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>npm --silent run dev:cli -- blocks add [seq] [--name &lt;n&gt;] [--parent &lt;name|id&gt;] [--type dna|rna|protein] [--topology linear|circular]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>[seq]</code></td><td>stdin</td><td>Sequence (bare string), a <code>--file</code>-style path, or piped via stdin.</td></tr>
+          <tr><td><code>--name &lt;n&gt;</code></td><td>input name / <code>block</code></td><td>Name for the new block.</td></tr>
+          <tr><td><code>--conversation-id &lt;id&gt;</code></td><td>CLI scratch</td><td>Target conversation (id or title). Ignored when <code>--parent</code> is set.</td></tr>
+          <tr><td><code>--parent &lt;name|id&gt;</code></td><td>none (top-level)</td><td>Parent block. Makes the new block a nested child (inherits the parent's conversation).</td></tr>
+          <tr><td><code>--type &lt;t&gt;</code></td><td>auto-detect</td><td><code>dna</code>, <code>rna</code>, or <code>protein</code>. Override the detector (for example, force <code>protein</code>).</td></tr>
+          <tr><td><code>--topology &lt;t&gt;</code></td><td><code>linear</code></td><td><code>linear</code> or <code>circular</code>.</td></tr>
+          <tr><td><code>--overhang5 / --overhang3 &lt;seq&gt;</code></td><td>none</td><td>Sticky-end overhangs (for example, from a <code>digest --json</code> fragment).</td></tr>
+          <tr><td><code>--overhang5-type / --overhang3-type &lt;kind&gt;</code></td><td>none</td><td>Overhang kind (<code>5prime</code>, <code>3prime</code>, or <code>blunt</code>).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Save a translated protein as a block">
+<pre><code>seal translate ATGAAATAG \
+  | npm --silent run dev:cli -- blocks add --type protein --name "peptide"</code></pre>
+    </div>
+
+    <h4>blocks translate</h4>
+    <p>The one-step decompose convenience, the CLI equivalent of the desktop app's "Translate to Protein". Translates a CDS block and adds the protein as a nested child (<code>type=protein</code>, <code>parentBlockId</code> set to the CDS, <code>manipulation=translate</code>), with the trailing stop codon stripped for a complete CDS and a warning on internal stops.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>npm --silent run dev:cli -- blocks translate --block &lt;name|id&gt; [--from-atg | --frame 0|1|2] [--new-name &lt;n&gt;]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--block &lt;n&gt;</code></td><td>required</td><td>Source DNA/RNA block to translate (required; rejects protein).</td></tr>
+          <tr><td><code>--strand &lt;1|-1&gt;</code></td><td>coding feature, else forward</td><td>Translate the forward strand or reverse complement. By default, use the strand of a coding feature covering the block.</td></tr>
+          <tr><td><code>--from-atg</code></td><td>off</td><td>Translate from the first ATG/AUG instead of a fixed frame.</td></tr>
+          <tr><td><code>--frame &lt;n&gt;</code></td><td><code>0</code></td><td>Reading frame offset (0, 1, or 2). Ignored when <code>--from-atg</code> is set.</td></tr>
+          <tr><td><code>--new-name &lt;n&gt;</code></td><td><code>Translation &lt;block&gt;</code></td><td>Name for the protein child.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>blocks link-parts</h4>
+    <p>Record that a construct was assembled from its source parts. A multi-input assembly (Gibson, Golden Gate, or ligation) cannot be expressed by a single <code>parentBlockId</code>, so this writes the <code>workflow_events</code> lineage edge the desktop app reads to show "assembled from N source blocks", and stamps the construct's <code>manipulation</code> column. Pair it with <code>blocks add</code> (materialize the construct) and the stateless <code>gibson</code> or <code>golden-gate</code> math.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>npm --silent run dev:cli -- blocks link-parts --construct &lt;name|id&gt; --parts &lt;id1,id2,...&gt; [--manipulation gibson_assembly]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--construct &lt;n&gt;</code></td><td>required</td><td>The assembled output block (required).</td></tr>
+          <tr><td><code>--parts &lt;list&gt;</code></td><td>required</td><td>Comma-separated source block names/ids, all in the same conversation (required).</td></tr>
+          <tr><td><code>--manipulation &lt;k&gt;</code></td><td><code>gibson_assembly</code></td><td><code>gibson_assembly</code>, <code>golden_gate_assembly</code>, <code>ligate</code>, or <code>vector_insert</code>.</td></tr>
+          <tr><td><code>--summary &lt;text&gt;</code></td><td>auto</td><td>Human-readable summary stored on the event.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>blocks reorder</h4>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal blocks reorder --order &lt;id1,id2,...&gt; [--conversation-id &lt;id&gt;]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--order &lt;list&gt;</code></td><td>required</td><td>Comma-separated block ids in the desired order. Must include all ids (required).</td></tr>
+          <tr><td><code>--conversation-id &lt;id&gt;</code></td><td>CLI scratch</td><td>Target conversation id (defaults to the CLI scratch conversation).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>blocks extract-selection</h4>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal blocks extract-selection --block &lt;name|id&gt; --start &lt;n&gt; --end &lt;n&gt; [--new-name &lt;name&gt;]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--block &lt;n&gt;</code></td><td>required</td><td>Block name or id to extract from (required).</td></tr>
+          <tr><td><code>--start &lt;n&gt;</code></td><td>required</td><td>0-indexed start position, inclusive (required).</td></tr>
+          <tr><td><code>--end &lt;n&gt;</code></td><td>required</td><td>0-indexed end position, exclusive. Pass start greater than end for circular wrap-around (required).</td></tr>
+          <tr><td><code>--new-name &lt;n&gt;</code></td><td><code>{name}[start..end]</code></td><td>Optional name for the new child block.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>blocks annotate-selection</h4>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal blocks annotate-selection --block &lt;name|id&gt; --start &lt;n&gt; --end &lt;n&gt; --feature-json '{...}'</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--block &lt;n&gt;</code></td><td>required</td><td>Block name or id (required).</td></tr>
+          <tr><td><code>--start &lt;n&gt;</code></td><td>required</td><td>Feature start position, 0-indexed inclusive (required).</td></tr>
+          <tr><td><code>--end &lt;n&gt;</code></td><td>required</td><td>Feature end position, exclusive (required).</td></tr>
+          <tr><td><code>--feature-json &lt;j&gt;</code></td><td>required</td><td>JSON object with at least <code>"type"</code> and <code>"name"</code> fields (required). <code>"start"</code> and <code>"end"</code> are overridden by the outer <code>--start</code>/<code>--end</code> flags.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code># Reorder three blocks
+seal blocks reorder --order block-c-id,block-a-id,block-b-id
+
+# Extract bases 100 to 400 from a block into a new child block
+seal blocks extract-selection --block seal-synthetic-backbone --start 100 --end 400 --new-name "MCS region"
+
+# Annotate positions 0 to 720 as a CDS gene feature
+seal blocks annotate-selection --block insert1 --start 0 --end 720 \
+  --feature-json '{"type":"CDS","name":"Synthetic Reporter DNA"}'</code></pre>
+    </div>
+
+    <h3>checkpoints</h3>
+    <p>Save, restore, list, and diff block checkpoints in the shared database. The registered <code>delete</code> subcommand remains for script compatibility but fails closed until recoverable checkpoint trash exists.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal checkpoints &lt;subcommand&gt; [args]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Subcommand</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>save</code></td><td>Save a snapshot of a block as a new checkpoint.</td></tr>
+          <tr><td><code>restore</code></td><td>Transactionally restore a block from a checkpoint.</td></tr>
+          <tr><td><code>delete</code></td><td>Compatibility-only command that rejects without changing data.</td></tr>
+          <tr><td><code>list</code></td><td>List all checkpoints for a block, newest-first.</td></tr>
+          <tr><td><code>diff</code></td><td>Diff two checkpoints on the same block.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><code>save</code> takes <code>--block &lt;name|id&gt;</code> (required) and an optional <code>--label &lt;label&gt;</code> (auto-generated by default). <code>restore</code> takes <code>--block &lt;name|id&gt;</code> and <code>--checkpoint-id &lt;id&gt;</code> (both required). <code>list</code> takes <code>--block &lt;name|id&gt;</code> (required). <code>diff</code> takes <code>--checkpoint-a &lt;id&gt;</code> (the "before") and <code>--checkpoint-b &lt;id&gt;</code> (the "after"), both required. Calling <code>delete</code> returns a stable disabled-operation error before target lookup or mutation.</p>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal checkpoints save --block seal-synthetic-backbone --label "before BamHI digest"
+seal checkpoints list --block seal-synthetic-backbone
+seal checkpoints diff --checkpoint-a cp-abc --checkpoint-b cp-xyz
+seal checkpoints restore --block seal-synthetic-backbone --checkpoint-id cp-abc</code></pre>
+    </div>
+
+    <h3>conversations</h3>
+    <p>Manage conversations in the shared database: create, rename, list, get, and move conversations between projects. The registered <code>delete</code> subcommand fails closed because permanent conversation deletion is not recoverable.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal conversations &lt;subcommand&gt; [args]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Subcommand</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>create</code></td><td>Create a new conversation.</td></tr>
+          <tr><td><code>rename</code></td><td>Rename an existing conversation (fuzzy title resolution).</td></tr>
+          <tr><td><code>delete</code></td><td>Compatibility-only command that rejects and directs the user to Archive and Restore in the app.</td></tr>
+          <tr><td><code>list</code></td><td>List all conversations.</td></tr>
+          <tr><td><code>get</code></td><td>Get a single conversation by title or id.</td></tr>
+          <tr><td><code>move</code></td><td>Move a conversation to a different project (or unassign it).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><code>create &lt;title&gt;</code> (title required) takes an optional <code>--project-id &lt;id&gt;</code>. <code>rename &lt;name&gt; &lt;new-title&gt;</code> takes the current title or id then the new title. <code>get &lt;name&gt;</code> takes a single name-or-id positional argument. <code>move &lt;name&gt;</code> (name required) takes either <code>--project-id &lt;id&gt;</code> or <code>--unassign</code> (mutually exclusive), the latter removing the project assignment. Calling <code>delete</code> changes no data; archive the Entry in SEAL and restore it from Archived when needed.</p>
+    <p>Fuzzy name resolution runs in three steps: exact id, case-insensitive exact title, then case-insensitive partial match (unique matches resolve, multiple matches return suggestions).</p>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal conversations create "CRISPR experiment 1"
+seal conversations create "Cloning workflow" --project-id proj-abc
+seal conversations rename "CRISPR experiment 1" "CRISPR round 2"
+seal conversations move "CRISPR round 2" --project-id proj-xyz
+seal conversations move "CRISPR round 2" --unassign</code></pre>
+    </div>
+
+    <h3>export</h3>
+    <p>Export blocks from the shared workspace in various formats: CSV, Markdown, slide-friendly Markdown summary, GenBank, or a full JSON dump.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal export &lt;subcommand&gt; [--output &lt;path&gt;]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Subcommand</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>csv</code></td><td>CSV summary table (one row per block).</td></tr>
+          <tr><td><code>markdown</code></td><td>Markdown document (one section per block).</td></tr>
+          <tr><td><code>slide-summary</code></td><td>Compact slide-friendly Markdown (one bullet per block).</td></tr>
+          <tr><td><code>genbank</code></td><td>GenBank export for one block, all blocks, or one file per block.</td></tr>
+          <tr><td><code>workspace-json</code></td><td>Full JSON dump of every block in the scratch workspace.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>All subcommands accept <code>--output &lt;path&gt;</code> to write to a file instead of stdout. Per-subcommand flags:</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Subcommand</th><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>csv</code></td><td><code>--include-features</code></td><td>false</td><td>Add a features section below the table.</td></tr>
+          <tr><td><code>markdown</code></td><td><code>--include-analysis</code></td><td>false</td><td>Include GC% and length analysis rows for each block.</td></tr>
+          <tr><td><code>slide-summary</code></td><td><code>--title &lt;t&gt;</code></td><td>"Sequence Summary"</td><td>Optional title for the document.</td></tr>
+          <tr><td><code>genbank</code></td><td><code>--block &lt;id&gt;</code></td><td>none</td><td>Export only one block; omit to export all blocks.</td></tr>
+          <tr><td><code>genbank</code></td><td><code>--output &lt;path&gt;</code></td><td>none</td><td>Write a single GenBank file, possibly multi-record.</td></tr>
+          <tr><td><code>genbank</code></td><td><code>--output-dir &lt;dir&gt;</code></td><td>none</td><td>Write one <code>.gb</code> file per exported block.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal export csv --include-features --output report.csv
+seal export markdown --include-analysis
+seal export slide-summary --title "PCR results"
+seal export workspace-json --output workspace.json
+seal export genbank --block block-abc --output plasmid.gb
+seal export genbank --output-dir genbank-export</code></pre>
+    </div>
+
+    <h3>features</h3>
+    <p>Manage feature annotations on workspace sequence blocks: add, update, delete, and list features on any block in the CLI scratch workspace.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal features &lt;subcommand&gt; [args]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Subcommand</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>add</code></td><td>Add a feature to a block.</td></tr>
+          <tr><td><code>update</code></td><td>Update a feature on a block by feature id.</td></tr>
+          <tr><td><code>delete</code></td><td>Delete a feature from a block by feature id.</td></tr>
+          <tr><td><code>list</code></td><td>List all features on a block.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Subcommand</th><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>add</code></td><td><code>--block &lt;id&gt;</code></td><td>required</td><td>Block id in the CLI scratch workspace (required).</td></tr>
+          <tr><td><code>add</code></td><td><code>--feature-json &lt;j&gt;</code></td><td>required</td><td>Feature JSON with required fields <code>type</code>, <code>name</code>, <code>start</code>, <code>end</code>; <code>id</code> is auto-generated if absent (required).</td></tr>
+          <tr><td><code>update</code></td><td><code>--block &lt;id&gt;</code></td><td>required</td><td>Block id in the CLI scratch workspace (required).</td></tr>
+          <tr><td><code>update</code></td><td><code>--feature-id &lt;id&gt;</code></td><td>required</td><td>Id of the feature to update (required).</td></tr>
+          <tr><td><code>update</code></td><td><code>--patch-json &lt;j&gt;</code></td><td>required</td><td>Partial feature JSON; only supplied fields are merged (required).</td></tr>
+          <tr><td><code>delete</code></td><td><code>--block &lt;id&gt;</code></td><td>required</td><td>Block id in the CLI scratch workspace (required).</td></tr>
+          <tr><td><code>delete</code></td><td><code>--feature-id &lt;id&gt;</code></td><td>required</td><td>Id of the feature to delete (required).</td></tr>
+          <tr><td><code>list</code></td><td><code>--block &lt;id&gt;</code></td><td>required</td><td>Block id in the CLI scratch workspace (required).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Position rules: linear blocks require <code>start</code> &lt;= <code>end</code>, both in <code>[0, block_length]</code>. Circular blocks allow wrap-around (<code>start</code> &gt; <code>end</code>), each value in <code>[0, block_length]</code>.</p>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code># Add a gene feature
+seal features add --block block-id-abc \
+  --feature-json '{"id":"feat-reporter","type":"gene","name":"Synthetic Reporter DNA","start":0,"end":720}'
+
+# Update only the color field
+seal features update --block block-id-abc --feature-id feat-reporter \
+  --patch-json '{"color":"#0000ff"}'
+
+# List all features on a block
+seal features list --block block-id-abc</code></pre>
+    </div>
+
+    <h3>import</h3>
+    <p>Import one or more FASTA or GenBank files, supported sequence directories, or recognized structured workspace exports into the shared workspace. Multi-record files (multiple <code>&gt;</code> headers or multiple <code>LOCUS</code> blocks) are split automatically into separate blocks. Recognized inventory database layouts are detected automatically.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal import &lt;path&gt; [&lt;path&gt;...] [--recursive] [--conversation-id &lt;id&gt;] [--format json|text]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>&lt;paths&gt;</code></td><td>required</td><td>One or more file or directory paths to import.</td></tr>
+          <tr><td><code>--recursive</code></td><td>false</td><td>Recursively import supported files from ordinary directories.</td></tr>
+          <tr><td><code>--conversation-id &lt;id&gt;</code></td><td>CLI scratch</td><td>Target conversation id.</td></tr>
+          <tr><td><code>--dry-run</code></td><td>false</td><td>Parse and report records without writing blocks.</td></tr>
+          <tr><td><code>--repair-existing</code></td><td>false</td><td>Update matching existing blocks instead of creating duplicates.</td></tr>
+          <tr><td><code>--import-missing</code></td><td>false</td><td>With <code>--repair-existing</code>, create records that do not match.</td></tr>
+          <tr><td><code>--overwrite-features</code></td><td>false</td><td>With <code>--repair-existing</code>, replace non-empty feature arrays.</td></tr>
+          <tr><td><code>--format json|text</code></td><td>json</td><td>Output format.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal import plasmid.gb
+seal import primers.fa vector.gb insert.fa
+seal import seqs.fa --conversation-id conv-abc123
+seal import /path/to/workspace-export --recursive --dry-run --format text
+seal import annotated.gb --repair-existing --import-missing --format text</code></pre>
+    </div>
+
+    <h3>projects</h3>
+    <p>Manage projects in the shared database: create, rename, delete, list, get, and update project color.</p>
+    <div class="docs-code" data-lang="bash" data-title="Synopsis">
+<pre><code>seal projects &lt;subcommand&gt; [args]</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Subcommand</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>create</code></td><td>Create a new project.</td></tr>
+          <tr><td><code>rename</code></td><td>Rename an existing project (fuzzy name resolution).</td></tr>
+          <tr><td><code>delete</code></td><td>Delete a project (child conversations have projectId set to null).</td></tr>
+          <tr><td><code>list</code></td><td>List all projects.</td></tr>
+          <tr><td><code>get</code></td><td>Get a single project by name or id.</td></tr>
+          <tr><td><code>set-color</code></td><td>Update the color of a project.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><code>create &lt;name&gt;</code> (name required) takes an optional <code>--color &lt;hex&gt;</code> (default <code>"#6b7280"</code>). <code>rename &lt;name&gt; &lt;new-name&gt;</code> and <code>get &lt;name&gt;</code> take name-or-id positional arguments. <code>set-color &lt;name&gt; &lt;color&gt;</code> takes a name-or-id then a hex color. Before <code>delete &lt;name&gt;</code>, run <code>projects get</code> and supply <code>--confirm</code>, <code>--expected-updated-at &lt;ms&gt;</code>, <code>--expected-conversation-count &lt;n&gt;</code>, one <code>--expected-conversation-id &lt;id&gt;</code> per assigned Entry, and <code>--project-id &lt;id&gt;</code> when the positional name is not already the exact project ID. The guarded child unassignment, conditional delete, and durable audit tombstone commit atomically. Fuzzy name resolution runs the same three steps as conversations: exact id, case-insensitive exact name, then case-insensitive partial match.</p>
+    <div class="docs-code" data-lang="bash" data-title="Examples">
+<pre><code>seal projects create "CRISPR campaign"
+seal projects create "Library screen" --color "#ef4444"
+seal projects rename "CRISPR campaign" "CRISPR campaign v2"
+seal projects set-color "Library screen" "#22c55e"
+seal projects delete "CRISPR campaign v2" \
+  --confirm \
+  --project-id proj-id-abc \
+  --expected-updated-at 1712345678000 \
+  --expected-conversation-count 2 \
+  --expected-conversation-id conv-a \
+  --expected-conversation-id conv-b</code></pre>
+    </div>
+
+    <h2>Color systems reference</h2>
+    <p>SEAL uses several independent color systems. Not all of them respond to the same UI toggles. This section documents which systems are affected by each appearance setting.</p>
+
+    <h3>Amino-acid classification colors</h3>
+    <p>The amino-acid classification tokens (<code>--aa-class-*</code>) are controlled by the <strong>Vivid · Wong AA-color palette</strong> toggle in <strong>Settings → Appearance → Accessibility</strong>. When on, it overrides five chemistry-class hues with the Wong (2011) colorblind-safe palette:</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Token</th><th>Default</th><th>Wong (toggle on)</th></tr></thead>
+        <tbody>
+          <tr><td><code>--aa-class-hydrophobic</code></td><td><code>#f59e0b</code></td><td><code>#E69F00</code></td></tr>
+          <tr><td><code>--aa-class-polar</code></td><td><code>#22c55e</code></td><td><code>#009E73</code></td></tr>
+          <tr><td><code>--aa-class-positive</code></td><td><code>#60a5fa</code></td><td><code>#0072B2</code></td></tr>
+          <tr><td><code>--aa-class-negative</code></td><td><code>#fb7185</code></td><td><code>#D55E00</code></td></tr>
+          <tr><td><code>--aa-class-special</code></td><td><code>#a78bfa</code></td><td><code>#CC79A7</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The toggle also overrides <code>--amber</code> and <code>--green</code> (used by the Chou-Fasman secondary-structure bars) and <code>--coil-color</code> to matching Wong hues, so protein-track secondary-structure bars remain distinguishable under all three common CVD types (deuteranopia, protanopia, tritanopia). Scope: amino-acid tracks, protein inspector, Chou-Fasman bars, and AA-class feature pills. It does not affect DNA base colors.</p>
+
+    <h3>DNA base colors</h3>
+    <p>The DNA base tokens (<code>--base-a</code>, <code>--base-t</code>, <code>--base-g</code>, <code>--base-c</code>) are controlled by the light/dark theme only. These tokens are defined per theme and are not gated by the Wong AA-color palette toggle.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Base</th><th>Light theme</th><th>Dark theme</th></tr></thead>
+        <tbody>
+          <tr><td>A</td><td><code>#198841</code></td><td><code>#4ade80</code></td></tr>
+          <tr><td>T</td><td><code>#ed0c0c</code></td><td><code>#f87171</code></td></tr>
+          <tr><td>G</td><td><code>#8f7303</code></td><td><code>#facc15</code></td></tr>
+          <tr><td>C</td><td><code>#0870f2</code></td><td><code>#60a5fa</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Users who need colorblind-safe DNA base colors should use the <strong>High contrast</strong> toggle (Settings → Appearance → Accessibility), which boosts all foreground and background contrast, or apply a system-level color filter via OS accessibility settings.</p>
+
+    <h3>Other color systems</h3>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>System</th><th>Controlled by</th></tr></thead>
+        <tbody>
+          <tr><td>Feature annotation pills</td><td>Theme only</td></tr>
+          <tr><td>Restriction site markers</td><td>Theme only</td></tr>
+          <tr><td>Scar / mutation highlights</td><td>Theme only</td></tr>
+          <tr><td>Accent color</td><td>Settings → Appearance → Accent</td></tr>
+          <tr><td>Selection highlight</td><td>Settings → Appearance → Selection</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

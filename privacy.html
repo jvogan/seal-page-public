@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Privacy &middot; SEAL</title>
+  <meta name="description" content="SEAL's privacy policy: what it stores on your Mac, what leaves your Mac and when, and how to delete your data." />
+
+  <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon-16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Privacy &middot; SEAL" />
+  <meta property="og:description" content="SEAL's privacy policy: what it stores on your Mac, what leaves your Mac and when, and how to delete your data." />
+
+
+  <link rel="stylesheet" href="styles.css?v=20260907" />
+  <script src="assets/theme.js"></script>
+  <link rel="stylesheet" href="assets/images.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" role="banner">
+    <a class="nav-brand" href="index.html" aria-label="SEAL home">
+      <span class="nav-mark" aria-hidden="true"><img src="assets/img/favicon-32.png" width="32" height="32" alt="" /></span>
+      <span class="nav-word">SEAL</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html#tour">Tour</a>
+
+      <a href="index.html#install">Install</a>
+
+      <a href="docs/">Docs</a>
+      <a href="docs/editions.html">Editions</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="theme-toggle" id="theme-toggle" aria-pressed="false" aria-label="Switch to dark theme" title="Toggle dark mode">
+        <svg class="theme-toggle-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21M5.6 5.6l1.1 1.1M17.3 17.3l1.1 1.1M5.6 18.4l1.1-1.1M17.3 6.7l1.1-1.1" stroke-linecap="round" />
+        </svg>
+        <svg class="theme-toggle-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z" />
+        </svg>
+      </button>
+      <a class="btn btn-primary" href="index.html#install">Get SEAL</a>
+      <button class="nav-burger" id="nav-burger" aria-label="Open menu" aria-expanded="false" aria-controls="nav-mobile-sheet">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16" />
+        </svg>
+      </button>
+    </div>
+
+    <nav class="nav-mobile-sheet" id="nav-mobile-sheet" aria-label="Site navigation" hidden>
+      <a href="index.html#tour">Tour</a>
+
+      <a href="index.html#install">Install</a>
+
+      <a href="docs/">Docs</a>
+      <a href="docs/editions.html">Editions</a>
+      <a href="try.html">Try the Sample Lab</a>
+      <a href="workflows.html">Workflows</a>
+      <a href="privacy.html">Privacy</a>
+        <a href="support.html">Support</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="page-hero">
+      <p class="eyebrow">Privacy policy</p>
+      <h1>How SEAL stores and sends data.</h1>
+      <p class="page-lede">SEAL keeps your sequences, lab notes, and workspace history on your Mac. It contains no analytics, no telemetry, and no crash reporting. Data leaves your Mac only when you run a tool that contacts a service, and the page below lists every one of them.</p>
+      <p class="page-meta">Effective 10 September 2026.</p>
+    </section>
+
+    <section class="privacy-tables" aria-labelledby="summary">
+      <div class="section-header"><h2 id="summary">Summary</h2></div>
+      <ul class="privacy-list">
+        <li>SEAL stores your work in a SQLite database on your Mac. No account is required and nothing is uploaded to run the app.</li>
+        <li>SEAL collects no usage analytics, sends no telemetry, and files no crash reports.</li>
+        <li>SEAL does not check for updates on its own. The Mac App Store delivers updates for the Mac App Store edition.</li>
+        <li>Record lookups and protein predictions send data only when you start them, and only to the service that answers them.</li>
+        <li>The Mac App Store edition contacts no AI provider at all and stores no provider key.</li>
+        <li>SEAL operates no workspace server. You control your local files; services you submit data to handle their own copies.</li>
+      </ul>
+    </section>
+
+    <section class="privacy-tables" aria-labelledby="store-data">
+      <div class="section-header"><h2 id="store-data">What SEAL stores on your Mac</h2></div>
+      <table class="privacy-table">
+        <thead><tr><th>Data</th><th>Where it is stored</th></tr></thead>
+        <tbody>
+          <tr><td>Sequences, annotations, Notebook entries, checkpoints, Activity history, and database settings</td><td>A SQLite database at <code>.seal/seal.db</code>, either in the app's own data folder or in a workspace folder you select</td></tr>
+          <tr><td>Preferences such as theme, panel layout, and view options</td><td>The app's local profile. Each selected workspace keeps its own profile</td></tr>
+          <tr><td>Permission to reach folders you picked</td><td>Security-scoped bookmarks in the app's local profile</td></tr>
+          <tr><td>Recovery backups made before you clear data</td><td>Files beside the workspace, up to five copies</td></tr>
+          <tr><td>An AI provider key, in the direct-download edition only</td><td>Encrypted by macOS and stored as ciphertext in the app's data folder. The Mac App Store edition stores none. See <a href="#provider-keys">AI provider keys</a></td></tr>
+        </tbody>
+      </table>
+      <p>These files use your Mac's file permissions. Protect your Mac account and any backups or shared workspace folders.</p>
+    </section>
+
+    <section class="privacy-tables" aria-labelledby="mas">
+      <div class="section-header"><h2 id="mas">Mac App Store edition</h2></div>
+      <p>The Mac App Store edition runs inside Apple's App Sandbox. It can open and save files you pick in a standard macOS file dialog, and it remembers those choices so it can reopen the same folder later. It cannot read the rest of your disk.</p>
+      <p>This edition contacts no AI provider. It cannot store a provider key, and the code that would send a hosted model request refuses to run without that storage, so no sequence or prompt of yours reaches an AI service from it.</p>
+      <p>It also ships without a terminal and launches no external programs. Alignment executables, genome tools, and scoring runtimes are not installed or run by it. See <a href="docs/editions.html">Edition differences</a> for the full comparison.</p>
+    </section>
+
+    <section class="privacy-tables" aria-labelledby="direct">
+      <div class="section-header"><h2 id="direct">Direct-download edition</h2></div>
+      <p>The direct-download edition can use a hosted protein model. You enter your own API key from the provider, and SEAL sends requests only to the endpoint that key belongs to. Nothing is sent until you run the feature, and no request is sent at all while no key is stored.</p>
+      <p>This edition also includes a terminal. The terminal runs programs that you install on your Mac yourself, including alignment, genome, and scoring tools or an AI agent command-line tool. Those programs can read files they have permission to access and open their own network connections using credentials you gave them. Their handling of that data follows their own privacy terms.</p>
+    </section>
+
+    <section class="privacy-tables" aria-labelledby="network">
+      <div class="section-header"><h2 id="network">When data leaves your Mac</h2></div>
+      <p>Each row below happens only after you start the action. SEAL sends the item named in the second column and nothing else from your workspace.</p>
+      <table class="privacy-table">
+        <thead><tr><th>Action you take</th><th>Service and what it receives</th></tr></thead>
+        <tbody>
+          <tr><td>Fetch a nucleotide or protein record by accession</td><td><code>eutils.ncbi.nlm.nih.gov</code> receives the accession or search term and a tool identifier. No email address is sent</td></tr>
+          <tr><td>Fetch a UniProt record or its features</td><td><code>rest.uniprot.org</code> receives the accession or search term</td></tr>
+          <tr><td>Run an EMBL-EBI annotation or prediction job</td><td><code>www.ebi.ac.uk</code> receives the protein sequence you submitted, the job parameters, and the contact email address you entered. See <a href="#ebi-contact">the note below</a> on that address</td></tr>
+          <tr><td>Run a hosted model request, direct-download edition only</td><td><code>biohub.ai</code> receives the protein context you submitted, your request options, and your own API key. The Mac App Store edition never makes this request</td></tr>
+          <tr><td>Click a reference link in the app</td><td>Your default browser opens the page. SEAL does not fetch it</td></tr>
+        </tbody>
+      </table>
+      <p>Each service handles what it receives under its own privacy terms. SEAL does not send your Notebook, Activity history, or unrelated sequences to any of them. The table is the whole list for both editions: SEAL's own code contacts no other host. The Notion schema check is a command in the source distribution rather than a feature of the app, and it runs only when you run it.</p>
+      <h3 id="ebi-contact">The contact address on EMBL-EBI requests</h3>
+      <p>EMBL-EBI requires a contact address on every job it accepts. The first time you run an EMBL-EBI analysis, SEAL asks you for an email address and tells you what each submission sends. SEAL stores that address on your Mac, sends it to EMBL-EBI with each job you submit, and never substitutes an address of its own. You can change or remove it in Settings. SEAL never reads your Mac account, your mail app, or your workspace to find one, and no SEAL server receives it.</p>
+      <p>Removing the address or deleting a workspace does not delete jobs already submitted to EMBL-EBI. Its <a href="https://www.ebi.ac.uk/jdispatcher/assets/html/privacy-notice.pdf" rel="noopener">Job Dispatcher privacy notice</a> describes retention and how to make a data request. Services also receive ordinary connection information, including your IP address.</p>
+      <p>NCBI lookups work the other way. A contact address is optional there, SEAL substitutes none of its own, and no screen in SEAL asks you for one, so an NCBI request carries no email address at all.</p>
+      <p>The Mac App Store edition has no terminal and launches no external tool. In an edition that has one, a command-line tool you start receives the prompt and the workspace context you hand it, and sends that on to its own provider under its own privacy terms.</p>
+    </section>
+
+    <section class="privacy-tables" aria-labelledby="provider-keys">
+      <div class="section-header"><h2 id="provider-keys">AI provider keys</h2></div>
+      <p>The Mac App Store edition stores no provider key. Key storage is switched off in it, and every code path that would read or send a key checks that switch first and stops.</p>
+      <p>In the direct-download edition, the hosted model feature uses your own API key from the provider. You enter the key in Settings, and SEAL encrypts it with the macOS Keychain and writes only the encrypted form to a small file in the app's data folder. The key never goes into your workspace database and never appears in a workspace backup or an export.</p>
+      <p>SEAL accepts a key only under the fixed identifiers it defines for its own model settings, and rejects any other identifier, so no other secret can be written through the same path.</p>
+      <p>Delete a key in Settings and SEAL removes the stored ciphertext. Revoke the key at the provider as well if you no longer want it used.</p>
+    </section>
+
+    <section class="privacy-tables" aria-labelledby="not-collected">
+      <div class="section-header"><h2 id="not-collected">What SEAL does not do</h2></div>
+      <ul class="privacy-list">
+        <li>No analytics, and no usage or event reporting of any kind. The Usage panel in Settings counts records already in your own database and sends nothing.</li>
+        <li>No crash reporting, in either edition. SEAL registers no crash reporter and uploads no stack traces, logs, or diagnostic reports.</li>
+        <li>No advertising, no advertising identifiers, and no data sold or shared with data brokers.</li>
+        <li>No accounts, sign-in, or profile. SEAL asks for no name or payment detail. The one email address it asks for is the contact address EMBL-EBI requires, and it stays on your Mac except when you submit an EMBL-EBI job.</li>
+        <li>No background network activity. SEAL does not contact a server at launch, on a timer, or to check for a new version.</li>
+      </ul>
+    </section>
+
+    <section class="privacy-tables" aria-labelledby="retention">
+      <div class="section-header"><h2 id="retention">Keeping and deleting your data</h2></div>
+      <p>SEAL keeps your data until you delete it. Activity records workspace changes locally, and checkpoints and backups hold earlier versions so you can recover them.</p>
+      <p><strong>Settings &rarr; Data &rarr; Clear all data</strong> writes a recovery backup, clears the active workspace database, and keeps up to five recovery copies. Delete those copies as well when you want the earlier data gone.</p>
+      <p>To remove everything SEAL holds, quit SEAL and any tool using the same workspace, then delete the workspace folders you selected, the app's own data folder, and any backups you exported. Deleting <code>seal.db</code> alone leaves the profile and the recovery copies in place.</p>
+      <p>Deleting the app alone does not ensure its stored data is removed. Check its local data folder, workspace folders, and backups separately.</p>
+      <p>A stored provider key and your folder permissions are tied to your Mac and your macOS account. Neither is included in a portable workspace backup.</p>
+    </section>
+
+    <section class="privacy-tables" aria-labelledby="children">
+      <div class="section-header"><h2 id="children">Children</h2></div>
+      <p>SEAL is a laboratory tool for researchers and students. It is not directed at children under 13.</p>
+    </section>
+
+    <section class="privacy-tables" aria-labelledby="website-support">
+      <div class="section-header"><h2 id="website-support">This website and the support mailbox</h2></div>
+      <p>This site serves its scripts, styles, images, and recordings from its own address. It loads no third-party fonts, scripts, or trackers, and it runs no analytics. It stores your chosen theme in your browser's local storage, and nothing else.</p>
+      <p>The site is hosted on GitHub Pages. GitHub logs visitors' IP addresses for security purposes. See <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection" rel="noopener">GitHub Pages data collection</a> and the <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">GitHub Privacy Statement</a>.</p>
+      <p>Email sent to support arrives in a Gmail inbox and is used to answer your message. Gmail processes it under <a href="https://policies.google.com/privacy" rel="noopener">Google's Privacy Policy</a>. Support messages are kept while the question is open and deleted on request. Leave private sequences, passwords, and access tokens out of what you send.</p>
+    </section>
+
+    <section class="privacy-tables" aria-labelledby="changes">
+      <div class="section-header"><h2 id="changes">Changes to this policy</h2></div>
+      <p>When this policy changes, the new version appears on this page with a new effective date. A change that affects what SEAL sends or stores will also be described in the release notes for the version that makes the change. Keep using SEAL after a change and the new policy applies.</p>
+    </section>
+
+    <section class="privacy-tables" aria-labelledby="contact">
+      <div class="section-header"><h2 id="contact">Contact</h2></div>
+      <p>Email <a href="mailto:kingtelomere@gmail.com">kingtelomere@gmail.com</a> with a privacy question, a request to delete a support message, or a security report. <a href="support.html">SEAL Support</a> explains what to include.</p>
+      <p><a href="docs/privacy.html">The technical privacy guide</a> lists the same behaviour at the level of files, endpoints, and settings.</p>
+    </section>
+  </main>
+
+  <footer class="footer" role="contentinfo">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="nav-brand" href="index.html" aria-label="SEAL home">
+          <span class="nav-mark" aria-hidden="true"><img src="assets/img/favicon-32.png" width="32" height="32" alt="" /></span>
+          <span class="nav-word">SEAL</span>
+        </a>
+        <p class="footer-tag">A local-first workbench for sequences and lab records.</p>
+      </div>
+      <div class="footer-col">
+        <h3 class="footer-col-h">Product</h3>
+        <a href="index.html#install">Get SEAL</a>
+        <a href="docs/changelog.html" data-repository-path="/blob/main/CHANGELOG.md" rel="noopener">Changelog</a>
+        <a href="index.html#team-sync">Team sync (alpha)</a>
+      </div>
+      <div class="footer-col">
+        <h3 class="footer-col-h">Source-edition agents</h3>
+        <a href="agents/claude-code.html">Claude Code</a>
+        <a href="agents/codex.html">Codex</a>
+        <a href="agents/gemini-cli.html">Gemini CLI</a>
+      </div>
+      <div class="footer-col">
+        <h3 class="footer-col-h">Docs</h3>
+        <a href="docs/quickstart.html">Quickstart</a>
+        <a href="docs/mcp-setup.html">MCP setup</a>
+        <a href="docs/cli.html">CLI reference</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="support.html">Support</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 SEAL contributors. MIT licensed.</span>
+      <span class="footer-citation">
+        <a href="index.html#cite" data-repository-path="/blob/main/CITATION.cff" rel="noopener">Cite this work</a>
+      </span>
+    </div>
+  </footer>
+
+  <script src="script.js?v=20260907" defer></script>
+  <script src="assets/images.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Primer design · SEAL docs</title>
+  <meta name="description" content="Design and rank PCR primers around a target region with Tm, GC, and 3' clamp checks, from the CLI or the desktop app." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Primer design" />
+  <meta property="og:description" content="Design and rank PCR primers around a target region with Tm, GC, and 3' clamp checks." />
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+  <link rel="stylesheet" href="../assets/tutorials.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>Primer design</h1>
+    <p class="edition-note" data-edition-note>Screenshots and recordings show the direct edition. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">Design and rank PCR primers with Tm, GC, and 3' clamp checks. Give a template and a target region, and SEAL searches the flanking sequence for primer pairs and ranks them.</p>
+
+    <!-- Tutorial player -->
+    <h2 id="watch">Watch the walkthrough</h2>
+    <section class="tutorial-video" aria-label="Video lesson: Design primers">
+      <p>Open the primer tools and compare candidate sequences and their properties.</p>
+      <video id="lesson-video" controls playsinline preload="none" width="1440" height="900" poster="../assets/img/tutorials/05-primer-design.jpg" aria-label="Design primers">
+        <source src="../assets/videos/05-primer-design.mp4" type="video/mp4" />
+        <track kind="captions" src="../assets/videos/05-primer-design.vtt" srclang="en" label="English" default />
+        <p><a href="../assets/videos/05-primer-design.mp4">Download this video</a> to watch the lesson.</p>
+      </video>
+      <p class="video-links"><span>1:07 · AI narration</span><a href="../assets/videos/05-primer-design.mp4" download>Download video (18.7 MB)</a><a href="../assets/videos/05-primer-design.vtt" download>English captions</a></p>
+      <ul class="lesson-chapters" aria-label="Video chapters" hidden>
+        <li><button type="button" data-seek="4.6" aria-controls="lesson-video">0:04 · Open primer design</button></li>
+        <li><button type="button" data-seek="12.3" aria-controls="lesson-video">0:12 · Set the target</button></li>
+        <li><button type="button" data-seek="28.9" aria-controls="lesson-video">0:28 · Review Pair 1</button></li>
+        <li><button type="button" data-seek="45.5" aria-controls="lesson-video">0:45 · Save and find the primers</button></li>
+      </ul>
+      <details>
+        <summary>Read the transcript</summary>
+        <p>Open Synthetic Reporter and select Synthetic Reporter DNA. Use the block&#x27;s Actions menu and choose Design primers. The dialog calculates candidate pairs for the selected target.</p>
+        <p>Check the target coordinates first. This example uses bases fifty-one through five hundred fifty. The primer length range is eighteen to twenty-eight bases, and the target melting temperature is sixty degrees Celsius. These settings appear above the ranked results.</p>
+        <p>Read Pair one. Its forward and reverse sequences are shown in the five-prime to three-prime direction. Compare their melting temperatures and GC percentages, and check the predicted amplicon length. This pair produces a five hundred fourteen base-pair amplicon.</p>
+        <p>Click Add selected pair. The dialog closes after adding the annotations. Open Features in the Inspector to verify the result. The source DNA now includes a named forward primer and reverse primer alongside its existing annotations. You can use those feature names and coordinates to revisit the selected pair.</p>
+      </details>
+    </section>
+    <!-- End tutorial player -->
+
+
+    <h2 id="try-primer-design">Add a primer pair to the sample reporter</h2>
+    <p>Start with the <a href="first-workspace.html">Sample Lab loaded</a>. This example designs a pair around bases 51–550 of its 720 bp reporter.</p>
+    <ol>
+      <li>In the sidebar, open <strong>SEAL Sample Lab → Synthetic Reporter</strong> and click <strong>Synthetic Reporter DNA</strong>.</li>
+      <li>Open <strong>Actions</strong> beneath the DNA block and choose <strong>Design primers</strong>.</li>
+      <li>Set <strong>Target start (1-indexed)</strong> to <strong>51</strong> and <strong>Target end (1-indexed)</strong> to <strong>550</strong>. Set <strong>Primer length</strong> to <strong>18–28</strong> and <strong>Target Tm</strong> to <strong>60 °C</strong>.</li>
+      <li>Read <strong>Pair 1</strong> in the ranked results. Both sequences are shown 5′ to 3′. Compare their Tm and GC values, and check the predicted <strong>514 bp amplicon</strong>.</li>
+      <li>Select <strong>Pair 1</strong> and click <strong>Add selected pair</strong>. The dialog closes.</li>
+      <li>Open <strong>Features</strong> in the Inspector. Find <strong>Fwd primer 1 (Synthetic Reporter DNA)</strong> and <strong>Rev primer 1 (Synthetic Reporter DNA)</strong>, marked <strong>PRIMER_BIND</strong> on the forward and reverse strands.</li>
+    </ol>
+    <p>The pair is saved as two features on the source DNA. Use their names and coordinates to revisit the predicted binding sites.</p>
+
+    <h2>Design primers from the CLI</h2>
+    <p>Use <code>seal primers</code> with a template and a target region. The region is set with <code>--start</code> and <code>--end</code>, both 0-indexed (end is exclusive). SEAL designs primers flanking that region.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Design primers around a target">
+<pre><code>seal primers myseq.fa --start 100 --end 400</code></pre>
+    </div>
+
+    <p>Tune the target melting temperature with <code>--tm</code> (default 60.0 &deg;C) and bound primer length with <code>--min-length</code> and <code>--max-length</code> (defaults 18 and 28). Add <code>--json</code> for machine-readable output.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Set Tm and emit JSON">
+<pre><code>seal primers myseq.fa --start 100 --end 400 --tm 62 --json</code></pre>
+    </div>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/primer-design.png" alt="The Design primers dialog with target start and end, primer length, a target Tm slider, a GC range, and optional forward and reverse tails for cloning, plus a count of primer pairs found." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">Design primers sets the target region, primer length, Tm window, and GC range, with optional enzyme tails for cloning. The dialog reports how many pairs it found.</figcaption>
+    </figure>
+
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--start &lt;n&gt;</code></td><td>required</td><td>Target region start, 0-indexed.</td></tr>
+          <tr><td><code>--end &lt;n&gt;</code></td><td>required</td><td>Target region end, 0-indexed, exclusive.</td></tr>
+          <tr><td><code>--tm &lt;t&gt;</code></td><td>60.0</td><td>Target melting temperature in &deg;C.</td></tr>
+          <tr><td><code>--min-length &lt;n&gt;</code></td><td>18</td><td>Minimum primer length in bases.</td></tr>
+          <tr><td><code>--max-length &lt;n&gt;</code></td><td>28</td><td>Maximum primer length in bases.</td></tr>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON output.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Ranking</h2>
+    <p>Candidate pairs are scored and sorted so the closest match to your target comes first. The score combines two terms:</p>
+    <div class="docs-code" data-lang="text" data-title="Pair score (lower is better)">
+<pre><code>|Tm - targetTm| + anchorDistance &times; 0.05</code></pre>
+    </div>
+    <p>The first term is the absolute difference between a primer's melting temperature and your target Tm, so pairs near the requested Tm rank higher. The second term, <code>anchorDistance</code>, penalizes primers that sit farther from the target region, weighted at 0.05. A lower combined score is a better pair.</p>
+
+    <h2>Presets</h2>
+    <p>The flanking-region scan in the desktop app ships three built-in presets that set the search parameters for common reaction styles:</p>
+    <ul>
+      <li><strong>Standard PCR</strong> for routine PCR.</li>
+      <li><strong>Touchdown PCR (higher Tm)</strong> for touchdown thermocycling.</li>
+      <li><strong>Cloning (long inserts)</strong> for primers intended for downstream assembly.</li>
+    </ul>
+    <p>You can also save your own presets. A user-saved preset stores the parameters you chose so you can reuse them across runs.</p>
+
+    <h2>Flanking-region scan</h2>
+    <p>The flanking-region scan searches the sequence on both sides of the target for primer pairs, then ranks them with the score above. Run it in the desktop app over a selected region. Use a built-in preset, or save your own, to set the Tm window and search behavior before scanning.</p>
+
+    <h2>Diagnostics</h2>
+    <p>When the scan finds no acceptable pairs, SEAL reports why instead of returning an empty result. The callout breaks down how many candidates each check rejected:</p>
+    <div class="docs-code" data-lang="text" data-title="No-pairs diagnostic">
+<pre><code>0 pairs (no forward candidates): rejected X by GC%, Y by Tm, Z by 3' GC clamp</code></pre>
+    </div>
+    <p>Each number is the count of candidates filtered out by that check: GC content, melting temperature, the 3' GC clamp, hairpins, and self-dimers. Read it to see which constraint to loosen. For example, a high count under Tm means your target Tm or length bounds are too tight for this region.</p>
+
+    <h2>Keyboard shortcut</h2>
+    <p>Open the flanking-region scan in the desktop app with <kbd class="docs-kbd">Cmd</kbd> <kbd class="docs-kbd">Shift</kbd> <kbd class="docs-kbd">U</kbd>.</p>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/pcr.png" alt="The Simulate PCR dialog with a template, a forward primer, and a reverse primer, and an Add Product action." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">Simulate PCR checks a primer pair against the template and previews the product before you add it to the workspace.</figcaption>
+    </figure>
+
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>Agents can design primers over MCP with the <code>design_primers</code> tool, which adds enzyme-tail presets and GC bounds. To test a designed pair against a template, use <code>pcr</code>. See the <a href="mcp-reference.html">MCP tool reference</a>.</p>
+      </div>
+    </div>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+  <script src="../assets/tutorials.js" defer></script>
+</body>
+</html>

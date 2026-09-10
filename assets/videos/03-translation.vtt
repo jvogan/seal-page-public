@@ -1,0 +1,81 @@
+WEBVTT
+
+1
+00:00:00.380 --> 00:00:06.230
+Open the Synthetic Reporter Entry and
+select its DNA block.
+
+2
+00:00:06.260 --> 00:00:10.750
+This bundled example contains seven hundred
+twenty bases.
+
+3
+00:00:10.780 --> 00:00:13.750
+In the Inspector, click Translate.
+
+4
+00:00:13.780 --> 00:00:18.230
+The panel lists the six possible reading
+frames: three in the forward
+
+5
+00:00:18.260 --> 00:00:21.500
+direction and three on the reverse
+complement.
+
+6
+00:00:21.530 --> 00:00:25.510
+Compare the frame labels before
+interpreting a peptide.
+
+7
+00:00:25.540 --> 00:00:29.150
+Next, switch the DNA block to Detail.
+
+8
+00:00:29.180 --> 00:00:32.195
+Turn on its inline translation track.
+
+9
+00:00:32.225 --> 00:00:36.950
+Amino-acid letters now align with the DNA,
+alongside the sequence coordinates
+
+10
+00:00:36.980 --> 00:00:41.350
+and feature annotations. This view helps
+you relate a protein position
+
+11
+00:00:41.380 --> 00:00:46.060
+to the underlying bases. Scroll to the
+existing Synthetic Reporter Protein
+
+12
+00:00:46.090 --> 00:00:51.290
+block and select it. The Inspector changes
+to Codons and shows a
+
+13
+00:00:51.320 --> 00:00:55.640
+Back-translation preview marked Draft.
+Review the target host and codon
+
+14
+00:00:55.670 --> 00:00:58.590
+strategy before using this output.
+
+15
+00:00:58.620 --> 00:01:03.070
+Here the preview contains seven hundred
+seventeen DNA bases.
+
+16
+00:01:03.100 --> 00:01:07.930
+Back-translation proposes one possible
+coding sequence; it does not recover
+
+17
+00:01:07.960 --> 00:01:10.109
+a unique original DNA sequence.

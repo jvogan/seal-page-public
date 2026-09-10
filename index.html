@@ -1,0 +1,713 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SEAL, a local-first sequence design workbench for macOS</title>
+  <meta name="description" content="Edit DNA, RNA, and protein on your Mac. Explore sequence analysis, cloning, and lab notes. Coming to the Mac App Store." />
+
+  <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon-16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="SEAL, a local-first sequence design workbench" />
+  <meta property="og:description" content="Sequence · Editing · Activity · Library. A local sequence workbench coming to the Mac App Store." />
+
+  <meta property="og:image:alt" content="SEAL: Sequence, Editing, Activity, Library." />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="SEAL, a local-first sequence design workbench" />
+  <meta name="twitter:description" content="Edit biological sequences and keep your lab notes on your Mac. Coming to the Mac App Store." />
+  <meta name="twitter:image" content="assets/img/og-image.jpg" />
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "SEAL",
+  "operatingSystem": "macOS",
+  "applicationCategory": "ScienceApplication",
+  "description": "A local-first workbench for editing and analyzing DNA, RNA, and protein on macOS.",
+  "license": "https://opensource.org/licenses/MIT",
+  "image": "assets/img/og-image.jpg",
+  "author": {
+    "@type": "Person",
+    "name": "Jacob Vogan",
+    "url": "https://github.com/jvogan"
+  },
+  "keywords": "bioinformatics, sequence-analysis, restriction-digest, primer-design, CRISPR guide design, sequence alignment, lab notebook, molecular-biology, DNA, RNA, protein, MCP, Claude Code, Codex, Gemini CLI"
+}
+  </script>
+
+  <link rel="stylesheet" href="styles.css?v=20260907" />
+  <script src="assets/theme.js"></script>
+  <link rel="stylesheet" href="assets/images.css" />
+  <link rel="stylesheet" href="assets/overview-player.css" />
+  <link rel="preload" as="image" href="assets/img/tutorials/00-seal-overview.jpg" fetchpriority="high" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" role="banner">
+    <a class="nav-brand" href="#top" aria-label="SEAL home">
+      <span class="nav-mark" aria-hidden="true"><img src="assets/img/favicon-32.png" width="32" height="32" alt="" /></span>
+      <span class="nav-word">SEAL</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#tour">Tour</a>
+
+      <a href="#install">Install</a>
+
+      <a href="docs/">Docs</a>
+      <a href="docs/editions.html">Editions</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="theme-toggle" id="theme-toggle" aria-pressed="false" aria-label="Switch to dark theme" title="Toggle dark mode">
+        <svg class="theme-toggle-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21M5.6 5.6l1.1 1.1M17.3 17.3l1.1 1.1M5.6 18.4l1.1-1.1M17.3 6.7l1.1-1.1" stroke-linecap="round" />
+        </svg>
+        <svg class="theme-toggle-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z" />
+        </svg>
+      </button>
+      <a class="btn btn-primary" href="#install">Get SEAL</a>
+      <button class="nav-burger" id="nav-burger" aria-label="Open menu" aria-expanded="false" aria-controls="nav-mobile-sheet">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16" />
+        </svg>
+      </button>
+    </div>
+
+    <nav class="nav-mobile-sheet" id="nav-mobile-sheet" aria-label="Site navigation" hidden>
+      <a href="#tour">Tour</a>
+
+      <a href="#install">Install</a>
+
+      <a href="docs/">Docs</a>
+      <a href="docs/editions.html">Editions</a>
+      <a href="try.html">Try the Sample Lab</a>
+      <a href="workflows.html">Workflows</a>
+      <a href="privacy.html">Privacy</a>
+        <a href="support.html">Support</a>
+    </nav>
+  </header>
+
+  <main id="main">
+
+    <!-- Hero ============================================ -->
+    <section class="hero" id="top">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Sequence · Editing · Activity · Library</p>
+          <h1>Your AI-native molecular biology workbench.</h1>
+          <p class="lede">Explore biological sequences, test ideas, and develop your research, with analysis tools and lab notes in one workspace on your Mac.</p>
+          <div class="hero-ctas">
+            <a class="btn btn-primary btn-lg" href="#install" data-cta="store-hero">Coming to the Mac App Store</a>
+            <a class="btn btn-ghost btn-lg" href="#tour" data-cta="tour-hero">Explore the app</a>
+          </div>
+          <p class="hero-quiet-link">The App Store edition will launch first. <a href="docs/editions.html">Compare editions</a>.</p>
+          <ul class="hero-trust" aria-label="At a glance">
+            <li>Local workspace</li>
+            <li>DNA, RNA, and protein</li>
+          </ul>
+        </div>
+        <div class="hero-media">
+          <figure class="window-frame">
+            <div class="window-chrome" aria-hidden="true">
+              <span class="dot dot-red"></span>
+              <span class="dot dot-amber"></span>
+              <span class="dot dot-green"></span>
+              <span class="window-title">SEAL Sample Lab</span>
+            </div>
+            <div class="overview-player">
+              <video id="overview-video" controls playsinline preload="none" width="1440" height="900" poster="assets/img/tutorials/00-seal-overview.jpg" aria-label="SEAL overview: sequences, analysis, and lab notes">
+                <source src="assets/videos/00-seal-overview.mp4?v=20260908" type="video/mp4" />
+                <track kind="captions" src="assets/videos/00-seal-overview.vtt?v=20260908" srclang="en" label="English" default />
+                <p><a href="assets/videos/00-seal-overview.mp4">Download the SEAL overview video</a> or <a href="docs/overview.html">read the overview guide</a>.</p>
+              </video>
+              <button class="overview-launch" id="overview-launch" type="button" aria-controls="overview-video" hidden>
+                <span class="overview-launch-label"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M5 3L15 9L5 15Z" fill="currentColor" /></svg><span id="overview-launch-text">Play the overview · 4:12</span></span>
+              </button>
+            </div>
+          </figure>
+          <p id="overview-player-status" class="overview-player-status" role="status" aria-live="polite"></p>
+          <p class="hero-media-caption">
+            Direct-edition recording: follow the Sample Lab from a first sequence to an exported report. AI narration. <a href="docs/overview.html">Chapters and transcript</a>.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Three pillars =================================== -->
+    <section class="pillars" aria-label="Overview">
+      <div class="pillar">
+        <div class="pillar-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6">
+            <rect x="4" y="6" width="16" height="12" rx="2" />
+            <path d="M4 10 H20 M9 14 H11 M9 16 H15" />
+          </svg>
+        </div>
+        <h2>Local-first</h2>
+        <p>Keep your sequences, analyses, and lab notes together on your Mac. Open a workspace and continue where you left off.</p>
+      </div>
+      <div class="pillar">
+        <div class="pillar-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M6 4 Q12 12 6 20 M18 4 Q12 12 18 20" stroke-linecap="round" />
+            <path d="M8 7 L16 7 M8 12 L16 12 M8 17 L16 17" stroke-linecap="round" />
+          </svg>
+        </div>
+        <h2>Sequence and Editing</h2>
+        <p>Edit DNA, RNA, and protein alongside maps and annotations. Select a region to add a feature, create a derived sequence, or follow its live translation.</p>
+      </div>
+      <div class="pillar">
+        <div class="pillar-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6">
+            <circle cx="6" cy="12" r="2.5" />
+            <circle cx="18" cy="6" r="2.5" />
+            <circle cx="18" cy="18" r="2.5" />
+            <path d="M8 11 L16 7 M8 13 L16 17" />
+          </svg>
+        </div>
+        <h2>Activity and Library</h2>
+        <p>Review workspace changes in Activity and recover earlier versions with checkpoints. Keep sequences, parts, and feature templates in the Sequence Library, ready to reuse.</p>
+        <p class="pillar-link">
+          <a href="docs/notebook-records.html">Notebook records and Activity</a>
+        </p>
+      </div>
+    </section>
+
+    <section class="workflow-preview" aria-labelledby="preview-title">
+      <div class="section-header">
+        <p class="eyebrow">Explore SEAL</p>
+        <h2 id="preview-title">See the tools in use.</h2>
+        <p class="section-lede">Open any screenshot for a closer view. The examples use synthetic sequences you can explore in the app.</p>
+      </div>
+      <div class="preview-grid">
+        <article class="preview-card">
+          <figure><img src="assets/img/sample-map-tour.png" width="2880" height="1800" alt="A circular map and its linked DNA sequence in SEAL." loading="lazy" decoding="async" /></figure>
+          <h3><a href="docs/plasmid-map.html">Sequences and maps</a></h3>
+          <p>Edit bases and features with a linked circular or linear map.</p>
+        </article>
+        <article class="preview-card">
+          <figure><img src="assets/img/primer-design.png" width="2880" height="1800" alt="SEAL primer design controls for the selected DNA block." loading="lazy" decoding="async" /></figure>
+          <h3><a href="docs/cloning.html">Primers and cloning</a></h3>
+          <p>Design primers and review digest, PCR, and assembly plans.</p>
+        </article>
+        <article class="preview-card">
+          <figure><img src="assets/img/alignment-variant-panel.png" width="2880" height="1800" alt="A multiple sequence alignment with aligned rows and conservation in SEAL." loading="lazy" decoding="async" /></figure>
+          <h3><a href="docs/alignment.html">Alignments and traces</a></h3>
+          <p>Compare variants and inspect Sanger reads with their chromatograms.</p>
+        </article>
+        <article class="preview-card">
+          <figure><img src="assets/img/notebook.png" width="2880" height="1800" alt="A SEAL Notebook page with notes linked to sequence work." loading="lazy" decoding="async" /></figure>
+          <h3><a href="docs/notebook.html">Notebook and reports</a></h3>
+          <p>Keep experiment notes and export sequences with a report.</p>
+        </article>
+      </div>
+      <p class="tour-footer"><a href="docs/tutorials.html">Follow a video tutorial &rarr;</a> &nbsp; <a href="workflows.html">Browse workflow screenshots &rarr;</a></p>
+    </section>
+
+    <!-- Install -->
+    <section class="install" id="install">
+      <div class="section-header">
+        <p class="eyebrow">Get SEAL</p>
+        <h2>Coming to the Mac App Store.</h2>
+        <p class="section-lede">SEAL will launch on the Mac App Store first. A download link will appear here when the app is available.</p>
+      </div>
+      <div class="install-grid install-grid-store">
+        <article class="install-card install-card-store">
+          <span class="install-status">Coming soon</span>
+          <h3>Mac App Store edition</h3>
+          <p>Edit sequences, inspect local analyses, and keep lab notes in one workspace. See which tools are planned for the first Store release.</p>
+          <a class="btn btn-primary" href="docs/editions.html">Store edition details</a>
+        </article>
+        <article class="install-card">
+          <h3>Help and privacy</h3>
+          <p>Find setup information, contact support, and read how SEAL stores data and handles network requests.</p>
+          <a class="btn btn-ghost" href="support.html">Contact support</a>
+          <p><a href="privacy.html">Privacy information</a></p>
+        </article>
+      </div>
+      <p class="tour-footer" id="agent-quickstart">The source repository and direct-download edition will launch later. <a href="docs/install.html#build-from-source">Distribution details</a>.</p>
+    </section>
+
+    <!-- The full toolset ================================ -->
+    <section class="suite" id="suite" aria-label="Tools in the app">
+      <div class="section-header">
+        <p class="eyebrow">In the app</p>
+        <h2>Tools grouped by what you are doing.</h2>
+        <p class="section-lede">
+          Each one has a documentation page.
+        </p>
+      </div>
+
+      <div class="suite-grid">
+        <div class="suite-group">
+          <h3>Reading and editing</h3>
+          <ul class="suite-list">
+            <li><a href="docs/editing.html">Editing and annotation</a></li>
+            <li><a href="docs/plasmid-map.html">Plasmid maps</a></li>
+            <li><a href="docs/import-export.html">Import and export</a></li>
+            <li><a href="docs/sequence-sources.html">Vector library and fetch</a></li>
+            <li><a href="docs/diff.html">Sequence diff</a></li>
+            <li><a href="docs/quality.html">Quality checks</a></li>
+          </ul>
+        </div>
+
+        <div class="suite-group">
+          <h3>Analysis</h3>
+          <ul class="suite-list">
+            <li><a href="docs/translation.html">Translation and ORFs</a></li>
+            <li><a href="docs/alignment.html">Pairwise and multiple alignment</a></li>
+            <li><a href="docs/codon-analysis.html">Codon usage</a></li>
+            <li><a href="docs/protein-analysis.html">Protein analysis</a></li>
+            <li><a href="docs/sanger-traces.html">Sanger traces</a></li>
+          </ul>
+        </div>
+
+        <div class="suite-group">
+          <h3>Design and cloning</h3>
+          <ul class="suite-list">
+            <li><a href="docs/restriction-digest.html">Restriction digest</a></li>
+            <li><a href="docs/primer-design.html">Primer design</a></li>
+            <li><a href="docs/cloning.html">Gibson, Golden Gate, ligation</a></li>
+            <li><a href="docs/guide-design.html">CRISPR guide design</a></li>
+            <li><a href="docs/codon-optimizers.html">Codon optimisers</a></li>
+          </ul>
+        </div>
+
+        <div class="suite-group">
+          <h3>Notes and handoff</h3>
+          <ul class="suite-list">
+            <li><a href="docs/notebook.html">Notebook pages</a></li>
+            <li><a href="docs/notebook-records.html">Records and signing</a></li>
+            <li><a href="docs/reports.html">Report packages</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Built for these workflows ======================= -->
+    <section class="workflows" id="workflows" aria-label="Built for these workflows">
+      <div class="section-header">
+        <p class="eyebrow">Sample workspace</p>
+        <h2>Workflows you can open and follow.</h2>
+        <p class="section-lede">
+          Open one from the Start Panel, follow it through, then build your
+          own.
+        </p>
+      </div>
+
+      <div class="workflow-grid">
+        <article class="workflow-card">
+          <span class="workflow-tag">DNA &middot; Protein</span>
+          <h3>Synthetic Reporter.</h3>
+          <p>Translate the project-authored reporter DNA, compare the derived protein, inspect features and ORFs, then export FASTA or GenBank and build a report package.</p>
+          <p class="workflow-foot">Fixture: <code>Synthetic Reporter DNA</code></p>
+        </article>
+        <article class="workflow-card">
+          <span class="workflow-tag">Cloning</span>
+          <h3>Synthetic backbone review.</h3>
+          <p>Inspect illustrative origin-like, marker-like, and multi-cloning-site features. Run a restriction map and preview vector and insert compatibility in Clone Builder.</p>
+          <p class="workflow-foot">Fixture: <code>SEAL Synthetic Cloning Backbone</code></p>
+        </article>
+        <article class="workflow-card">
+          <span class="workflow-tag">Assembly</span>
+          <h3>Golden Gate and GoldenBraid.</h3>
+          <p>Inspect three synthetic Level 0 parts, the destination backbone, the shipped sample product, its Activity event, and the linked assembly notebook before an in-silico rerun.</p>
+          <p class="workflow-foot">Fixture: <code>SEAL Golden Gate Sample Assembly</code></p>
+        </article>
+        <article class="workflow-card">
+          <span class="workflow-tag">Genomic</span>
+          <h3>30 kb synthetic region.</h3>
+          <p>Inspect parent features, derived CDS and protein blocks, search synthetic annotations, and build a report while keeping every child tied to its parent interval.</p>
+          <p class="workflow-foot">Fixture: <code>SEAL Synthetic Genomic Region (30 kb)</code></p>
+        </article>
+        <article class="workflow-card">
+          <span class="workflow-tag">Report</span>
+          <h3>Formatting and report handoff.</h3>
+          <p>Keep highlights and layout in the styled report while biological exports stay clean. Inspect the portable zip, <code>manifest.json</code>, and <code>validation.md</code>.</p>
+          <p class="workflow-foot">Output: reviewable local package</p>
+        </article>
+      </div>
+
+      <p class="workflow-foot-link">
+        Every bundled sample is project-authored, synthetic, and deterministic.
+        Browse the full <a href="workflows.html">workflow gallery</a>.
+      </p>
+    </section>
+
+    <!-- Feature tour ==================================== -->
+    <section class="tour" id="tour">
+      <div class="section-header">
+        <p class="eyebrow">Tour</p>
+        <h2>Current workflows, end to end.</h2>
+        <p class="section-lede">
+          These views come from the current SEAL app and its project-authored
+          Sample Lab. Click a tab to compare the major work surfaces.
+        </p>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="Feature tour">
+        <button class="tab" role="tab" aria-selected="true" aria-controls="tab-workspace" id="t-workspace">Workspace</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="tab-cloning" id="t-cloning">Cloning</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="tab-primers" id="t-primers">Translation</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="tab-analysis" id="t-analysis">Six frames</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="tab-library" id="t-library">Reverse translate</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="tab-alignments" id="t-alignments">Alignments</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="tab-notebook" id="t-notebook">Notebook</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="tab-provenance" id="t-provenance">Activity</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="tab-handoff" id="t-handoff">Handoff</button>
+      </div>
+
+      <div class="tab-panels">
+        <article class="tab-panel" id="tab-workspace" role="tabpanel" aria-labelledby="t-workspace">
+          <div class="tab-media">
+            <figure class="tab-illustration">
+              <img src="assets/img/sequence-workbench.png" width="2880" height="1800" alt="SEAL Sample Lab workspace with Entries, editable sequence blocks, feature tracks, and the Inspector." loading="lazy" decoding="async" />
+              <figcaption>Entries, blocks, maps, and Inspector tools in one local workbench.</figcaption>
+            </figure>
+            <figure class="tab-media-still">
+              <img src="assets/img/empty-start-workflow.png" width="2880" height="1800" alt="SEAL empty start workflow showing paste, sample, import, fetch, and vector options." loading="lazy" decoding="async" />
+              <figcaption>Start empty, import your own data, or load the synthetic Sample Lab.</figcaption>
+            </figure>
+          </div>
+          <div class="tab-copy">
+            <h3>Always-editable DNA, RNA, and protein blocks.</h3>
+            <p>Inline mutation tracking, feature annotations, and per-block stats stay on the same canvas. Drag to reorder, paste from the clipboard, or import FASTA, FASTQ, GenBank, EMBL, GFF, SBOL, binary DNA, ABI, PDB/mmCIF, CSV, or registry JSON.</p>
+            <ul class="tab-list">
+              <li>Multi-kilobase sequences stay responsive to scroll and select.</li>
+              <li>Inline feature track with overlap-aware lanes.</li>
+              <li>Save a block checkpoint before an edit, then inspect or restore it.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="tab-panel" id="tab-cloning" role="tabpanel" aria-labelledby="t-cloning" hidden>
+          <div class="tab-media">
+            <figure class="tab-illustration">
+              <img src="assets/img/clone-builder.png" width="2880" height="1800" alt="SEAL Clone Builder with synthetic vector and insert inputs and an in-silico construct preview." loading="lazy" decoding="async" />
+              <figcaption>Pick synthetic fixtures, choose an assembly path, and preview the construct.</figcaption>
+            </figure>
+            <figure class="tab-media-still">
+              <img src="assets/img/restriction-digest.png" width="2880" height="1800" alt="SEAL restriction digest workflow on a synthetic sequence fixture." loading="lazy" decoding="async" />
+              <figcaption>Restriction planning and assembly previews are in-silico tools.</figcaption>
+            </figure>
+          </div>
+          <div class="tab-copy">
+            <h3>Digests, Gibson, Golden Gate, PCR, and ligation.</h3>
+            <p>Search 154 built-in enzymes or narrow the list to common cutters. Clone Builder previews vector and insert compatibility. Gibson, Golden Gate, GoldenBraid, PCR, and ligation tools keep the plan inspectable.</p>
+            <ul class="tab-list">
+              <li>Forward and reverse primer binding visualised in PCR simulation.</li>
+              <li>Linker-aware ligation with scar tracking.</li>
+              <li>One-click gel simulation with banding pattern.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="tab-panel" id="tab-primers" role="tabpanel" aria-labelledby="t-primers" hidden>
+          <div class="tab-media">
+            <figure class="tab-illustration">
+              <img src="assets/img/live-translation.png" width="2880" height="1800" alt="SEAL showing a translation track above DNA and the six-frame Translate Inspector." loading="lazy" decoding="async" />
+              <figcaption>Read a translation above its DNA sequence and compare frames in the Inspector.</figcaption>
+            </figure>
+
+          </div>
+          <div class="tab-copy">
+            <h3>Live translation for the current selection.</h3>
+            <p>Drag across DNA or RNA and the Inspector updates without a separate run step. The readout exposes the current frame, strand, genetic code, amino-acid count, trailing bases, and internal-stop warnings through an accessible live region.</p>
+          </div>
+        </article>
+
+        <article class="tab-panel" id="tab-analysis" role="tabpanel" aria-labelledby="t-analysis" hidden>
+          <div class="tab-media">
+            <figure class="tab-illustration">
+              <img src="assets/img/six-frame-translation.png" width="2880" height="1800" alt="SEAL Translate inspector comparing all six forward and reverse reading frames." loading="lazy" decoding="async" />
+              <figcaption>Compare +1, +2, +3, -1, -2, and -3 in one Inspector tab.</figcaption>
+            </figure>
+            <figure class="tab-media-still">
+              <img src="assets/img/sequence-diff.png" width="2880" height="1800" alt="SEAL sequence diff view showing substitutions, insertions, and deletions." loading="lazy" decoding="async" />
+              <figcaption>The Inspector also provides ORF, codon, alignment, and diff tools.</figcaption>
+            </figure>
+          </div>
+          <div class="tab-copy">
+            <h3>Compare six parent-anchored frames.</h3>
+            <p>Use a selection or the whole sequence, inspect coordinates and internal stops, copy any frame, reveal it on the parent, or promote it to a derived protein block. Circular-origin selections keep their parent coordinates.</p>
+            <ul class="tab-list">
+              <li>Selectable and custom genetic codes.</li>
+              <li>Whole-sequence and selection scopes.</li>
+              <li>Forward and reverse frames with explicit coordinate ranges.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="tab-panel" id="tab-library" role="tabpanel" aria-labelledby="t-library" hidden>
+          <div class="tab-media">
+            <figure class="tab-illustration">
+              <img src="assets/img/reverse-translation.png" width="2880" height="1800" alt="SEAL Codons Inspector showing a Back-translation preview, host codon table, Codon strategy, Avoid sites, and draft metrics." loading="lazy" decoding="async" />
+              <figcaption>Choose a host, codon strategy, and sites to avoid for a DNA or RNA draft.</figcaption>
+            </figure>
+            <figure class="tab-media-still">
+              <img src="assets/img/command-palette-route.png" width="2880" height="1800" alt="SEAL command palette routing a plain-language request to a sequence workflow." loading="lazy" decoding="async" />
+              <figcaption>Use the command palette to open sequence tools.</figcaption>
+            </figure>
+          </div>
+          <div class="tab-copy">
+            <h3>Back-translate a protein in the Codons panel.</h3>
+            <p>Choose DNA or RNA, a host table, and a codon strategy: Max-frequency, Balanced codon usage, or Synthesis-guarded. Add enzyme names or motifs under Avoid sites. Review the preview and remaining sites, then copy it or create a draft block. Stop codons remain in the sequence; unencodable symbols become <code>NNN</code>.</p>
+          </div>
+        </article>
+
+        <article class="tab-panel" id="tab-alignments" role="tabpanel" aria-labelledby="t-alignments" hidden>
+          <div class="tab-media">
+            <figure class="tab-illustration">
+              <img src="assets/img/sanger-paired-reads.png" width="2880" height="1800" alt="A paired Sanger alignment against a reference, with primer features and chromatogram traces." loading="lazy" decoding="async" />
+              <figcaption>Review paired reads alongside their reference and primer features.</figcaption>
+            </figure>
+            <figure class="tab-media-still">
+              <img src="assets/img/alignment-variant-panel.png" width="2880" height="1800" alt="A twelve-sequence DNA panel in SEAL's alignment viewer." loading="lazy" decoding="async" />
+              <figcaption>Compare a DNA sample panel and inspect differences across rows.</figcaption>
+            </figure>
+          </div>
+          <div class="tab-copy">
+            <h3>Compare sequences and inspect Sanger reads.</h3>
+            <p>Open a saved alignment from the Alignments page. Inspect differences, conservation, primer features, and trace peaks. Six synthetic examples let you explore DNA, RNA, protein, and clone-verification workflows.</p>
+            <p><a href="docs/alignment.html">Alignment guide</a> &middot; <a href="docs/sanger-traces.html">Sanger trace guide</a></p>
+          </div>
+        </article>
+        <article class="tab-panel" id="tab-notebook" role="tabpanel" aria-labelledby="t-notebook" hidden>
+          <div class="tab-media">
+            <figure class="tab-illustration">
+              <img src="assets/img/notebook.png" width="2880" height="1800" alt="A SEAL Notebook page with synthetic assembly notes, status, tags, and sequence links." loading="lazy" decoding="async" />
+              <figcaption>Link an experiment's notes to the sequence records it describes.</figcaption>
+            </figure>
+            <figure class="tab-media-still">
+              <img src="assets/img/sequence-library.png" width="2880" height="1800" alt="SEAL's Sequence Library for browsing reusable parts and annotations." loading="lazy" decoding="async" />
+              <figcaption>Browse reusable sequences in the Library.</figcaption>
+            </figure>
+          </div>
+          <div class="tab-copy">
+            <h3>Keep notes and reusable parts with your sequence work.</h3>
+            <p>Organize Notebook pages by project and notebook. Add text, tables, images, and comments, then link a page to an Entry or sequence region. The Library stores parts and feature templates for reuse.</p>
+            <p><a href="docs/notebook.html">Notebook guide</a> &middot; <a href="docs/notebook-records.html">Revisions and signing</a></p>
+          </div>
+        </article>
+
+        <article class="tab-panel" id="tab-provenance" role="tabpanel" aria-labelledby="t-provenance" hidden>
+          <div class="tab-media">
+            <figure class="tab-illustration">
+              <img src="assets/img/agent-activity-write.png" width="2880" height="1800" alt="SEAL Activity view showing a write with its originating surface and context." loading="lazy" decoding="async" />
+              <figcaption>Each external write carries its source and review context.</figcaption>
+            </figure>
+            <figure class="tab-media-still">
+              <img src="assets/img/checkpoint-recovery.png" width="2880" height="1800" alt="SEAL checkpoint controls for the selected sequence block." loading="lazy" decoding="async" />
+              <figcaption>Inspect Activity, then restore a checkpoint when needed.</figcaption>
+            </figure>
+          </div>
+          <div class="tab-copy">
+            <h3>Review changes in Activity.</h3>
+            <p>Activity shows recorded changes with their source. Save a checkpoint before editing a sequence block, then compare or restore that block when needed.</p>
+          </div>
+        </article>
+
+        <article class="tab-panel" id="tab-handoff" role="tabpanel" aria-labelledby="t-handoff" hidden>
+          <div class="tab-media">
+            <figure class="tab-illustration">
+              <img src="assets/img/export-report.png" width="2880" height="1800" alt="SEAL report handoff view with export formats, style presets, and package options." loading="lazy" decoding="async" />
+              <figcaption>Pick formats and a style preset, then inspect the local package.</figcaption>
+            </figure>
+            <figure class="tab-media-still">
+              <img src="assets/img/compact-workflow.png" width="780" height="1640" alt="SEAL compact workflow view prepared for a local report handoff." loading="lazy" decoding="async" />
+              <figcaption>Keep the Entry, source blocks, and review output together.</figcaption>
+            </figure>
+          </div>
+          <div class="tab-copy">
+            <h3>Report packages with a manifest and validation file.</h3>
+            <p>Select sequences and export them with a styled report. Choose GenBank for sequence metadata, FASTA for sequences, or CSV for tabular summaries. The package includes a manifest and validation file.</p>
+          </div>
+        </article>
+      </div>
+
+      <p class="tour-footer">
+        Follow the current
+        <a href="workflows.html" data-repository-path="/blob/main/docs/EXAMPLE_GALLERY.md" rel="noopener">example gallery</a>.
+      </p>
+    </section>
+
+    <section class="agents" id="agents">
+      <div class="section-header">
+        <p class="eyebrow">Source and direct editions</p>
+        <h2>Work with agents through MCP and the CLI.</h2>
+        <p class="section-lede">Use the source and direct editions to connect agents through MCP and work with sequences through the CLI. These editions will become available after the Mac App Store launch.</p>
+      </div>
+      <p id="developers"><a href="docs/editions.html#source-tools">Read the edition differences</a>. Developer setup guides describe the source and direct editions.</p>
+    </section>
+
+    <section class="teamsync" id="team-sync" aria-label="Source-edition Notion tools">
+      <div class="section-header">
+        <p class="eyebrow">Source-edition developer tools</p>
+        <h2>Check a Notion database schema.</h2>
+        <p class="section-lede">The source-edition tools check a Notion schema and a local order-release policy. <a href="docs/notion-team-sync.html">Read the source guide</a> for setup and supported checks.</p>
+      </div>
+    </section>
+
+    <section class="release" id="release" aria-labelledby="alignment-examples-title">
+      <div class="section-header">
+        <p class="eyebrow">Alignment examples</p>
+        <h2 id="alignment-examples-title">Try a comparison with sample data.</h2>
+        <p class="section-lede">The Alignments page includes six synthetic examples with saved results. Open one to inspect aligned sequences, conservation, and differences.</p>
+      </div>
+      <ul class="release-grid">
+        <li class="release-item"><span class="release-num">01</span><h3>Paired Sanger reads</h3><p>Compare forward and reverse reads against a 1.2 kb reference, with primer features and traces.</p></li>
+        <li class="release-item"><span class="release-num">02</span><h3>Clone verification</h3><p>Inspect overlapping primer-walk reads against a 2.4 kb clone reference.</p></li>
+        <li class="release-item"><span class="release-num">03</span><h3>DNA sample panel</h3><p>Review substitutions and gaps across a reference and 11 synthetic samples.</p></li>
+        <li class="release-item"><span class="release-num">04</span><h3>Long DNA</h3><p>Navigate a longer alignment and compare conserved and variable regions.</p></li>
+        <li class="release-item"><span class="release-num">05</span><h3>Protein variants</h3><p>Compare aligned residues and conservation across related protein sequences.</p></li>
+        <li class="release-item"><span class="release-num">06</span><h3>RNA variants</h3><p>Inspect RNA differences with the alignment's molecule type and coordinates preserved.</p></li>
+      </ul>
+      <p class="tour-footer"><a href="docs/alignment.html">Open the alignment guide &rarr;</a></p>
+    </section>
+
+    <!-- Citation ======================================== -->
+    <section class="citation" id="cite" aria-label="Citation">
+      <div class="citation-grid">
+        <div class="citation-copy">
+          <p class="eyebrow">Cite this work</p>
+          <h2>Copy the BibTeX entry.</h2>
+          <p class="section-lede">Use this software citation when describing work you did with SEAL. Update the version to the build you used.</p>
+        </div>
+        <pre class="code-block citation-block"><code>@software{vogan_seal_2026,
+  title   = {SEAL: a local-first sequence design workbench},
+  author  = {Vogan, Jacob},
+  year    = {2026},
+  version = {2.2.1},
+  license = {MIT}
+}</code></pre>
+      </div>
+    </section>
+
+    <!-- FAQ ============================================== -->
+    <section class="faq" id="faq">
+      <div class="section-header">
+        <p class="eyebrow">FAQ</p>
+        <h2>Setup, data, citation, and platforms.</h2>
+      </div>
+
+      <div class="faq-list">
+        <details class="faq-item" open>
+          <summary>What can I do in the first ten minutes?</summary>
+          <p>
+            Load the <strong>SEAL Sample Lab</strong>, open Synthetic Reporter,
+            select a DNA range to see live translation, compare all six frames,
+            and open its derived protein to preview a reverse-translation
+            draft. Then try a synthetic restriction plan or report package.
+            The <a href="try.html">Sample Lab guide</a> has worked recipes.
+          </p>
+        </details>
+        <details class="faq-item">
+          <summary>What sample sequences are seeded?</summary>
+          <p>
+            SEAL ships five project-authored, deterministic synthetic vector
+            fixtures plus synthetic reporter, assembly, protein-model, and
+            30 kb genomic-region demonstrations. They cover sequence editing,
+            cloning, translation, alignment, reports, and Activity. They are documented in
+            <a href="workflows.html" data-repository-path="/blob/main/docs/EXAMPLE_GALLERY.md" rel="noopener">EXAMPLE_GALLERY.md</a>.
+          </p>
+        </details>
+        <details class="faq-item">
+          <summary>Where do lab notes go?</summary>
+          <p>
+            Into the Notebook, a full-pane document space organised as projects,
+            notebooks, and pages. A page takes rich text, tables, imported
+            spreadsheets, images, and comments anchored to a span, and it links
+            to the entry, block, or base range it describes. Pages carry a
+            status and a revision history, and signing one freezes that revision
+            and locks the page. See
+            <a href="docs/notebook.html">Notebook</a> and
+            <a href="docs/notebook-records.html">Records and signing</a>.
+          </p>
+        </details>
+        <details class="faq-item">
+          <summary>Can I use my existing coding agent?</summary>
+          <p>Source and direct editions support separately installed MCP and CLI tools. The first Store release does not launch agents or include a terminal. <a href="docs/editions.html#source-tools">Compare editions</a> before following an agent setup guide.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Does it work offline?</summary>
+          <p>Sequence editing, built-in analysis, Notebook, maps, traces, and reports work locally. Fetching NCBI or UniProt records and submitting EBI predictions require a network connection. Hosted-model and external-agent workflows belong to supported source and direct editions.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Where is my workspace stored, and how do I back it up?</summary>
+          <p>The Store edition uses its sandbox-managed workspace or a folder selected through <strong>File → Workspace</strong>. Use the workspace backup and restore controls, and keep an independent backup. See <a href="privacy.html#retention">storage and recovery details</a>.</p>
+        </details>
+        <details class="faq-item">
+          <summary>How do I cite SEAL in a paper?</summary>
+          <p>Use the <a href="#cite">BibTeX entry above</a> and update its version to the build you used.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Is my data sent anywhere?</summary>
+          <p>SEAL stores workspace records locally. Fetching database records or submitting a protein prediction sends the requested data to that service. Source and direct editions offer additional integrations. The <a href="privacy.html">privacy page</a> explains each boundary.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Is it free?</summary>
+          <p>The source is MIT-licensed. A paid Mac App Store edition is planned; its price has not been announced.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Where can I download the macOS build?</summary>
+          <p>SEAL is coming to the Mac App Store first. A link will appear in <a href="#install">Get SEAL</a> when it is available. The source repository and GitHub app downloads will launch later.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Windows or Linux?</summary>
+          <p>The desktop build targets Apple silicon Macs. Windows and Linux desktop packages are not provided.</p>
+        </details>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer" role="contentinfo">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="nav-brand" href="#top" aria-label="SEAL home">
+          <span class="nav-mark" aria-hidden="true"><img src="assets/img/favicon-32.png" width="32" height="32" alt="" /></span>
+          <span class="nav-word">SEAL</span>
+        </a>
+        <p class="footer-tag">A local-first sequence design workbench.</p>
+      </div>
+      <div class="footer-col">
+        <h3 class="footer-col-h">Product</h3>
+        <a href="#install">Get SEAL</a>
+        <a href="docs/changelog.html" data-repository-path="/blob/main/CHANGELOG.md" rel="noopener">Changelog</a>
+        <a href="#team-sync">Source-edition Notion tools</a>
+      </div>
+      <div class="footer-col">
+        <h3 class="footer-col-h">Community</h3>
+        <a href="docs/editions.html">Editions</a>
+        <a href="docs/troubleshooting.html" data-repository-path="/issues" rel="noopener">Troubleshooting</a>
+        <a href="docs/security.html" data-repository-path="/blob/main/SECURITY.md" rel="noopener">Security</a>
+      </div>
+      <div class="footer-col">
+        <h3 class="footer-col-h">Docs</h3>
+        <a href="docs/quickstart.html">Quickstart</a>
+        <a href="docs/mcp-setup.html">Source-edition MCP setup</a>
+        <a href="docs/cli.html">Source-edition CLI reference</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="support.html">Support</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 SEAL contributors. MIT licensed.</span>
+      <span class="footer-citation">
+        <a href="index.html#cite" data-repository-path="/blob/main/CITATION.cff" rel="noopener">Cite this work</a>
+      </span>
+    </div>
+  </footer>
+
+  <script src="script.js?v=20260907" defer></script>
+  <script src="assets/images.js" defer></script>
+  <script src="assets/overview-player.js" defer></script>
+</body>
+</html>

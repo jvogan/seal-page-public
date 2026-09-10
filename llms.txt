@@ -1,0 +1,82 @@
+# SEAL
+
+SEAL is coming to the Mac App Store first. Source and direct downloads will follow later.
+Agent, terminal, MCP, and CLI guides describe source and direct-edition tools.
+
+- [Edition differences](docs/editions.html): Store features and direct-edition recordings.
+
+- [Support](support.html): contact information and problem-reporting instructions.
+
+> SEAL is a local-first macOS workbench for sequences, lab records, and activity records. A separately built Rust CLI and source-checkout MCP server can work against the same SQLite workspace as the desktop app.
+
+This file indexes SEAL's documentation for coding agents. SEAL is a local-first macOS workbench for DNA, RNA, and protein. Use an authorized source checkout to build the app, or install a verified unnotarized DMG when the repository has a release. A Mac App Store edition is planned. MCP requires a separate source checkout and an explicit active workspace path. Use block_list for shared sequence blocks; workspace_list covers MCP Scratch only. The Sample Lab includes synthetic examples. Network services run when requested; the app sends no telemetry.
+
+## Get started
+- [Overview](docs/index.html): What SEAL is and how the docs are organized.
+- [Install SEAL](docs/install.html): Build from source, install an available GitHub DMG, or read about the planned Mac App Store edition.
+- [Quickstart](docs/quickstart.html): From a pasted sequence to a first analysis in a few minutes.
+- [Core concepts](docs/concepts.html): Workspaces, Entries, stable conversation API names, blocks, features, and the sequence model.
+- [Sequence sources](docs/sequence-sources.html): Synthetic fixtures, your own files, explicit public-database fetches, and provenance.
+
+## Sequence workflows
+- [Import and export](docs/import-export.html): Read eleven file formats, write FASTA, GenBank, and GFF3.
+- [Editing and annotation](docs/editing.html): Edit bases, add features, and annotate selections.
+- [Plasmid maps](docs/plasmid-map.html): Open any block as a circular or linear map with feature lanes and cut sites.
+- [Restriction digest](docs/restriction-digest.html): Map and simulate cuts across 154 enzymes.
+- [Primer design](docs/primer-design.html): Design and rank PCR primers with Tm and clamp checks.
+- [Cloning and assembly](docs/cloning.html): Plan Gibson, Golden Gate, GoldenBraid, MoClo, ligation, and guided clone builds.
+- [Sequence alignment](docs/alignment.html): Pairwise and multiple alignment with selectable engines.
+- [Sanger traces](docs/sanger-traces.html): Import AB1 chromatograms and read per-base quality.
+- [Translation and ORFs](docs/translation.html): Live selection translation, all six frames, reverse-translation drafts, and ORFs.
+- [Protein analysis](docs/protein-analysis.html): Molecular weight, charge, hydropathy, annotations, and predictions.
+- [Codon analysis](docs/codon-analysis.html): Codon usage, GC content, and host comparison.
+- [Sequence diff](docs/diff.html): Compare two sequences base by base.
+- [Quality checks](docs/quality.html): Flag homopolymers, ambiguous bases, and internal stops.
+- [Reports and packages](docs/reports.html): Export reports and zipped packages.
+
+## Design and generation
+- [ESM design](docs/esm-design.html): Generate, insert, and mutate sequences with the biohub.ai ESM engine.
+- [Codon optimizers](docs/codon-optimizers.html): Optimize coding sequences with pluggable host profiles.
+- [CRISPR guide design](docs/guide-design.html): Design guides for a region and scan a chosen reference for off-target sites.
+
+## Notebook
+- [Notebook](docs/notebook.html): A local lab notebook whose pages reference the sequences they describe.
+- [Records and signing](docs/notebook-records.html): Revisions, restore points, signing a page, and what the attestation covers.
+
+## Agents
+- [Agent control plane](docs/agents.html): How external agents read and write the same local workspace.
+- [Connect Claude Code](docs/agents-claude-code.html): Set up Claude Code over MCP.
+- [Connect Codex](docs/agents-codex.html): Set up Codex over MCP.
+- [Connect Gemini CLI](docs/agents-gemini-cli.html): Set up Gemini CLI over MCP.
+- [Terminal dock](docs/terminal-dock.html): Launch a local agent CLI from inside SEAL.
+- [Prompts and safety](docs/agent-prompts.html): Safety prompts and review patterns for agent edits.
+- [What agents can change](docs/mutation-matrix.html): The surfaces an external agent can read and mutate.
+
+## Reference
+- [CLI reference](docs/cli.html): Every seal command and flag.
+- [MCP setup](docs/mcp-setup.html): Run the MCP server and point a client at it.
+- [MCP tool reference](docs/mcp-reference.html): MCP tools, grouped by module.
+- [IO contract](docs/io-contract.html): Shapes for analysis output across CLI, MCP, and the app.
+- [Settings and backup](docs/settings.html): Appearance, accessibility, and portable settings backup.
+- [Security](docs/security.html): Process isolation, IPC limits, subprocess policy, and release integrity.
+- [Troubleshooting](docs/troubleshooting.html): Fix MCP connection problems, first-launch issues, and find runtime diagnostics.
+
+## Teams
+- [Notion Team Sync](docs/notion-team-sync.html): Optional schema and tooling for Notion-first teams.
+
+## About
+- [Architecture](docs/architecture.html): Electron and SQLite with TypeScript app/MCP operations, a Rust CLI, and bounded native Rust commands.
+- [Privacy](docs/privacy.html): What stays on device and what reaches out.
+- [Release status](docs/changelog.html): Source capabilities, user-visible changes, and distribution options.
+
+## Product
+- [Product overview](index.html): What SEAL is, who it is for, and how it works.
+- [Workflows](workflows.html): Annotated walkthroughs of common bench tasks.
+- [Try SEAL](try.html): Worked examples you can run end to end.
+
+## Guided lessons
+
+- [SEAL overview](docs/overview.html): A five-minute app walkthrough with chapters, captions, and a transcript.
+- [Video tutorials](docs/tutorials.html): recorded workflows with captions and written steps.
+- [Your first workspace](docs/first-workspace.html): Sample Lab, Entries, blocks, and the Inspector.
+- [Add your first sequence](docs/import-first-sequence.html): copy a practice FASTA and verify its DNA block.

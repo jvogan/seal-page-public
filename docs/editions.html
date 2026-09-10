@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SEAL editions · SEAL docs</title>
+  <meta name="description" content="Compare the first Mac App Store release with source and direct editions." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="SEAL editions" />
+  <meta property="og:description" content="Check Store availability and learn how SEAL editions differ." />
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>SEAL editions</h1>
+    <p class="docs-lede">SEAL is coming to the Mac App Store first. The source repository and direct-download edition will launch later.</p>
+    <h2>First Store release</h2>
+    <p>The Store edition focuses on sequence editing, maps, built-in analysis, cloning plans, Library, Notebook, Activity, and reports. It uses the bundled computation engine and local workspace storage.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Workflow</th><th>First Store release</th><th>Source and direct editions</th></tr></thead>
+        <tbody>
+          <tr><td>Sequence editing, maps, Notebook, Library, Activity, and reports</td><td>Included in the current Store configuration</td><td>Available</td></tr>
+          <tr><td>Built-in analysis and alignment</td><td>Uses bundled computations</td><td>Uses bundled computations</td></tr>
+          <tr><td>Terminal and agent launching</td><td>Not included</td><td>Available in supported desktop builds</td></tr>
+          <tr><td>External MUSCLE and Clustal Omega</td><td>Not included</td><td>Require separately installed tools</td></tr>
+          <tr><td>External genome and scoring tools</td><td>Not included</td><td>Require separately installed tools and references</td></tr>
+          <tr><td>Hosted-model key storage and ESM requests</td><td>Not enabled</td><td>Require a build with secure provider storage; disabled in the unsigned package</td></tr>
+          <tr><td>External MCP server and Rust CLI</td><td>Not bundled; shared-folder use remains experimental</td><td>Separate source tools</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h2>Workspace permissions</h2>
+    <p>The Store edition uses a sandbox-managed default workspace. Its native file and folder pickers grant access to files you select. <strong>File → Workspace</strong> can select a workspace folder containing <code>.seal/seal.db</code>.</p>
+    <p>The Store and direct editions have separate default data and preferences. Move records between editions with an explicit workspace backup and restore; installing another edition does not automatically move your data.</p>
+    <h2 id="source-tools">Source and direct-edition tools</h2>
+    <p>Agent setup, terminal, MCP, and CLI guides describe separately installed source tools and direct-edition workflows. They do not describe software bundled with the Store app.</p>
+    <p>The Store app does not launch external agents. A separately installed tool may be able to use an explicitly selected shared workspace, but this is not a supported Store workflow until it has been verified in the signed sandboxed app.</p>
+    <h2 id="screenshots">Screenshots and recordings</h2>
+    <p>The current screenshots and recordings show the direct edition. They demonstrate core workflows and can also show controls or external engines that the first Store release does not include. They are not screenshots of a signed Store build.</p>
+    <p><a href="install.html">Check availability</a> or <a href="../support.html">contact support</a>.</p>
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

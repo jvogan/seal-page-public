@@ -1,0 +1,64 @@
+WEBVTT
+
+1
+00:00:00.360 --> 00:00:05.290
+In the Cloning and Assembly Entry, select
+SEAL Demo Plasmid.
+
+2
+00:00:05.320 --> 00:00:11.200
+This is a synthetic circular DNA example
+with seven hundred sixty-two bases.
+
+3
+00:00:11.230 --> 00:00:14.090
+Click Map to display its circular map.
+
+4
+00:00:14.120 --> 00:00:18.890
+The colored regions represent annotations,
+and the enzyme labels mark predicted
+
+5
+00:00:18.920 --> 00:00:23.600
+restriction cuts. Click the AluI site at
+position one hundred forty-six
+
+6
+00:00:23.630 --> 00:00:28.420
+to inspect its location. Then open the
+block's Actions menu and choose
+
+7
+00:00:28.450 --> 00:00:33.580
+Restriction digest. Choose Cutters to focus
+the list on enzymes with sites
+
+8
+00:00:33.610 --> 00:00:39.210
+in this sequence. Select AluI and read the
+preview before creating anything.
+
+9
+00:00:39.240 --> 00:00:43.620
+For this full circular block, the summary
+reports two cuts and two
+
+10
+00:00:43.650 --> 00:00:48.430
+linear fragments. Their lengths are seven
+hundred forty-two and twenty
+
+11
+00:00:48.460 --> 00:00:51.690
+bases, which add back to the original
+length.
+
+12
+00:00:51.720 --> 00:00:56.420
+Click Digest. SEAL creates a separate block
+for each fragment and links
+
+13
+00:00:56.450 --> 00:00:58.100
+the results to the source block.

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Connect Claude Code · SEAL docs</title>
+  <meta name="description" content="Connect Claude Code to the SEAL MCP server so it reads and writes your local workspace through explicit tools." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Connect Claude Code" />
+  <meta property="og:description" content="Connect Claude Code to the SEAL MCP server so it reads and writes your local workspace through explicit tools." />
+
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>Connect Claude Code</h1>
+    <p class="edition-note" data-edition-note>This guide covers source and direct-edition tools. These tools are not bundled with the first Store release. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">Add the SEAL MCP server to Claude Code so it reads and writes the same on-device workspace you use by hand. Activity records each agent write.</p>
+
+    <p>MCP is optional. To install the app with an agent, start with <a href="install.html">Install SEAL</a>.</p>
+
+    <h2>Prerequisites</h2>
+    <ul>
+      <li>SEAL installed and run at least once, so the workspace database exists. See <a href="install.html">Install SEAL</a>.</li>
+      <li>Claude Code installed and able to read an MCP config file.</li>
+      <li>A SEAL source checkout from a repository you have access to. Use the Node.js version in <code>.nvmrc</code>, run <code>npm ci</code>, and use the checkout's absolute <code>node_modules/.bin/tsx</code> path.</li>
+      <li>The path to the SEAL checkout and the path to the database you want the agent to share. The Agent Setup panel in SEAL can copy a ready-to-paste config snippet with the resolved database path filled in.</li>
+    </ul>
+
+    <h2>Configure</h2>
+    <p>Register the server with Claude Code's <code>mcp add</code> command. Pick a scope with <code>-s</code>: <code>local</code> (the default, just you in the current project), <code>project</code> (a shareable <code>.mcp.json</code> in the project root), or <code>user</code> (available in every project). Set <code>SEAL_DB_PATH</code> to the database the running app uses, so Claude Code writes to the same file instead of a repo-local development database. Replace the checkout placeholder with your source path and the database placeholder with the active path from Agent Setup.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Add the server in user scope">
+<pre><code>claude mcp add seal-bio \
+  -s user \
+  -e SEAL_DB_PATH="/absolute/path/to/active/seal.db" \
+  -- /absolute/path/to/seal/node_modules/.bin/tsx /absolute/path/to/seal/mcp/server.ts</code></pre>
+    </div>
+
+    <p>Project scope writes the server into a <code>.mcp.json</code> file at the project root, which you can commit to share the connection with collaborators. The file uses the standard <code>mcpServers</code> shape:</p>
+
+    <div class="docs-code" data-lang="json" data-title=".mcp.json">
+<pre><code>{
+  "mcpServers": {
+    "seal-bio": {
+      "command": "/absolute/path/to/seal/node_modules/.bin/tsx",
+      "args": ["/absolute/path/to/seal/mcp/server.ts"],
+      "env": {
+        "SEAL_DB_PATH": "/absolute/path/to/active/seal.db"
+      }
+    }
+  }
+}</code></pre>
+    </div>
+
+    <p>User scope stores the same entry in <code>~/.claude.json</code> instead, so the server is available in any directory. Local scope keeps it private to you in the current project. In every scope, set <code>SEAL_DB_PATH</code> in the server's environment.</p>
+
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>Keep <code>SEAL_DB_PATH</code> explicit. Without it, Claude Code resolves to the repo-local <code>.seal/seal.db</code> when launched from the checkout, while the installed app reads the application-data database, and the two will not see each other's data. See <a href="mcp-setup.html">MCP setup</a> for the full path resolution order.</p>
+      </div>
+    </div>
+
+    <h2>Verify</h2>
+    <p>Confirm the connection before asking the agent to write.</p>
+    <ol>
+      <li>In SEAL, run <strong>Agent Doctor</strong> from Agent Setup or the command palette. It checks the active database path, the file watcher, the schema, and Activity hydration.</li>
+      <li>Open a Claude Code session in the project directory and ask it to list your sequences. Claude Code calls <code>block_list</code> to read blocks across shared projects and Entries. <code>workspace_list</code> covers only MCP Scratch records.</li>
+    </ol>
+    <p>If the call succeeds, the tools are available. For the full set of tools Claude Code can call, see the <a href="mcp-reference.html">MCP tool reference</a>. If the UI does not reflect a later write, the usual cause is a database path mismatch; see <a href="mcp-setup.html">MCP setup</a>.</p>
+
+    <h2>Starter prompts</h2>
+    <p>Start read-only, then move to writes once the agent has named its targets. Paste this safety prompt at the start of a session:</p>
+
+    <div class="docs-code" data-lang="text" data-title="Session prompt">
+<pre><code>You are working with SEAL through the configured SEAL MCP server or Rust seal CLI.
+
+Use the active SQLite workspace only. Start read-only: list sequences, projects, user-facing Entries, and recent Activity if available. The MCP API calls Entries conversations. Then propose a short plan before writing.
+
+Do not delete, overwrite, rename, reorder, or mutate existing blocks unless I explicitly confirm the target and action. Before destructive edits, create or identify a checkpoint. After every write, summarize the affected block names, IDs when available, write source, and any warnings I should verify in SEAL Activity.</code></pre>
+    </div>
+
+    <p>Then ask for a read-only inventory:</p>
+
+    <div class="docs-code" data-lang="text" data-title="Inventory the workspace">
+<pre><code>Use SEAL MCP/CLI read-only tools to inventory my current workspace. List sequences, projects, Entries, feature counts, topology, synthetic-fixture provenance, and any obvious metadata gaps. Do not write yet. End with the next safest actions.</code></pre>
+    </div>
+
+    <p>For more copyable prompts and the review patterns that keep agent edits recoverable, see <a href="agent-prompts.html">prompts and safety</a>. For how this connection fits the wider system, see the <a href="agents.html">agent control plane</a>.</p>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

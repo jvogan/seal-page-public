@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Architecture · SEAL docs</title>
+  <meta name="description" content="SEAL's local-first architecture: an Electron desktop app, a shared SQLite workspace, a Rust CLI, a TypeScript MCP server, and selected native Rust operations." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="SEAL architecture" />
+  <meta property="og:description" content="Local-first design: Electron, SQLite, a Rust CLI, a TypeScript MCP server, and selected native Rust operations." />
+
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>Architecture</h1>
+    <p class="edition-note" data-edition-note>This guide includes source and direct-edition features. Check the edition comparison for the first Store release. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">SEAL keeps its primary workspace on your machine. The desktop app, source MCP server, and Rust CLI can work against the same SQLite file, while each surface uses the execution engine appropriate to it.</p>
+
+    <figure class="docs-figure">
+      <div class="docs-figure-head">
+        <p class="docs-figure-title">One workspace, several execution surfaces</p>
+        <span class="docs-figure-mark">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 7q5 5 0 10 M16 7q-5 5 0 10"/></svg>
+        </span>
+      </div>
+      <svg viewBox="0 0 900 432" role="img" aria-label="Diagram: the desktop app, Rust CLI, and source MCP server can use one SQLite workspace on your Mac. The app and MCP server use TypeScript operations, the CLI is Rust-native, and selected app analyses use a native Rust bridge. External agents connect through the MCP server.">
+        <defs>
+          <marker id="d-arrow" markerWidth="10" markerHeight="10" refX="6.5" refY="4.5" orient="auto-start-reverse">
+            <path d="M1 1.5 L6.5 4.5 L1 7.5" fill="none" stroke="currentColor" stroke-width="1.4" />
+          </marker>
+        </defs>
+
+        <!-- On your Mac boundary -->
+        <rect class="d-group" x="24" y="40" width="560" height="364" rx="16" />
+        <text class="d-grouplabel" x="42" y="66">On your Mac</text>
+
+        <!-- Surfaces -->
+        <rect class="d-box" x="48" y="92" width="150" height="60" rx="10" />
+        <text class="d-label" x="123" y="118" text-anchor="middle">Desktop app</text>
+        <text class="d-cap" x="123" y="136" text-anchor="middle">Electron + React</text>
+
+        <rect class="d-box" x="222" y="92" width="140" height="60" rx="10" />
+        <text class="d-label" x="292" y="118" text-anchor="middle">seal CLI</text>
+        <text class="d-cap" x="292" y="136" text-anchor="middle">terminal</text>
+
+        <rect class="d-box" x="386" y="92" width="150" height="60" rx="10" />
+        <text class="d-label" x="461" y="118" text-anchor="middle">MCP server</text>
+        <text class="d-cap" x="461" y="136" text-anchor="middle">stdio</text>
+
+        <!-- Execution engines -->
+        <rect class="d-box" x="48" y="204" width="488" height="56" rx="10" />
+        <text class="d-label" x="292" y="232" text-anchor="middle">Bioinformatics operations</text>
+        <text class="d-cap" x="292" y="249" text-anchor="middle">TypeScript app + MCP · Rust CLI · native bridge</text>
+
+        <!-- Surfaces to engine -->
+        <path class="d-line" d="M123 152 L123 204" marker-end="url(#d-arrow)" />
+        <path class="d-line" d="M292 152 L292 204" marker-end="url(#d-arrow)" />
+        <path class="d-line" d="M461 152 L461 204" marker-end="url(#d-arrow)" />
+
+        <!-- Workspace -->
+        <rect class="d-box" x="176" y="312" width="232" height="64" rx="10" />
+        <text class="d-label" x="292" y="340" text-anchor="middle">SQLite workspace</text>
+        <text class="d-cap" x="292" y="358" text-anchor="middle">seal.db</text>
+
+        <!-- Engine to workspace (read + write) -->
+        <path class="d-line" d="M292 260 L292 312" marker-start="url(#d-arrow)" marker-end="url(#d-arrow)" />
+        <text class="d-cap" x="306" y="290" text-anchor="start">read + write</text>
+
+        <!-- External agents -->
+        <rect class="d-group" x="636" y="92" width="232" height="200" rx="14" />
+        <text class="d-grouplabel" x="654" y="116">External agents</text>
+        <rect class="d-box-ghost" x="656" y="128" width="192" height="42" rx="8" />
+        <text class="d-label" x="752" y="154" text-anchor="middle">Claude Code</text>
+        <rect class="d-box-ghost" x="656" y="180" width="192" height="42" rx="8" />
+        <text class="d-label" x="752" y="206" text-anchor="middle">Codex</text>
+        <rect class="d-box-ghost" x="656" y="232" width="192" height="42" rx="8" />
+        <text class="d-label" x="752" y="258" text-anchor="middle">Gemini CLI</text>
+
+        <!-- Agents into MCP server, crossing the boundary -->
+        <path class="d-line" d="M636 192 L560 192 L560 122 L536 122" marker-end="url(#d-arrow)" />
+        <text class="d-cap" x="566" y="210" text-anchor="start">MCP</text>
+      </svg>
+      <figcaption class="docs-figcaption">The three surfaces can share one SQLite workspace, but they do not all call one runtime. The app and source MCP server use the TypeScript operation layer, the CLI is Rust-native, and the packaged desktop app can route six bounded analyses through its native Rust bridge. External agents connect through MCP.</figcaption>
+    </figure>
+
+    <h2>Local-first by default</h2>
+    <p>There is no required SEAL cloud workspace. The desktop app, CLI, and MCP server can read and write a single SQLite database on your machine. Network access happens only after an explicit outbound action, such as fetching from NCBI or UniProt, requesting an EBI or biohub.ai prediction, using an external model provider, or running an external agent. See <a href="privacy.html">Privacy</a> for the complete boundary.</p>
+    <p>Native builds store data in the platform application-data directory, so your SQLite workspace is separate from any browser profile.</p>
+
+    <h2>The surfaces</h2>
+    <p>Three surfaces can share one workspace when they resolve the same database path. You can move between them, and a committed change made through one becomes visible to the others through the shared database and live-sync layer.</p>
+    <h3>Desktop app</h3>
+    <p>An Electron and React interface for reading, editing, and annotating sequences, with digest, primer design, assembly, alignment, and Activity records for workspace changes.</p>
+    <h3>seal CLI</h3>
+    <p>A Rust-native command-line tool for analysis, transformation, retrieval, and selected workspace operations. It is independently implemented and tested for explicit parity where the surfaces overlap. See the <a href="cli.html">CLI reference</a>.</p>
+    <h3>MCP server</h3>
+    <p>A source-checkout TypeScript Model Context Protocol server with 61 tools for analysis, transformation, cloning, IO, and workspace work. It is not bundled into the installed desktop app. See <a href="mcp-setup.html">MCP setup</a> and the <a href="mcp-reference.html">MCP tool reference</a>.</p>
+
+    <h2>The shared workspace</h2>
+    <p>State lives in a SQLite database. Commands that read or write shared data (blocks, conversations, features, projects, checkpoints, exports) resolve the database path in this order:</p>
+    <ol>
+      <li><code>SEAL_DB_PATH</code> if set. An absolute path is recommended; a relative path is resolved against the current directory.</li>
+      <li>A repo-local <code>.seal/seal.db</code> in the nearest parent directory that contains <code>package.json</code> or <code>.git</code>. Packaged desktop builds skip this lookup.</li>
+      <li>The platform application-data directory, such as <code>~/Library/Application Support/io.github.jvogan.seal/seal.db</code> on macOS.</li>
+    </ol>
+
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>Set <code>SEAL_DB_PATH</code> to a scratch file to isolate agent or test work from your live workspace. For example, <code>export SEAL_DB_PATH=$(mktemp -d)/demo.db</code> before a recording or a CI run.</p>
+      </div>
+    </div>
+
+    <h2>Execution engines and parity</h2>
+    <p>The desktop and MCP surfaces implement their broad operation set in TypeScript. The packaged app can route six bounded operations through native Rust commands: restriction-site search, ORF search, GC windows, Needleman-Wunsch alignment, inverted-repeat search, and repeat search. Browser fallback uses the TypeScript worker path. The <code>seal</code> CLI is a separate Rust-native implementation.</p>
+    <p>Shared command names do not by themselves promise byte-for-byte identity. SEAL pins parity with focused cross-runtime tests and documents known boundaries, such as the CLI primer command's legacy end-anchored algorithm versus the desktop and MCP flanking-region workflow.</p>
+
+    <h2>Agents over MCP</h2>
+    <p>External agents such as Claude Code, Codex, and Gemini CLI connect to the MCP server and operate on the same workspace through explicit tools. Activity records each write alongside changes made in the desktop app. See the <a href="agents.html">agent control plane</a> for setup and behavior.</p>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

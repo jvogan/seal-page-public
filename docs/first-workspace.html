@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Your first workspace · SEAL docs</title>
+  <meta name="description" content="Open SEAL’s synthetic Sample Lab, find an Entry and sequence block, inspect a selection, and change map placement." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Your first workspace" />
+  <meta property="og:description" content="Open SEAL’s synthetic Sample Lab, find an Entry and sequence block, inspect a selection, and change map placement." />
+
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+  <link rel="stylesheet" href="../assets/tutorials.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>Your first workspace</h1>
+    <p class="edition-note" data-edition-note>Screenshots and recordings show the direct edition. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">Open the Sample Lab, inspect a DNA block, and change map placement. This walkthrough uses SEAL’s synthetic examples.</p>
+
+    <!-- Tutorial player -->
+    <h2 id="watch">Watch the walkthrough</h2>
+    <section class="tutorial-video" aria-label="Video lesson: Open your first workspace">
+      <p>This video introduces the sample workspace and its main views. If <strong>SEAL Sample Lab</strong> is already present, jump to <strong>Open the sample Entry</strong>. The written steps also cover selecting bases and changing map placement.</p>
+      <video id="lesson-video" controls playsinline preload="none" width="1440" height="900" poster="../assets/img/tutorials/01-first-workspace.jpg" aria-label="Open your first workspace">
+        <source src="../assets/videos/01-first-workspace.mp4" type="video/mp4" />
+        <track kind="captions" src="../assets/videos/01-first-workspace.vtt" srclang="en" label="English" default />
+        <p><a href="../assets/videos/01-first-workspace.mp4">Download this video</a> to watch the lesson.</p>
+      </video>
+      <p class="video-links"><span>1:06 · AI narration</span><a href="../assets/videos/01-first-workspace.mp4" download>Download video (16.5 MB)</a><a href="../assets/videos/01-first-workspace.vtt" download>English captions</a></p>
+      <ul class="lesson-chapters" aria-label="Video chapters" hidden>
+        <li><button type="button" data-seek="0" aria-controls="lesson-video">0:00 · Load the samples</button></li>
+        <li><button type="button" data-seek="18.4" aria-controls="lesson-video">0:18 · Open the sample Entry</button></li>
+        <li><button type="button" data-seek="27.5" aria-controls="lesson-video">0:27 · Read the Inspector</button></li>
+        <li><button type="button" data-seek="46.8" aria-controls="lesson-video">0:46 · Notebook and alignments</button></li>
+      </ul>
+      <details>
+        <summary>Read the transcript</summary>
+        <p>Start with SEAL open. This workspace is empty. Select Load demo workspace to add the sample sequences, notebook pages, and saved alignments. The examples use synthetic data.</p>
+        <p>In the left sidebar, expand SEAL Sample Lab and open Synthetic Reporter. The center of the window shows an Entry. An Entry groups related sequence blocks and notes.</p>
+        <p>Select Synthetic Reporter DNA. The Inspector on the right shows information for that block. In Overview, check the sequence length, molecule type, and base composition. The example DNA has seven hundred and twenty bases.</p>
+        <p>The sidebar also opens other parts of your workspace. Notebook contains lab notes. Alignments contains saved sequence comparisons, including examples with Sanger reads.</p>
+        <p>Return to Synthetic Reporter to continue working with its sequences. You can move between these pages while keeping the same workspace open.</p>
+      </details>
+    </section>
+    <!-- End tutorial player -->
+
+
+    <h2>Before you start</h2>
+    <p><a href="install.html">Install SEAL</a> and open the desktop app. You can follow this guide offline with the bundled sample data.</p>
+
+    <h2>1. Open the Sample Lab</h2>
+    <ol>
+      <li>In the sidebar, find <strong>SEAL Sample Lab</strong> under <strong>Projects</strong>. Expand the project if its entries are hidden.</li>
+      <li>Select <strong>Synthetic Reporter</strong>. The workspace opens the entry’s blocks.</li>
+      <li>Find <strong>Synthetic Reporter DNA</strong>. Its header shows <strong>DNA</strong>, <strong>720 bp</strong>, and <strong>linear</strong>.</li>
+    </ol>
+    <p>If the sample project is missing, click <strong>New entry</strong>. Press <kbd>Escape</kbd> to leave the entry-name field, then click <strong>Load demo workspace</strong> in the empty workspace. Return to <strong>SEAL Sample Lab → Synthetic Reporter</strong>.</p>
+    <p><strong>Expected result:</strong> you can read the synthetic DNA sequence and see the entry name in the workspace header.</p>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img src="assets/img/app/workbench.png" width="2880" height="1800" alt="Synthetic Reporter open in SEAL Sample Lab, with its DNA block and the Overview Inspector showing 720 bp." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">The sidebar selects an entry. The center shows its blocks. The Inspector describes the active block.</figcaption>
+    </figure>
+
+    <h2>2. Find the parts of the workspace</h2>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Part</th><th>What it holds</th><th>In this example</th></tr></thead>
+        <tbody>
+          <tr><td>Project</td><td>A group of related entries.</td><td>SEAL Sample Lab</td></tr>
+          <tr><td>Entry</td><td>Related sequence and note blocks.</td><td>Synthetic Reporter</td></tr>
+          <tr><td>Sequence block</td><td>One DNA, RNA, or protein sequence with its own name, type, and features.</td><td>Synthetic Reporter DNA</td></tr>
+          <tr><td>Inspector</td><td>Details and tools for the active block or selected sequence range.</td><td>Overview, Features, Restriction, Translate, and other tabs.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ol>
+      <li>Click inside the <strong>Synthetic Reporter DNA</strong> block to make it active.</li>
+      <li>Open <strong>Overview</strong> in the Inspector. If the Inspector is hidden, use <strong>Show inspector</strong> in the workspace header.</li>
+      <li>Compare the Inspector’s block name and length with the block header.</li>
+      <li>Open <strong>Features</strong> to inspect the sample’s annotations.</li>
+    </ol>
+    <p><strong>Expected result:</strong> the Inspector names the DNA block you selected. Selecting another block changes the Inspector’s contents.</p>
+
+    <h2>3. Select part of the sequence</h2>
+    <ol>
+      <li>Drag across a short run of DNA letters in the sequence block.</li>
+      <li>Open <strong>Translate</strong> in the Inspector to inspect reading frames for the selected range.</li>
+      <li>Read the displayed range before copying a result or creating a derived block. For this walkthrough, leave the sequence unchanged.</li>
+    </ol>
+    <p><strong>Expected result:</strong> the sequence letters are highlighted, and the translation preview refers to your selection. See <a href="translation.html">Translation and ORFs</a> for the frame controls.</p>
+
+    <h2>4. Show a map with the sequence</h2>
+    <ol>
+      <li>In the sidebar, open <strong>Cloning &amp; Assembly</strong> and find <strong>SEAL Demo Plasmid</strong>.</li>
+      <li>Open the arrow beside <strong>Map</strong> in that block’s header. The menu is labelled <strong>Map layout</strong>.</li>
+      <li>Choose <strong>Map above sequence</strong>. Compare the map’s feature labels with the sequence block.</li>
+      <li>Try <strong>Map below sequence</strong>, then choose <strong>Sequence only</strong> to hide the map.</li>
+    </ol>
+    <p><strong>Expected result:</strong> map placement changes for the same block; its sequence remains intact. The <a href="plasmid-map.html">map guide</a> covers floating and side-panel layouts.</p>
+
+    <h2>If you lose your place</h2>
+    <ul>
+      <li><strong>The sidebar looks empty:</strong> clear <strong>Search projects and entries</strong>, then expand SEAL Sample Lab.</li>
+      <li><strong>The Inspector shows another sequence:</strong> click the intended block and compare its name with the Inspector heading.</li>
+      <li><strong>The sequence is hidden by a map:</strong> open the block’s Map menu and choose <strong>Sequence only</strong>.</li>
+      <li><strong>You accidentally edit sample bases:</strong> use <kbd>⌘Z</kbd> immediately to undo the edit, then check the sequence again.</li>
+    </ul>
+
+    <h2>Continue</h2>
+    <ul>
+      <li><a href="import-first-sequence.html">Add your first sequence</a> with a copyable 80 bp practice record.</li>
+      <li><a href="concepts.html">Core concepts</a> explains how projects, entries, and blocks relate.</li>
+      <li><a href="editing.html">Editing and annotation</a> covers deliberate sequence changes.</li>
+    </ul>
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+  <script src="../assets/tutorials.js" defer></script>
+</body>
+</html>

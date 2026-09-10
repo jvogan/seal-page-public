@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ESM design · SEAL docs</title>
+  <meta name="description" content="Generate, insert, and mutate sequences with the biohub.ai ESM engine, from the sequence tab." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="ESM design" />
+  <meta property="og:description" content="Generate, insert, and mutate sequences with the biohub.ai ESM engine, from the sequence tab." />
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>ESM design</h1>
+    <p class="edition-note" data-edition-note>This guide covers source and direct-edition tools. These tools are not bundled with the first Store release. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">Generate, insert, and mutate sequences with the biohub.ai ESM engine, from the sequence tab. The same three operations also run against a deterministic on-device placeholder when no model is configured, so the workflow works offline.</p>
+
+    <h2>Overview</h2>
+    <p>ESM design is a single dialog in the sequence tab, opened from the toolbar action <strong>ESM Design</strong>. It captures the active block and any current selection, then lets you pick one of three operations:</p>
+    <ul>
+      <li><strong>Generate</strong> a new sequence of a chosen length.</li>
+      <li><strong>Insert</strong> new residues into the active sequence at a chosen position.</li>
+      <li><strong>Mutate</strong> residues across the active sequence or a selected region.</li>
+    </ul>
+    <p>Candidates come from a swappable sequence-generation engine registry. Two engines are wired:</p>
+    <ul>
+      <li><strong>biohub.ai ESM</strong>, a hosted ESM protein language model (ESMC / ESM3) reached over the biohub.ai logits API. It runs the three operations as masked-language-model infill.</li>
+      <li>The <strong>local preview engine</strong>, a deterministic on-device generator for trying the workflow. It uses no model weights, API key, or network connection.</li>
+    </ul>
+    <p>The biohub.ai engine is preferred automatically for protein sequences when the provider is enabled in <code>Settings → Models</code> and a key is present. The local unsigned package disables in-app provider-key storage and uses the local preview engine. Builds with secure key storage can use the hosted engine for protein; DNA and RNA use the local engine. The ESM Design action appears in the toolbar only when a model is enabled.</p>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/settings-models.png" alt="The Models pane in Settings listing sequence ML providers: on-device ESM-2 embeddings, EvolutionaryScale Forge, NVIDIA BioNeMo, and biohub.ai protein ESM, each with an enable toggle and a note that keys are stored in the OS keychain." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">In builds with secure key storage, enable a provider in Settings → Models. The biohub.ai option turns on hosted ESM for protein generate, insert, and mutate; keys are stored through the OS keychain rather than the workspace.</figcaption>
+    </figure>
+
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>The dialog labels each candidate with which engine produced it and shows whether the source was a real model or the local placeholder. Read that label before you commit a candidate.</p>
+      </div>
+    </div>
+
+    <figure class="docs-figure">
+      <div class="docs-figure-head">
+        <p class="docs-figure-title">Three operations, one engine registry</p>
+        <span class="docs-figure-mark">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 7q5 5 0 10 M16 7q-5 5 0 10"/></svg>
+        </span>
+      </div>
+      <svg viewBox="0 0 900 392" role="img" aria-label="Diagram: the generate, insert, and mutate operations all flow through one sequence-generation engine registry, which routes to the biohub.ai ESM model when it is available or the local preview engine otherwise, then scores candidates and applies the chosen one to the workspace.">
+        <defs>
+          <marker id="d-arrow" markerWidth="10" markerHeight="10" refX="6.5" refY="4.5" orient="auto-start-reverse">
+            <path d="M1 1.5 L6.5 4.5 L1 7.5" fill="none" stroke="currentColor" stroke-width="1.4" />
+          </marker>
+        </defs>
+
+        <!-- Operations -->
+        <rect class="d-group" x="24" y="40" width="208" height="296" rx="16" />
+        <text class="d-grouplabel" x="42" y="66">Operations</text>
+
+        <rect class="d-box" x="48" y="92" width="160" height="48" rx="10" />
+        <text class="d-label" x="128" y="121" text-anchor="middle">Generate</text>
+
+        <rect class="d-box" x="48" y="156" width="160" height="48" rx="10" />
+        <text class="d-label" x="128" y="185" text-anchor="middle">Insert</text>
+
+        <rect class="d-box" x="48" y="220" width="160" height="48" rx="10" />
+        <text class="d-label" x="128" y="249" text-anchor="middle">Mutate</text>
+
+        <!-- Registry -->
+        <rect class="d-box" x="332" y="132" width="180" height="116" rx="10" />
+        <text class="d-label" x="422" y="184" text-anchor="middle">Engine</text>
+        <text class="d-label" x="422" y="204" text-anchor="middle">registry</text>
+
+        <!-- Operations into registry -->
+        <path class="d-line" d="M208 116 L270 116 L270 168 L332 168" marker-end="url(#d-arrow)" />
+        <path class="d-line" d="M208 180 L332 190" marker-end="url(#d-arrow)" />
+        <path class="d-line" d="M208 244 L270 244 L270 212 L332 212" marker-end="url(#d-arrow)" />
+
+        <!-- Engines -->
+        <rect class="d-box" x="612" y="92" width="240" height="56" rx="10" />
+        <text class="d-label" x="732" y="116" text-anchor="middle">biohub.ai ESM</text>
+        <text class="d-cap" x="732" y="134" text-anchor="middle">hosted, protein only</text>
+
+        <rect class="d-box-ghost" x="612" y="172" width="240" height="56" rx="10" />
+        <text class="d-label" x="732" y="196" text-anchor="middle">Local preview engine</text>
+        <text class="d-cap" x="732" y="214" text-anchor="middle">on-device placeholder</text>
+
+        <!-- Registry to engines -->
+        <path class="d-line" d="M512 168 L562 168 L562 120 L612 120" marker-end="url(#d-arrow)" />
+        <path class="d-line" d="M512 212 L562 212 L562 200 L612 200" marker-end="url(#d-arrow)" />
+        <rect x="524" y="138" width="104" height="15" fill="#000" />
+        <text class="d-cap" x="528" y="150" text-anchor="start">when available</text>
+
+        <!-- Candidates back to workspace -->
+        <rect class="d-box" x="332" y="276" width="180" height="48" rx="10" />
+        <text class="d-label" x="422" y="305" text-anchor="middle">Scored candidates</text>
+        <path class="d-line" d="M422 248 L422 276" marker-end="url(#d-arrow)" />
+      </svg>
+      <figcaption class="docs-figcaption">Generate, insert, and mutate all flow through one registry. It routes to the biohub.ai model for protein when the provider is enabled and a key is present, and to the local preview engine otherwise. Either way the dialog returns scored candidates you choose from.</figcaption>
+    </figure>
+
+    <h2>Generate</h2>
+    <p>Generate builds a new sequence from scratch. Open ESM Design, select the <strong>Generate</strong> tab, set <strong>New sequence length</strong> in the sequence's unit (bp, nt, or aa), and pick a candidate.</p>
+    <p>Against the biohub.ai engine, generate sends an all-mask request of the requested length and samples each position from the model's returned logits. Against the local engine it samples from a background residue composition. Generate does not send your existing sequence to the model: only the requested length is sent.</p>
+    <p>Applying a generate result creates a new, independent block. It is not recorded as derived from the block that was active when you opened the dialog.</p>
+
+    <h2>Insert</h2>
+    <p>Insert adds new residues into the active sequence. Select the <strong>Insert</strong> tab, choose where the residues go, and set the <strong>Insert length</strong>.</p>
+    <p>You can anchor the insert <strong>before</strong> or <strong>after</strong> the current selection, or type an explicit position. With the biohub.ai engine, mask tokens are spliced into the real context at the anchor and only the masked positions are sampled, so the surrounding residues condition the fill.</p>
+    <p>Applying an insert result creates a new block derived from the source block, with a parent link recorded.</p>
+
+    <h2>Mutate</h2>
+    <p>Mutate resamples residues in place. Select the <strong>Mutate</strong> tab. If you have a region selected, mutation is scoped to that selection; with no selection (or a collapsed caret), it runs across the whole sequence.</p>
+    <p>With the biohub.ai engine, mutate sends the unmasked context and resamples the chosen positions while excluding each position's current residue, so every chosen position changes. The number of positions changed scales with temperature. Each candidate's note lists the substitutions, for example <code>A12G, L45V</code>.</p>
+    <p>Applying a mutate result creates a new block derived from the source block, with a parent link recorded.</p>
+
+    <h3>Sampling controls</h3>
+    <p>The dialog's power settings drive sampling for whichever engine is active:</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Control</th><th>Effect</th></tr></thead>
+        <tbody>
+          <tr><td>Temperature</td><td>Sharpens (below 1) or flattens (above 1) the residue distribution before sampling.</td></tr>
+          <tr><td>Top-p</td><td>Nucleus sampling: keep the smallest residue set whose cumulative probability reaches top-p.</td></tr>
+          <tr><td>Top-k</td><td>Keep only the k highest-weight residues. 0 turns it off.</td></tr>
+          <tr><td>Candidates</td><td>How many candidate sequences to return.</td></tr>
+          <tr><td>Seed</td><td>Deterministic seed. The same seed and inputs return identical candidates. A button randomizes it.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>For the biohub.ai engine, the sampling knobs are applied to the returned logits on your device. Moving a slider re-samples without another network request; only a change to the structural input (operation, length, context, insert position, or model) fetches new logits.</p>
+
+    <h2>PROSITE motif constraints</h2>
+    <p>You can constrain a design with a PROSITE pattern, either typed into the motif field or chosen from the preset list. The pattern is validated for the sequence's alphabet before it is applied. An invalid pattern is reported and ignored.</p>
+    <p>A valid motif changes each operation:</p>
+    <ul>
+      <li><strong>Generate and insert</strong> force the generated region to contain the motif. Each conserved position samples only from its allowed residues, and variable spacers fill freely. For an unanchored motif, <strong>Motif start</strong> places it within the region.</li>
+      <li><strong>Mutate</strong> preserves existing motif occurrences. Positions inside a match are excluded from mutation so an edit cannot break them.</li>
+    </ul>
+    <p>Every candidate is then re-scanned with the exact PROSITE matcher, tagged as containing the motif or not, and re-ranked so satisfying candidates come first. In the candidate list, a <strong>motif</strong> or <strong>no motif</strong> badge marks each one, and matches are highlighted in the result preview. A <strong>Show only matches</strong> checkbox hides non-matching candidates.</p>
+
+    <h3>When a motif cannot fit</h3>
+    <p>A pattern can be valid yet impossible to place for the chosen length. The dialog warns instead of silently returning unmatched candidates. The cases it flags:</p>
+    <ul>
+      <li>The motif's minimum length is larger than the generate length or insert length. The warning tells you the minimum needed.</li>
+      <li>An anchored motif (<code>&lt;</code> or <code>&gt;</code>) targets a sequence end. On an insert it can only hold when the insert sits at the matching end, so the dialog suggests using Generate, dropping the anchor, or inserting at the start or end.</li>
+      <li>A both-anchored <code>&lt;...&gt;</code> motif must be the whole sequence, so the length has to fall inside the motif's own span.</li>
+    </ul>
+    <p>Mutate has no length to outgrow, so these fit warnings do not apply to it.</p>
+
+    <h2>Score with ESM-C</h2>
+    <p>Generate, insert, and mutate are design operations, and each can fall back to the on-device placeholder when no model is configured. The next two actions evaluate an existing protein instead, and they run on the hosted model only. Both open from the same sequence toolbar actions menu that hosts ESM Design.</p>
+    <p>Choose <strong>Score with ESM-C</strong> to rate how expected a protein looks to the model. The action appears only for a protein block when biohub.ai is enabled in <code>Settings → Models</code> and a key is present. There is no local fallback, so running it sends your sequence off your device to the hosted model.</p>
+    <p>The dialog reports a <strong>pseudo-perplexity</strong> and a <strong>mean logP</strong> for the scored window, with a short verdict that runs from <strong>highly expected</strong>, through <strong>plausible</strong>, <strong>unusual</strong>, and <strong>surprising</strong>, to <strong>implausible</strong> as the pseudo-perplexity rises.</p>
+    <p>Below the metrics, a per-residue heat strip shows the model's confidence at each position. Each cell encodes that confidence in both bar height and color, so the track stays readable in high-contrast mode where chroma is stripped. A short <strong>most surprising</strong> list calls out the lowest-probability residues in the window.</p>
+    <p>Pick how the score is computed. <strong>Precise</strong> masks each residue in turn and reads the probability of the true residue given the rest, at a cost of one request per residue. <strong>Fast</strong> reads every position in a single pass, and the dialog defaults to it for longer windows. Scoring a selection scopes the result to that window.</p>
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>Score and Mutational scan are read-only. They report on the active sequence and create no block and record no provenance, so nothing new appears in the provenance graph or the Activity trail.</p>
+      </div>
+    </div>
+
+    <h2>Mutational scan</h2>
+    <p>Choose <strong>Mutational scan</strong> to rate every single-residue substitution across a window. The gating matches Score: protein block only, biohub.ai enabled in <code>Settings → Models</code> with a key present, and no local fallback, so your sequence is sent off your device to the hosted model.</p>
+    <p>The result is a heatmap of all 20 amino acids at each position. Each cell is <strong>ΔlogP</strong>, the change in pseudo-log-likelihood for that substitution versus the wild-type residue. Tolerated substitutions read cool and disfavored ones read warm, the wild-type cell is outlined in each column, and hovering a cell shows the exact value. In high-contrast mode the color ramp becomes a grayscale lightness scale so the signal survives without chroma. The same Precise and Fast choice from scoring applies here.</p>
+    <div class="docs-note is-warn">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.6 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg>
+      </span>
+      <div>
+        <p>ΔlogP is a language-model preference signal, not a ΔΔG or folding free energy. Read it as relative tolerance for each substitution, not a thermodynamic prediction.</p>
+      </div>
+    </div>
+
+    <h2>Provenance</h2>
+    <p>Applying a candidate records where the sequence came from. The new block carries sequence-generation metadata including the operation, the engine id and label, whether the source was a real model, the candidate note, the score, the sampling parameters, and the output length and type.</p>
+    <p>Insert and mutate results link to the source block as derivatives, so the provenance graph includes the parent edge and Activity records the change. Generate results are independent new blocks with no parent edge because they are not derived from an existing sequence.</p>
+
+    <div class="docs-note is-warn">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.6 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg>
+      </span>
+      <div>
+        <p>What reaches the network depends on the engine and operation. The local preview engine sends nothing off your device. In a build with secure key storage, the biohub.ai engine is a hosted service: a <strong>generate</strong> request sends mask tokens for the requested length. <strong>Insert</strong> and <strong>mutate</strong> send the protein context as token IDs, which can include the full active sequence when editing a selected region. The app reads the API key from OS-backed secure storage and sends the request from the Electron main process. Using a hosted model may consume provider credits. See <a href="privacy.html">Privacy</a>.</p>
+      </div>
+    </div>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

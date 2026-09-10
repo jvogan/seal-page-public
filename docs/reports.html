@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reports and packages · SEAL docs</title>
+  <meta name="description" content="Export reports and zipped packages from the workspace for review or for an agent." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Reports and packages" />
+  <meta property="og:description" content="Export reports and zipped packages from the workspace." />
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+  <link rel="stylesheet" href="../assets/tutorials.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>Reports and packages</h1>
+    <p class="edition-note" data-edition-note>Screenshots and recordings show the direct edition. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">Export reports and zipped packages. Write a single format from the CLI, or build one package that bundles the report, the sequences, and a manifest.</p>
+
+    <!-- Tutorial player -->
+    <h2 id="watch">Watch the walkthrough</h2>
+    <section class="tutorial-video" aria-label="Video lesson: Export a report and review Activity">
+      <p>Choose report attachments, download a ZIP, and confirm the completed export in Activity.</p>
+      <video id="lesson-video" controls playsinline preload="none" width="1440" height="900" poster="../assets/img/tutorials/08-report-handoff.jpg" aria-label="Export a report and review Activity">
+        <source src="../assets/videos/08-report-handoff.mp4" type="video/mp4" />
+        <track kind="captions" src="../assets/videos/08-report-handoff.vtt" srclang="en" label="English" default />
+        <p><a href="../assets/videos/08-report-handoff.mp4">Download this video</a> to watch the lesson.</p>
+      </video>
+      <p class="video-links"><span>0:54 · AI narration</span><a href="../assets/videos/08-report-handoff.mp4" download>Download video (12.3 MB)</a><a href="../assets/videos/08-report-handoff.vtt" download>English captions</a></p>
+      <ul class="lesson-chapters" aria-label="Video chapters" hidden>
+        <li><button type="button" data-seek="4.3" aria-controls="lesson-video">0:04 · Open Build report</button></li>
+        <li><button type="button" data-seek="16.1" aria-controls="lesson-video">0:16 · Choose attachments</button></li>
+        <li><button type="button" data-seek="30.2" aria-controls="lesson-video">0:30 · Inspect the ZIP contents</button></li>
+        <li><button type="button" data-seek="42.2" aria-controls="lesson-video">0:42 · Download and check Activity</button></li>
+      </ul>
+      <details>
+        <summary>Read the transcript</summary>
+        <p>Open Synthetic Reporter and select Synthetic Reporter DNA. Press Command K to open the command palette, type Build report, and choose that command.</p>
+        <p>Report handoff opens for the selected source block. Start by checking the name at the top. Then review Attachments. This example includes the selected sequence as FASTA, a block-summary CSV, a styled sequence report, and a GenBank file. The dialog describes what each format preserves.</p>
+        <p>Expand Package zip preview to inspect the files that will be included. The package brings the report, selected attachments, and supporting metadata together in one download. Review the selection before clicking Download ZIP.</p>
+        <p>After the download, open Activity in the Inspector. Find Report package exported and confirm that the event is marked completed.</p>
+      </details>
+    </section>
+    <!-- End tutorial player -->
+
+
+    <h2>Download a report and review its Activity event</h2>
+    <p>Package the selected reporter block, then check the export record in the Inspector.</p>
+    <ol>
+      <li>Open <strong>Synthetic Reporter</strong> and select <strong>Synthetic Reporter DNA</strong>.</li>
+      <li>Press <strong>⌘K</strong>, type <strong>Build report</strong>, and choose the command.</li>
+      <li>In <strong>Report handoff</strong>, confirm that the source block is <strong>Synthetic Reporter DNA</strong>.</li>
+      <li>Under <strong>Attachments</strong>, review <strong>Selected sequences FASTA</strong>, <strong>Block summary CSV</strong>, <strong>Styled sequence report</strong>, and the block's <strong>GenBank</strong> file. Read the format notes and select the files you want.</li>
+      <li>Expand <strong>Package zip preview</strong>. Check that its file list matches your selections, including the report and supporting metadata.</li>
+      <li>Click <strong>Download ZIP</strong> and wait for the download to finish.</li>
+      <li>Open <strong>Activity</strong> in the Inspector. Find <strong>Report package exported</strong> and confirm that the event is marked <strong>completed</strong>.</li>
+    </ol>
+    <p>The package contents depend on the selected blocks and attachments. Keep the ZIP with your review notes so you can identify the exported files later.</p>
+
+    <figure class="docs-figure">
+      <div class="docs-figure-head">
+        <p class="docs-figure-title">From workspace to a handoff package</p>
+        <span class="docs-figure-mark">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 7q5 5 0 10 M16 7q-5 5 0 10"/></svg>
+        </span>
+      </div>
+      <svg viewBox="0 0 900 300" role="img" aria-label="Diagram: workspace blocks feed an export step, which produces either a single-format file or a package zip. The zip bundles the report, the sequences, a summary, and a manifest, among other per-block files listed in the text below.">
+        <defs>
+          <marker id="d-arrow" markerWidth="10" markerHeight="10" refX="6.5" refY="4.5" orient="auto-start-reverse">
+            <path d="M1 1.5 L6.5 4.5 L1 7.5" fill="none" stroke="currentColor" stroke-width="1.4" />
+          </marker>
+        </defs>
+
+        <!-- Source -->
+        <rect class="d-box" x="32" y="118" width="150" height="64" rx="10" />
+        <text class="d-label" x="107" y="146" text-anchor="middle">Workspace</text>
+        <text class="d-cap" x="107" y="164" text-anchor="middle">blocks</text>
+
+        <!-- Export step -->
+        <rect class="d-box" x="262" y="118" width="160" height="64" rx="10" />
+        <text class="d-label" x="342" y="146" text-anchor="middle">export</text>
+        <text class="d-cap" x="342" y="164" text-anchor="middle">CLI or Report Handoff</text>
+
+        <!-- Single file output -->
+        <rect class="d-box-ghost" x="502" y="36" width="170" height="52" rx="8" />
+        <text class="d-label" x="587" y="62" text-anchor="middle">Single file</text>
+        <text class="d-cap" x="587" y="78" text-anchor="middle">csv · md · gb · json</text>
+
+        <!-- Package group -->
+        <rect class="d-group" x="502" y="118" width="372" height="158" rx="14" />
+        <text class="d-grouplabel" x="520" y="142">Package zip</text>
+        <rect class="d-box-ghost" x="520" y="156" width="160" height="40" rx="8" />
+        <text class="d-label" x="600" y="181" text-anchor="middle">report.md</text>
+        <rect class="d-box-ghost" x="694" y="156" width="160" height="40" rx="8" />
+        <text class="d-label" x="774" y="181" text-anchor="middle">sequences.fasta</text>
+        <rect class="d-box-ghost" x="520" y="204" width="160" height="40" rx="8" />
+        <text class="d-label" x="600" y="229" text-anchor="middle">summary.csv</text>
+        <rect class="d-box-ghost" x="694" y="204" width="160" height="40" rx="8" />
+        <text class="d-label" x="774" y="229" text-anchor="middle">manifest.json</text>
+
+        <!-- Connectors -->
+        <path class="d-line" d="M182 150 L262 150" marker-end="url(#d-arrow)" />
+        <path class="d-line" d="M422 150 L462 150 L462 62 L502 62" marker-end="url(#d-arrow)" />
+        <path class="d-line" d="M422 150 L462 150 L462 188 L502 188" marker-end="url(#d-arrow)" />
+      </svg>
+      <figcaption class="docs-figcaption">Workspace blocks feed one export step. It writes a single-format file, or a package zip that bundles the report, the sequences, a summary, and a manifest. The full list of package files is below.</figcaption>
+    </figure>
+
+    <h2>Export a report</h2>
+    <p>Run <code>seal export</code> with a format subcommand to write blocks from the shared workspace. Each subcommand prints to stdout, or writes a file with <code>--output</code>.</p>
+
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Subcommand</th><th>Output</th></tr></thead>
+        <tbody>
+          <tr><td><code>csv</code></td><td>A CSV summary table, one row per block.</td></tr>
+          <tr><td><code>markdown</code></td><td>A Markdown document, one section per block.</td></tr>
+          <tr><td><code>slide-summary</code></td><td>Compact slide-friendly Markdown, one bullet per block.</td></tr>
+          <tr><td><code>genbank</code></td><td>GenBank for one block, all blocks, or one file per block.</td></tr>
+          <tr><td><code>workspace-json</code></td><td>A full JSON dump of every block in the scratch workspace.</td></tr>
+          <tr><td><code>gff3</code></td><td>A GFF3 document, one ##sequence-region per block and one row per feature, with an optional ##FASTA section.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="docs-code" data-lang="bash" data-title="Markdown report with analysis rows">
+<pre><code>seal export markdown --include-analysis --output summary.md</code></pre>
+    </div>
+
+    <p>Some subcommands take extra flags: <code>csv</code> accepts <code>--include-features</code>, <code>markdown</code> accepts <code>--include-analysis</code>, and <code>slide-summary</code> accepts <code>--title</code>. For GenBank, write one file with <code>--output</code> or one file per block with <code>--output-dir</code>.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="GenBank: one file, one block, or one per block">
+<pre><code>seal export genbank --output all-blocks.gb
+seal export genbank --block block-abc --output plasmid.gb
+seal export genbank --output-dir genbank-export</code></pre>
+    </div>
+
+    <p>When a subcommand writes a file, it returns a small JSON receipt with the format, the block <code>count</code>, and the <code>path</code>.</p>
+
+    <div class="docs-code" data-lang="json" data-title="export receipt">
+<pre><code>{
+  "ok": true,
+  "format": "genbank",
+  "count": 5,
+  "path": "genbank-export"
+}</code></pre>
+    </div>
+
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>To export from the desktop workspace, set <code>SEAL_DB_PATH</code> to the active database path shown in SEAL's Agent Setup. See <a href="cli.html">CLI setup</a> for installation and <a href="architecture.html">Architecture</a> for path resolution.</p>
+      </div>
+    </div>
+
+    <h2>Report packages</h2>
+    <p>A report package bundles a report, selected attachments, and a manifest in one ZIP. In the desktop app, choose the attachments in <strong>Report handoff</strong>. Over MCP, use <code>export_package</code>: pass block names or IDs to <code>blocks</code>, or omit it to package the MCP scratch workspace.</p>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/report-handoff.png" alt="The Report Handoff dialog listing source blocks, format notes, and selectable attachments (FASTA, block summary CSV, styled report, GenBank), a styled-print option, a package zip preview, and Export Markdown and Download ZIP actions." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">Report Handoff lists the source blocks, warns which formats are lossy, and selects the attachments to bundle, then writes the package zip with a manifest and validation file.</figcaption>
+    </figure>
+
+    <div class="docs-code" data-lang="json" data-title="export_package over MCP">
+<pre><code>{
+  "tool": "export_package",
+  "arguments": {
+    "blocks": ["seal-synthetic-assembly"],
+    "includeBase64": true
+  }
+}</code></pre>
+    </div>
+
+    <p>The package file list depends on the export options. It can include:</p>
+    <ul>
+      <li><code>report.md</code>: the Markdown report.</li>
+      <li><code>sequences.fasta</code>: the sequences as FASTA.</li>
+      <li><code>summary.csv</code> and <code>features.csv</code>: the summary table and feature list.</li>
+      <li>Per-block GenBank files under <code>genbank/</code>.</li>
+      <li><code>validation.md</code>: a note on which files are lossless.</li>
+      <li><code>manifest.json</code>: the file list with sizes, CRC32 checksums, and source block and event ids.</li>
+    </ul>
+
+    <p>The manifest records, for each file, whether it is lossless and whether it should be verified by reimport. GenBank is the metadata-preserving biological export. FASTA and CSV are lossy summaries by design. Set <code>includeBase64</code> to <code>false</code> to return only the manifest and validation metadata without the zip payload.</p>
+
+    <h2>Handoff to an agent</h2>
+    <p>A package gives an agent the report, exported sequences, and manifest together. Its contents reflect the selected blocks and export options.</p>
+
+    <p>To verify a handoff end to end, reimport the GenBank files from the package and confirm they round-trip.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Reimport the GenBank from a package">
+<pre><code>seal import genbank-export/plasmid.gb</code></pre>
+    </div>
+
+    <p>See <a href="agents.html">the agent control plane</a> for how agents read and write the same local workspace, and the <a href="mcp-reference.html">MCP tool reference</a> for the export tools. For output field shapes, see the <a href="io-contract.html">IO contract</a>.</p>
+
+    <h2>Next steps</h2>
+    <ul>
+      <li><a href="notebook.html">Notebook</a>: keep a persistent, linked record of an analysis alongside the packages you hand off.</li>
+    </ul>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+  <script src="../assets/tutorials.js" defer></script>
+</body>
+</html>

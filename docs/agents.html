@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agent control plane · SEAL docs</title>
+  <meta name="description" content="How external agents read and write the same local SEAL workspace through explicit MCP tools." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Agent control plane" />
+  <meta property="og:description" content="How external agents read and write the same local SEAL workspace through explicit MCP tools." />
+
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>Agent control plane</h1>
+    <p class="edition-note" data-edition-note>This guide covers source and direct-edition tools. These tools are not bundled with the first Store release. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">External agents such as Claude Code, Codex, and Gemini CLI read and write the same local workspace you use by hand. They connect over MCP, use explicit tools, and record each write in Activity.</p>
+
+    <figure class="docs-figure">
+      <div class="docs-figure-head">
+        <p class="docs-figure-title">The agent control loop</p>
+        <span class="docs-figure-mark">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 7q5 5 0 10 M16 7q-5 5 0 10"/></svg>
+        </span>
+      </div>
+      <svg viewBox="0 0 900 470" role="img" aria-label="Diagram: an external agent calls MCP tools to read from and act on the SQLite workspace; every write is recorded in the Activity trail, which the agent reads back to confirm the change. The four steps form a clockwise loop.">
+        <defs>
+          <marker id="d-arrow" markerWidth="10" markerHeight="10" refX="6.5" refY="4.5" orient="auto-start-reverse">
+            <path d="M1 1.5 L6.5 4.5 L1 7.5" fill="none" stroke="currentColor" stroke-width="1.4" />
+          </marker>
+        </defs>
+
+        <!-- On your Mac boundary -->
+        <rect class="d-group" x="232" y="40" width="636" height="392" rx="16" />
+        <text class="d-grouplabel" x="250" y="66">On your Mac</text>
+
+        <!-- External agent, outside the boundary on the left -->
+        <rect class="d-box" x="40" y="186" width="156" height="92" rx="10" />
+        <text class="d-label" x="118" y="220" text-anchor="middle">External agent</text>
+        <text class="d-cap" x="118" y="240" text-anchor="middle">Claude Code · Codex</text>
+        <text class="d-cap" x="118" y="256" text-anchor="middle">Gemini CLI</text>
+
+        <!-- 1. MCP tools, top of the loop -->
+        <rect class="d-box" x="360" y="96" width="200" height="68" rx="10" />
+        <text class="d-label" x="460" y="126" text-anchor="middle">MCP tools</text>
+        <text class="d-cap" x="460" y="146" text-anchor="middle">read · act</text>
+
+        <!-- 2. SQLite workspace, right of the loop -->
+        <rect class="d-box" x="668" y="200" width="176" height="68" rx="10" />
+        <text class="d-label" x="756" y="230" text-anchor="middle">SQLite workspace</text>
+        <text class="d-cap" x="756" y="250" text-anchor="middle">seal.db · WAL</text>
+
+        <!-- 3. Activity trail, bottom of the loop -->
+        <rect class="d-box" x="360" y="316" width="200" height="68" rx="10" />
+        <text class="d-label" x="460" y="346" text-anchor="middle">Activity trail</text>
+        <text class="d-cap" x="460" y="366" text-anchor="middle">audit · writeSource</text>
+
+        <!-- Loop step 1: agent -> MCP tools (call) -->
+        <path class="d-line d-accent" d="M196 210 L280 210 L280 130 L360 130" marker-end="url(#d-arrow)" />
+        <text class="d-cap" x="292" y="200" text-anchor="start">call</text>
+
+        <!-- Loop step 2: MCP tools -> workspace (read + write) -->
+        <path class="d-line" d="M560 142 L756 142 L756 200" marker-start="url(#d-arrow)" marker-end="url(#d-arrow)" />
+        <text class="d-cap" x="606" y="134" text-anchor="start">read + write</text>
+
+        <!-- Loop step 3: workspace -> Activity trail (record) -->
+        <path class="d-line" d="M756 268 L756 350 L560 350" marker-end="url(#d-arrow)" />
+        <text class="d-cap" x="606" y="368" text-anchor="end">record</text>
+
+        <!-- Loop step 4: Activity trail -> agent (read back) -->
+        <path class="d-line d-accent" d="M360 350 L280 350 L280 254 L196 254" marker-end="url(#d-arrow)" />
+        <text class="d-cap" x="292" y="300" text-anchor="start">read back</text>
+
+        <!-- Live UI sync, ghost element fed by the workspace -->
+        <rect class="d-box-ghost" x="668" y="316" width="176" height="68" rx="10" />
+        <text class="d-label" x="756" y="346" text-anchor="middle">Desktop app</text>
+        <text class="d-cap" x="756" y="366" text-anchor="middle">live sync</text>
+        <path class="d-line-dim" d="M756 268 L756 316" marker-end="url(#d-arrow)" />
+      </svg>
+      <figcaption class="docs-figcaption">The agent calls an MCP tool, the tool reads from and writes to the SQLite workspace, the write is recorded in Activity, and the agent reads that record back to confirm the change. The running desktop app rehydrates from the same workspace, so manual and agent changes converge on one source of truth.</figcaption>
+    </figure>
+
+    <h2>How it works</h2>
+    <p>An agent connects to the SEAL MCP server and calls tools that operate on the same on-device SQLite database the desktop app and CLI use. There is no separate agent copy of your data. When an agent imports a sequence, creates a project, adds a feature, or runs a simulation, it writes to that one file.</p>
+    <p>SEAL runs the MCP server, the CLI, and the app against the same schema, the same PRAGMAs (<code>WAL</code>, <code>synchronous=NORMAL</code>, <code>busy_timeout=5000</code>, <code>foreign_keys=ON</code>), and the same migration runner, so concurrent writes from different processes are safe. A file watcher in the desktop app picks up writes within about 300 ms and rehydrates the interface, so a change an agent makes in a terminal shows up in the running app without a refresh.</p>
+    <p>For the full picture of which process reads the watcher events and how the database path is resolved, see the <a href="architecture.html">architecture</a> overview.</p>
+
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>For an agent's writes and the app's writes to share one file, set <code>SEAL_DB_PATH</code> to the same path in the agent's MCP config and before any CLI command. The native app launched from the Dock resolves to the platform application-data path, which has no relationship to your repo checkout.</p>
+      </div>
+    </div>
+
+    <h2>Activity records</h2>
+    <p>Activity records agent writes in the same place as changes made in the desktop app. Each canonical mutation records its source (<code>writeSource</code> is <code>mcp</code> or <code>cli</code>), the tool or command name, and the affected project, conversation, and block IDs in structured metadata.</p>
+    <p>Collapsed Activity rows read with human block names and source labels. Raw IDs stay in the structured metadata so they are available for debugging and export round trips without cluttering the timeline.</p>
+    <p>Rows are split by lifetime. Conversation-scoped rows live in <code>workflow_events</code>. Workspace, project, and conversation rows that must survive a conversation deletion live in the durable <code>workspace_events</code> table and appear through the Activity filter labeled <strong>Workspace / agent writes</strong>.</p>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/activity.png" alt="The Activity tab in the Inspector showing a timeline of writes with a source filter, a Workspace / agent writes filter, and a recorded operation with its time and status." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">The Activity trail records each write with its source. Agent writes appear under the Workspace / agent writes filter, next to the edits you make by hand.</figcaption>
+    </figure>
+    <h3>Checkpoints</h3>
+    <p>Before a destructive block mutation, SEAL writes a checkpoint when the current schema can keep that checkpoint alive, so a recoverable change can be restored. Where a checkpoint would cascade away with the thing being deleted, such as removing a block or deleting a conversation, the row records a metadata snapshot instead. <a href="mutation-matrix.html">What agents can change</a> lists the checkpoint behavior per operation.</p>
+
+    <h2>Connect an agent</h2>
+    <p>Each client takes a small MCP server block pointed at your database. Pick your agent:</p>
+    <ul>
+      <li><a href="agents-claude-code.html">Connect Claude Code</a></li>
+      <li><a href="agents-codex.html">Connect Codex</a></li>
+      <li><a href="agents-gemini-cli.html">Connect Gemini CLI</a></li>
+    </ul>
+    <p>For the shared server command, the database path override, and startup verification that applies to any MCP client, see <a href="mcp-setup.html">MCP setup</a>. The tools an agent can call are listed in the <a href="mcp-reference.html">MCP tool reference</a>.</p>
+
+    <h2>Safety</h2>
+    <p>Agent writes go directly into SQLite. SEAL does not put them behind an approval queue. It makes them observable instead: through <code>writeSource</code>, the Activity trail, provenance metadata, checkpoints where the operation is recoverable, and live UI sync. You see what an agent did, and you can recover the changes the schema can keep.</p>
+    <p>Before you connect an agent, run Agent Doctor from the Agent Control Plane panel to confirm the database path, the watcher, and the renderer are ready. To keep agent or test work off your live workspace, set <code>SEAL_DB_PATH</code> to a scratch file first.</p>
+    <p>For copyable prompts that ask an agent to work review-first, see <a href="agent-prompts.html">prompts and safety</a>. For the exact surfaces an agent can read and mutate, see <a href="mutation-matrix.html">what agents can change</a>.</p>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

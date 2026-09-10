@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Try the SEAL Sample Lab &middot; SEAL</title>
+  <meta name="description" content="Nine newcomer-ready SEAL workflows using project-authored synthetic fixtures, including linked maps, MSA, synthetic traces, live translation, cloning, Activity, and report handoff." />
+
+  <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon-16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Try the SEAL Sample Lab" />
+  <meta property="og:description" content="Nine current workflows with synthetic, non-functional sample data." />
+
+
+  <link rel="stylesheet" href="styles.css?v=20260907" />
+  <script src="assets/theme.js"></script>
+  <link rel="stylesheet" href="assets/images.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" role="banner">
+    <a class="nav-brand" href="index.html" aria-label="SEAL home">
+      <span class="nav-mark" aria-hidden="true"><img src="assets/img/favicon-32.png" width="32" height="32" alt="" /></span>
+      <span class="nav-word">SEAL</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html#tour">Tour</a>
+
+      <a href="index.html#install">Install</a>
+
+      <a href="docs/">Docs</a>
+      <a href="docs/editions.html">Editions</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="theme-toggle" id="theme-toggle" aria-pressed="false" aria-label="Switch to dark theme" title="Toggle dark mode">
+        <svg class="theme-toggle-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21M5.6 5.6l1.1 1.1M17.3 17.3l1.1 1.1M5.6 18.4l1.1-1.1M17.3 6.7l1.1-1.1" stroke-linecap="round" />
+        </svg>
+        <svg class="theme-toggle-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z" />
+        </svg>
+      </button>
+      <a class="btn btn-primary" href="index.html#install">Get SEAL</a>
+      <button class="nav-burger" id="nav-burger" aria-label="Open menu" aria-expanded="false" aria-controls="nav-mobile-sheet">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16" />
+        </svg>
+      </button>
+    </div>
+
+    <nav class="nav-mobile-sheet" id="nav-mobile-sheet" aria-label="Site navigation" hidden>
+      <a href="index.html#tour">Tour</a>
+
+      <a href="index.html#install">Install</a>
+
+      <a href="docs/">Docs</a>
+      <a href="docs/editions.html">Editions</a>
+      <a href="try.html">Try the Sample Lab</a>
+      <a href="workflows.html">Workflows</a>
+      <a href="privacy.html">Privacy</a>
+        <a href="support.html">Support</a>
+    </nav>
+  </header>
+
+  <main id="main">
+
+    <section class="page-hero" id="top">
+      <p class="eyebrow">SEAL Sample Lab</p>
+      <h1>Guided recipes for the current app.</h1>
+      <p class="page-lede">
+        The Sample Lab contains project-authored, deterministic synthetic
+        records. These recipes cover translation, maps, cloning, alignment,
+        Activity, recovery, and report handoff.
+      </p>
+    </section>
+
+    <section class="try-list">
+      <p>Start with <a href="docs/first-workspace.html">Your first workspace</a> to open the Sample Lab. Each recipe begins in that project. Click inside a sequence block to make it active; use <strong>Show inspector</strong> in the workspace header if its panel is hidden. The block’s <strong>Actions</strong> menu is beneath its sequence.</p>
+      <article class="try-item" id="live-translate" data-chip="~4 minutes">
+        <header class="try-head">
+          <span class="try-num">01</span>
+          <span class="try-chip">~4 minutes</span>
+          <h2>Live selection translation.</h2>
+          <p class="try-sub">Use Synthetic Reporter DNA to see translation follow a nucleotide selection in real time.</p>
+        </header>
+        <ol class="try-steps">
+          <li>In the sidebar, expand <strong>SEAL Sample Lab</strong> and open <strong>Synthetic Reporter</strong>.</li>
+          <li>Click inside <strong>Synthetic Reporter DNA</strong>.</li>
+          <li>Drag across a base range, open <strong>Overview</strong> in the Inspector, and scroll to the <strong>Selection</strong> card.</li>
+          <li>Select a different range of DNA and compare the updated translation.</li>
+          <li>Check the amino-acid count, remainder, and internal-stop warnings.</li>
+        </ol>
+        <p class="try-notice">What to notice: the readout reports frame, strand, selected range, genetic code, translated length, trailing bases, and stops without creating a new block.</p>
+        <p class="try-finish"><span aria-hidden="true">✓</span> You should now see a selection-linked protein preview in the Inspector.</p>
+      </article>
+
+      <article class="try-item" id="reverse-translate" data-chip="~5 minutes">
+        <header class="try-head">
+          <span class="try-num">02</span>
+          <span class="try-chip">~5 minutes</span>
+          <h2>Six frames and reverse translation.</h2>
+          <p class="try-sub">Compare every DNA reading frame, then turn a synthetic protein into a clearly labelled draft nucleotide sequence.</p>
+        </header>
+        <ol class="try-steps">
+          <li>With Synthetic Reporter DNA active, open the Inspector <strong>Translate</strong> tab.</li>
+          <li>Compare +1, +2, +3, -1, -2, and -3 for the selection or whole block.</li>
+          <li>Use <strong>Show</strong>, <strong>Copy</strong>, or <strong>New block</strong> on one frame.</li>
+          <li>Click <strong>Synthetic Reporter Protein</strong> in the same entry and open <strong>Codons</strong> in the Inspector.</li>
+          <li>In <strong>Back-translation preview</strong>, choose DNA or RNA, a host table, and a <strong>Codon strategy</strong>. Add enzyme names or motifs under <strong>Avoid sites</strong>, review the preview, then choose <strong>Draft candidate</strong>.</li>
+        </ol>
+        <p class="try-notice">What to notice: Max-frequency is the default strategy; Balanced codon usage and Synthesis-guarded are also available. Unencodable symbols become <code>NNN</code>. Stop symbols receive codons, and later residues remain in the draft.</p>
+        <p class="try-finish"><span aria-hidden="true">✓</span> You should now see a draft with length, GC, encoded-symbol counts, and notices for stops or unresolved sites.</p>
+      </article>
+
+      <article class="try-item" id="synthetic-backbone" data-chip="~5 minutes">
+        <header class="try-head">
+          <span class="try-num">03</span>
+          <span class="try-chip">~5 minutes</span>
+          <h2>Linked maps and synthetic backbone review.</h2>
+          <p class="try-sub">Compare circular DNA, linear DNA, and protein maps, then inspect a deterministic synthetic cloning fixture.</p>
+        </header>
+        <ol class="try-steps">
+          <li>In the sidebar, open <strong>Cloning &amp; Assembly</strong> and click <strong>SEAL Demo Plasmid</strong>. Its circular map starts above the DNA.</li>
+          <li>Open the arrow beside <strong>Map</strong> in the block header and try <strong>Map only</strong>, <strong>Map below sequence</strong>, and <strong>Open floating map</strong>.</li>
+          <li>In the sidebar, open <strong>Synthetic Genomic Region</strong> to find <strong>SEAL Synthetic Genomic Region (30 kb)</strong>. Then open <strong>Synthetic Protein Models</strong> to find <strong>Synthetic Modular Peptide Model</strong>. Both use linear maps.</li>
+          <li>Click <strong>Browse vectors</strong> beside the composer. Select <strong>SEAL Synthetic Cloning Backbone</strong>, then click <strong>Add to workspace</strong>.</li>
+          <li>On the added DNA block, open <strong>Actions → Restriction digest</strong> to inspect cuts. Close the dialog, then choose <strong>Actions → Clone builder</strong> to inspect vector and insert compatibility.</li>
+        </ol>
+        <p class="try-notice">What to notice: map placement changes how you view the record. Choose <strong>Sequence only</strong> in the Map menu to return to the sequence.</p>
+        <p class="try-finish"><span aria-hidden="true">✓</span> You should now have compared map-only, linked, and floating layouts and reviewed an in-silico digest preview.</p>
+      </article>
+
+      <article class="try-item" id="assembly" data-chip="~8 minutes">
+        <header class="try-head">
+          <span class="try-num">04</span>
+          <span class="try-chip">~8 minutes</span>
+          <h2>Golden Gate and GoldenBraid assembly.</h2>
+          <p class="try-sub">Follow a complete synthetic example across parts, product, Activity, and a linked notebook.</p>
+        </header>
+        <ol class="try-steps">
+          <li>In the sidebar, open <strong>Cloning &amp; Assembly</strong>.</li>
+          <li>Scroll through the entry to read its <strong>SEAL assembly notebook</strong> note block.</li>
+          <li>Inspect the three synthetic Level 0 parts and the Level 1 destination backbone.</li>
+          <li>Click <strong>SEAL Golden Gate Sample Assembly</strong>, open the Inspector’s <strong>Activity</strong> tab, and review the assembly event.</li>
+          <li>Open a DNA block’s <strong>Actions</strong> menu and choose <strong>Golden Gate</strong> or <strong>GoldenBraid assembly</strong>. Use the <a href="docs/cloning.html">cloning guide</a> to configure a new assembly and compare it with the sample product.</li>
+        </ol>
+        <p class="try-notice">What to notice: parts, backbones, products, and notebook records stay linked as one synthetic example.</p>
+        <p class="try-finish"><span aria-hidden="true">✓</span> You should now see the product linked to its synthetic inputs and local records.</p>
+      </article>
+
+      <article class="try-item" id="synthetic-region" data-chip="~8 minutes">
+        <header class="try-head">
+          <span class="try-num">05</span>
+          <span class="try-chip">~8 minutes</span>
+          <h2>30 kb synthetic operon region.</h2>
+          <p class="try-sub">Use when you want to test larger synthetic-region handling and parent-child coordinates.</p>
+        </header>
+        <ol class="try-steps">
+          <li>In the sidebar, open <strong>Synthetic Genomic Region</strong>.</li>
+          <li>Select <strong>SEAL Synthetic Genomic Region (30 kb)</strong>.</li>
+          <li>Compare the parent features with extracted CDS and protein blocks.</li>
+          <li>Open <strong>Features</strong> in the Inspector and inspect annotations such as <code>sensorA</code>, <code>reporterB</code>, and <code>Synthetic promoter-like region</code>.</li>
+          <li>Select the region and its derived blocks using their header checkboxes, then click <strong>Add to report</strong> in the selection toolbar.</li>
+        </ol>
+        <p class="try-notice">What to notice: coordinates, linked CDS features, child blocks, and protein translations stay tied to the parent interval.</p>
+        <p class="try-finish"><span aria-hidden="true">✓</span> You should now see the synthetic 30 kb region and its lineage-linked child blocks.</p>
+      </article>
+
+      <article class="try-item" id="formatting" data-chip="~3 minutes">
+        <header class="try-head">
+          <span class="try-num">06</span>
+          <span class="try-chip">~3 minutes</span>
+          <h2>Sequence formatting and print.</h2>
+          <p class="try-sub">Apply presentation metadata without changing the biological sequence.</p>
+        </header>
+        <ol class="try-steps">
+          <li>Select a range in any synthetic DNA, RNA, or protein block.</li>
+          <li>Open the <strong>Display</strong> Inspector tab.</li>
+          <li>Scroll to the <strong>Highlights</strong> card and click <strong>Add</strong>. A new region highlight appears on your selected range.</li>
+          <li>Press <kbd>⌘K</kbd>, type <strong>Build report</strong>, and select the command to open <strong>Report handoff</strong>.</li>
+          <li>Under <strong>Attachments</strong>, select the styled report and biological formats, then click <strong>Download ZIP</strong>. Open the styled HTML to review the highlight and compare it with the sequence exports.</li>
+        </ol>
+        <p class="try-notice">What to notice: raw sequence, coordinates, translation, extraction, FASTA, GenBank, and CSV remain biologically clean.</p>
+        <p class="try-finish"><span aria-hidden="true">✓</span> You should now see presentation styling in the report but not in biological exports.</p>
+      </article>
+
+      <article class="try-item" id="msa-traces" data-chip="~7 minutes">
+        <header class="try-head">
+          <span class="try-num">07</span>
+          <span class="try-chip">~7 minutes</span>
+          <h2>Sample MSA and synthetic Sanger traces.</h2>
+          <p class="try-sub">Inspect a ready reference, two controlled variants, and paired synthetic chromatograms without importing a file.</p>
+        </header>
+        <ol class="try-steps">
+          <li>In the sidebar, open <strong>Sanger Reads &amp; Alignment</strong> in the SEAL Sample Lab.</li>
+          <li>Use the header checkboxes to select <strong>Synthetic Amplicon Reference</strong>, <strong>Synthetic Full-length SNP Variant</strong>, and <strong>Synthetic Full-length +3 bp Variant</strong>. Click <strong>Align</strong> in the selection toolbar, check the three staged names, then click <strong>Align 3</strong>.</li>
+          <li>Close the alignment, clear the previous header checkboxes, and select only <strong>Synthetic Amplicon Reference</strong> and <strong>Synthetic Sanger Forward Read</strong>. Click <strong>Align</strong>, then <strong>Align 2</strong>. Beneath the result, click <strong>Verify against…</strong>; the button names your reference.</li>
+          <li>Close the alignment and click the forward read block. Open <strong>Trace</strong> in the Inspector to inspect its four channels and quality values.</li>
+          <li>Clear the header checkboxes, then select only <strong>Synthetic Sanger Forward Read</strong> and <strong>Synthetic Sanger Reverse Read</strong>. Click <strong>Align</strong>, then <strong>Align 2</strong>. Beneath the result, click <strong>Build consensus contig</strong> to reconstruct their synthetic overlap.</li>
+        </ol>
+        <p class="try-notice">What to notice: the controlled forward read carries one low-quality probable miscall and one high-quality mismatch. The app reserves 100% identity for exact agreement and does not promote either result into an automatically confirmed variant.</p>
+        <p class="try-finish"><span aria-hidden="true">✓</span> You should now have reviewed an MSA, a four-channel synthetic trace, and a quality-weighted synthetic consensus.</p>
+      </article>
+
+      <article class="try-item" id="agent" data-chip="~10 minutes">
+        <header class="try-head">
+          <span class="try-num">08</span>
+          <span class="try-chip">~10 minutes</span>
+          <h2>External-agent dry run.</h2>
+          <p class="try-sub">Connect a source checkout to Codex, Claude Code, Gemini CLI, or another MCP client without granting an immediate write.</p>
+        </header>
+        <ol class="try-steps">
+          <li>Use the Node.js version in <code>.nvmrc</code> and run <code>npm ci</code> in a SEAL source checkout.</li>
+          <li>Configure the checkout-local <code>node_modules/.bin/tsx</code>, <code>mcp/server.ts</code>, and explicit <code>SEAL_DB_PATH</code>.</li>
+          <li>In the app, press <kbd>⌘K</kbd>, type <strong>Run agent doctor</strong>, and select the command.</li>
+          <li>Ask the agent to call <code>block_list</code> for shared sequence blocks, then inspect projects, entries, and recent Activity without writing.</li>
+          <li>Compare the returned block names and lengths with the app. For a later editing session, use the <a href="docs/agent-prompts.html">agent prompt examples</a> to plan a change and review its result.</li>
+        </ol>
+        <p class="try-notice">What to notice: the DMG does not install the MCP runtime or Rust CLI. External prompts and context follow the privacy terms of the agent provider you choose.</p>
+        <p class="try-finish"><span aria-hidden="true">✓</span> You should now have a verified read-only connection to the same workspace shown in SEAL.</p>
+        <p class="try-link">Setup: <a href="agents/claude-code.html">Claude Code</a> &middot; <a href="agents/codex.html">Codex</a> &middot; <a href="agents/gemini-cli.html">Gemini CLI</a></p>
+      </article>
+
+      <article class="try-item" id="report" data-chip="~4 minutes">
+        <header class="try-head">
+          <span class="try-num">09</span>
+          <span class="try-chip">~4 minutes</span>
+          <h2>Report package handoff.</h2>
+          <p class="try-sub">Build a shareable local review package and understand which exports preserve metadata.</p>
+        </header>
+        <ol class="try-steps">
+          <li>Select one or more sequence blocks using their header checkboxes.</li>
+          <li>Click <strong>Add to report</strong> in the selection toolbar to open <strong>Report handoff</strong>.</li>
+          <li>Under <strong>Attachments</strong>, select the FASTA, GenBank, CSV, or styled report files you need. Review the report sections beneath them.</li>
+          <li>For a styled report, choose a <strong>Preset</strong>. Click <strong>Download ZIP</strong> to save the package.</li>
+          <li>Inspect <code>manifest.json</code> and <code>validation.md</code>.</li>
+        </ol>
+        <p class="try-notice">What to notice: GenBank is metadata-preserving. FASTA and CSV are intentionally lossy summaries. Styled HTML is for review and print.</p>
+        <p class="try-finish"><span aria-hidden="true">✓</span> You should now have a local zip with the selected formats and validation results.</p>
+      </article>
+    </section>
+
+    <section class="cross-links">
+      <p>
+        Same content with file references:
+        <a href="workflows.html" data-repository-path="/blob/main/docs/EXAMPLE_GALLERY.md" rel="noopener">docs/EXAMPLE_GALLERY.md</a>
+      </p>
+      <p>
+        First-hour orientation:
+        <a href="docs/quickstart.html">Quickstart</a>
+      </p>
+    </section>
+
+  </main>
+
+  <footer class="footer" role="contentinfo">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="nav-brand" href="index.html" aria-label="SEAL home">
+          <span class="nav-mark" aria-hidden="true"><img src="assets/img/favicon-32.png" width="32" height="32" alt="" /></span>
+          <span class="nav-word">SEAL</span>
+        </a>
+        <p class="footer-tag">A local-first workbench for sequences and lab records.</p>
+      </div>
+      <div class="footer-col">
+        <h3 class="footer-col-h">Product</h3>
+        <a href="index.html#install">Get SEAL</a>
+        <a href="docs/changelog.html" data-repository-path="/blob/main/CHANGELOG.md" rel="noopener">Changelog</a>
+        <a href="index.html#team-sync">Team sync (alpha)</a>
+      </div>
+      <div class="footer-col">
+        <h3 class="footer-col-h">Source-edition agents</h3>
+        <a href="agents/claude-code.html">Claude Code</a>
+        <a href="agents/codex.html">Codex</a>
+        <a href="agents/gemini-cli.html">Gemini CLI</a>
+      </div>
+      <div class="footer-col">
+        <h3 class="footer-col-h">Docs</h3>
+        <a href="docs/quickstart.html">Quickstart</a>
+        <a href="docs/mcp-setup.html">MCP setup</a>
+        <a href="docs/cli.html">CLI reference</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="support.html">Support</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 SEAL contributors. MIT licensed.</span>
+      <span class="footer-citation">
+        <a href="index.html#cite" data-repository-path="/blob/main/CITATION.cff" rel="noopener">Cite this work</a>
+      </span>
+    </div>
+  </footer>
+
+  <script src="script.js?v=20260907" defer></script>
+  <script src="assets/images.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Core concepts · SEAL docs</title>
+  <meta name="description" content="The SEAL workspace data model and the vocabulary shared across the app, CLI, and MCP: projects, conversations, blocks, features, checkpoints, and the Activity trail." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Core concepts" />
+  <meta property="og:description" content="The SEAL workspace data model and the vocabulary shared across the app, CLI, and MCP: projects, conversations, blocks, features, checkpoints, and the Activity trail." />
+
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>Core concepts</h1>
+    <p class="edition-note" data-edition-note>Screenshots and recordings show the direct edition. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">One workspace holds your data. The app calls each working record an Entry; projects can group Entries, Entries contain ordered sequence blocks, and blocks carry features. The CLI and MCP retain the underlying <code>conversation</code> term for an Entry so existing automation contracts stay stable.</p>
+
+    <figure class="docs-figure">
+      <div class="docs-figure-head">
+        <p class="docs-figure-title">The workspace hierarchy</p>
+        <span class="docs-figure-mark">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 7q5 5 0 10 M16 7q-5 5 0 10"/></svg>
+        </span>
+      </div>
+      <svg viewBox="0 0 900 486" role="img" aria-label="Diagram: one SQLite workspace contains projects; a project contains Entries; an Entry contains blocks; a block contains features. A block can also nest another block, such as a protein translation under a coding sequence.">
+        <defs>
+          <marker id="d-arrow" markerWidth="10" markerHeight="10" refX="6.5" refY="4.5" orient="auto-start-reverse">
+            <path d="M1 1.5 L6.5 4.5 L1 7.5" fill="none" stroke="currentColor" stroke-width="1.4" />
+          </marker>
+        </defs>
+
+        <!-- Workspace root -->
+        <rect class="d-box" x="330" y="32" width="240" height="60" rx="10" />
+        <text class="d-label" x="450" y="58" text-anchor="middle">SQLite workspace</text>
+        <text class="d-cap" x="450" y="76" text-anchor="middle">seal.db</text>
+
+        <!-- Projects -->
+        <rect class="d-box" x="350" y="140" width="200" height="56" rx="10" />
+        <text class="d-label" x="450" y="166" text-anchor="middle">Projects</text>
+        <text class="d-cap" x="450" y="183" text-anchor="middle">optional grouping</text>
+
+        <!-- Entries -->
+        <rect class="d-box" x="350" y="240" width="200" height="56" rx="10" />
+        <text class="d-label" x="450" y="266" text-anchor="middle">Entries</text>
+        <text class="d-cap" x="450" y="283" text-anchor="middle">ordered blocks</text>
+
+        <!-- Blocks -->
+        <rect class="d-box" x="350" y="340" width="200" height="56" rx="10" />
+        <text class="d-label" x="450" y="366" text-anchor="middle">Blocks</text>
+        <text class="d-cap" x="450" y="383" text-anchor="middle">one sequence each</text>
+
+        <!-- Features -->
+        <rect class="d-box-ghost" x="362" y="424" width="176" height="52" rx="8" />
+        <text class="d-label" x="450" y="445" text-anchor="middle">Features</text>
+        <text class="d-cap" x="450" y="462" text-anchor="middle">annotations</text>
+
+        <!-- Vertical containment spine -->
+        <path class="d-line" d="M450 92 L450 140" marker-end="url(#d-arrow)" />
+        <path class="d-line" d="M450 196 L450 240" marker-end="url(#d-arrow)" />
+        <path class="d-line" d="M450 296 L450 340" marker-end="url(#d-arrow)" />
+        <path class="d-line" d="M450 396 L450 424" marker-end="url(#d-arrow)" />
+
+        <!-- Nested child block (protein under a CDS) -->
+        <rect class="d-box-ghost" x="636" y="340" width="208" height="56" rx="10" />
+        <text class="d-label" x="740" y="366" text-anchor="middle">Nested block</text>
+        <text class="d-cap" x="740" y="383" text-anchor="middle">protein under a CDS</text>
+        <path class="d-line" d="M550 368 L636 368" marker-end="url(#d-arrow)" />
+        <text class="d-cap" x="593" y="358" text-anchor="middle">parent</text>
+      </svg>
+      <figcaption class="docs-figcaption">One SQLite database holds the workspace. Projects group Entries, an Entry holds an ordered list of blocks, and each block carries features. A block can also parent another block, such as a translated protein nested under its coding sequence.</figcaption>
+    </figure>
+
+    <h2>The workspace</h2>
+    <p>State lives in one SQLite database on your machine. The desktop app, the CLI, and the MCP server all open the same file, so there is no separate copy to sync. Commands that read or write shared data resolve the database path in this order:</p>
+    <ol>
+      <li><code>SEAL_DB_PATH</code> if set. An absolute path is recommended; a relative path is resolved against the current directory.</li>
+      <li>A repo-local <code>.seal/seal.db</code> in the nearest parent directory that contains <code>package.json</code> or <code>.git</code>.</li>
+      <li>The platform application-data directory, such as <code>~/Library/Application Support/io.github.jvogan.seal/seal.db</code> on macOS.</li>
+    </ol>
+    <p>Set <code>SEAL_DB_PATH</code> to a scratch file to isolate agent or test work from your live workspace. See <a href="architecture.html">Architecture</a> for how the surfaces share this file.</p>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/workbench.png" alt="The SEAL workspace: projects and Entries on the left, a stack of sequence blocks in the middle, and the Inspector on the right." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">One workspace: projects and Entries on the left, blocks in the middle, and the Inspector on the right.</figcaption>
+    </figure>
+
+    <h2>Entries and projects</h2>
+    <p>An <strong>Entry</strong> is a working set of sequences. It holds an ordered list of blocks and is where most work happens. The CLI and MCP name this record type <code>conversation</code>. Use Archive and Restore in the app rather than assuming permanent deletion is available through every automation surface.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Create a conversation">
+<pre><code>seal conversations create "CRISPR experiment 1"</code></pre>
+    </div>
+
+    <p>A <strong>project</strong> is an optional grouping above Entries. Assign an Entry to a project, or leave it unassigned. Deleting a project clears that assignment rather than deleting its Entries.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Create a project and assign a conversation">
+<pre><code>seal projects create "CRISPR campaign"
+seal conversations move "CRISPR experiment 1" --project-id proj-abc</code></pre>
+    </div>
+
+    <h2>Blocks</h2>
+    <p>A <strong>block</strong> is the unit that holds one sequence. Every sequence you import, fetch, paste, or compute becomes a block. A block carries its raw sequence, a type, a topology, its features, and any checkpoints taken of it.</p>
+
+    <h3>Materialized sequences</h3>
+    <p>The analysis commands are stateless: they print a result and stop. To keep a computed sequence (a translation, a digest fragment, a PCR amplicon, an assembled construct) you materialize it as a block with the <code>blocks add</code> command. This is the bridge from the stateless commands into the workspace: pipe their output in. The <code>blocks add</code>, <code>blocks translate</code>, and <code>blocks link-parts</code> workflow commands, and <code>translate --from-atg</code>, run through the TypeScript CLI, invoked with <code>npm run dev:cli -- &lt;command&gt;</code>. The shipped Rust <code>seal</code> provides <code>blocks reorder</code>, <code>blocks extract-selection</code>, and <code>blocks annotate-selection</code>.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Materialize a translation as a block">
+<pre><code>npm run dev:cli -- translate synthetic-reporter.fa --from-atg | npm run dev:cli -- blocks add --type protein --name "Synthetic reporter translation"</code></pre>
+    </div>
+
+    <h3>Nesting</h3>
+    <p>A block can be the parent of another block. Setting <code>--parent</code> makes the new block a nested child that inherits the parent's conversation. The common case is a translated protein nested under its coding sequence. <code>blocks translate</code> does this in one step: it translates a CDS block and adds the protein as a nested child, stripping the trailing stop codon for a complete CDS.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Nest a protein under its CDS block">
+<pre><code>npm run dev:cli -- blocks translate --block synthetic-reporter --from-atg</code></pre>
+    </div>
+
+    <h3>Assembly lineage</h3>
+    <p>A construct assembled from several parts cannot be described by a single parent. <code>blocks link-parts</code> records the lineage instead: it writes the edge that lets the desktop app show "assembled from N source blocks" and stamps how the construct was made. Pair it with <code>blocks add</code> to materialize the construct and the stateless <code>gibson</code> or <code>golden-gate</code> commands for the assembly math.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Record assembly lineage">
+<pre><code>npm run dev:cli -- blocks link-parts --construct final --parts insert,vector --manipulation gibson_assembly</code></pre>
+    </div>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/provenance-map.png" alt="The Provenance dialog for a block, listing nodes for the source block and its derived blocks and edges for the operations that produced them, with a Jump action on each." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">The provenance map traces how a block was made: nodes for blocks, checkpoints, and exports, and edges for the operations between them. Here, translating the Synthetic Reporter DNA produced two derived protein blocks.</figcaption>
+    </figure>
+
+    <h2>Features and annotations</h2>
+    <p>A <strong>feature</strong> is an annotation on a range of a block, such as a gene, a CDS, or a promoter. Each feature has a type, a name, and a start and end position. Add, update, list, and delete features on any block.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Annotate a coding region">
+<pre><code>seal features add --block block-id-abc \
+  --feature-json '{"type":"gene","name":"synthetic_reporter","start":0,"end":720}'</code></pre>
+    </div>
+
+    <p>Positions are 0-indexed: <code>start</code> is inclusive, <code>end</code> is exclusive. On a linear block, <code>start</code> must be at or before <code>end</code>. On a circular block, a feature may wrap (<code>start</code> greater than <code>end</code>). To annotate a selection by range, use <code>seal blocks annotate-selection</code>, which takes the same range flags. SEAL also ships built-in feature templates for common parts (reporters, tags, promoters, recombination sites) so you can apply a known feature without typing its coordinates.</p>
+
+    <h2>Sequence types and topology</h2>
+    <p>Most blocks have a <strong>type</strong> of <code>dna</code>, <code>rna</code>, or <code>protein</code>, auto-detected on input and overridable with <code>--type</code> (for example, to force <code>protein</code>). Content you add as Unknown stays an untyped <code>misc</code> block, which reads its length in generic characters and hides the type-specific tabs.</p>
+    <p>DNA and RNA blocks also have a <strong>topology</strong>, either <code>linear</code> or <code>circular</code>. Topology is not cosmetic: it changes how analysis treats the ends of the sequence. A circular plasmid digested with a single-cutter yields one full-length fragment, and features on a circular block may wrap past the origin. Pass <code>--topology circular</code> when a sequence is a plasmid or other closed molecule.</p>
+
+    <h2>Checkpoints and the Activity trail</h2>
+    <p>A <strong>checkpoint</strong> is a saved snapshot of a block: its sequence, topology, type, features, and scars. Save one before a risky edit, then restore it later. Restore is transactional, so a block is never left half-updated. You can also diff two checkpoints of the same block.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Save, list, and restore a checkpoint">
+<pre><code>seal checkpoints save --block "Synthetic Reporter DNA" --label "before BamHI digest"
+seal checkpoints list --block "Synthetic Reporter DNA"
+seal checkpoints restore --block "Synthetic Reporter DNA" --checkpoint-id cp-abc</code></pre>
+    </div>
+
+    <p>The <strong>Activity trail</strong> records every workspace write and its source: the desktop app, CLI, or an external agent over MCP. Agent and desktop writes use the same record format, including the affected block and a checkpoint when one exists. See the <a href="agents.html">agent control plane</a> for external-agent setup.</p>
+
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>Some Activity rows are informational events or durable tombstones with no checkpoint to restore. A recovery action appears only when a checkpoint exists for that change.</p>
+      </div>
+    </div>
+
+    <h2>Mutation history</h2>
+    <p>Undo and redo are persisted. The mutation history for each block survives an app restart, so you can reopen the workspace and step back through recent edits. History is capped at the most recent 100 operations per stack. This is separate from checkpoints: mutation history is the per-block undo and redo stack for the active block, while a checkpoint is an explicit, labeled snapshot of a single block that you save and restore on purpose.</p>
+
+    <h2>Next steps</h2>
+    <ul>
+      <li><a href="editing.html">Editing and annotation</a>: edit bases, add features, and annotate selections on a block.</li>
+      <li><a href="quickstart.html">Quickstart</a>: put these concepts to work in a few minutes.</li>
+    </ul>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

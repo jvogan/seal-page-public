@@ -1,0 +1,312 @@
+WEBVTT
+
+1
+00:00:00.370 --> 00:00:05.550
+SEAL is a workbench for editing and
+analyzing DNA, RNA, and protein
+
+2
+00:00:05.580 --> 00:00:09.120
+on your Mac. Start with the built-in Sample
+Lab.
+
+3
+00:00:09.150 --> 00:00:12.790
+These synthetic examples are included in
+the app, so you can follow
+
+4
+00:00:12.820 --> 00:00:14.840
+along with the same sequences.
+
+5
+00:00:14.870 --> 00:00:17.750
+In the sidebar, open Synthetic Reporter.
+
+6
+00:00:17.780 --> 00:00:22.050
+A project groups related Entries, and each
+Entry holds sequence blocks
+
+7
+00:00:22.080 --> 00:00:25.320
+and notes. Click Synthetic Reporter DNA.
+
+8
+00:00:25.350 --> 00:00:29.450
+The Inspector now shows its name, length,
+and base composition.
+
+9
+00:00:30.783 --> 00:00:33.923
+For a sequence of your own, choose New
+entry and give it
+
+10
+00:00:33.953 --> 00:00:37.193
+a name. Paste a FASTA record into the
+sequence input.
+
+11
+00:00:37.223 --> 00:00:40.593
+Here, the preview shows FASTA and eighty
+base pairs.
+
+12
+00:00:40.623 --> 00:00:44.993
+Submit it and check the new block’s name,
+DNA label, and length.
+
+13
+00:00:45.023 --> 00:00:49.033
+Drag across some bases to select a range
+for analysis or annotation.
+
+14
+00:00:49.063 --> 00:00:52.703
+To change one base, click to place the
+cursor and check substitution
+
+15
+00:00:52.733 --> 00:00:56.673
+mode. Type a replacement, then press
+Command Z to undo.
+
+16
+00:00:56.703 --> 00:00:58.283
+The original base is restored.
+
+17
+00:00:59.610 --> 00:01:04.530
+Return to the reporter DNA and open
+Translate in the Inspector.
+
+18
+00:01:04.560 --> 00:01:08.510
+Choose Whole sequence to compare all six
+reading frames.
+
+19
+00:01:08.540 --> 00:01:12.390
+Each frame shows its peptide sequence and
+any internal stops.
+
+20
+00:01:12.420 --> 00:01:15.730
+Click Detail, then Translate to protein.
+
+21
+00:01:15.760 --> 00:01:20.710
+Amino-acid letters appear alongside the
+DNA, aligned with their codons.
+
+22
+00:01:20.740 --> 00:01:23.790
+Open ORFs to inspect candidate coding
+regions.
+
+23
+00:01:23.820 --> 00:01:27.960
+Now select Synthetic Reporter Protein and
+open Codons.
+
+24
+00:01:27.990 --> 00:01:32.550
+Back-translation preview shows a proposed
+coding sequence marked Draft.
+
+25
+00:01:32.580 --> 00:01:36.350
+Review the target host and codon strategy;
+different codon choices can
+
+26
+00:01:36.380 --> 00:01:38.000
+encode the same protein.
+
+27
+00:01:39.227 --> 00:01:42.077
+Open Sequence library to reuse a part.
+
+28
+00:01:42.107 --> 00:01:46.517
+Choose Vectors, then SEAL Synthetic Cloning
+Backbone, and click Add to
+
+29
+00:01:46.547 --> 00:01:51.997
+workspace. Next, open Cloning and Assembly
+and select SEAL Demo Plasmid.
+
+30
+00:01:52.027 --> 00:01:56.397
+Click Map to inspect its circular sequence
+and annotated features.
+
+31
+00:01:56.427 --> 00:01:59.717
+Selecting a feature highlights the
+corresponding region.
+
+32
+00:01:59.747 --> 00:02:02.717
+Under Actions, open Restriction digest.
+
+33
+00:02:02.747 --> 00:02:07.357
+Choose Cutters, select AluI, and review the
+predicted fragments.
+
+34
+00:02:07.387 --> 00:02:10.157
+Their lengths add up to the original
+plasmid.
+
+35
+00:02:10.187 --> 00:02:13.717
+Click Digest to add each fragment as a
+sequence block.
+
+36
+00:02:14.970 --> 00:02:20.060
+On the reporter DNA, open Actions and
+choose Design primers.
+
+37
+00:02:20.090 --> 00:02:24.180
+Set the target to bases fifty-one through
+five hundred fifty.
+
+38
+00:02:24.210 --> 00:02:29.340
+Compare the sequences, melting
+temperatures, and predicted product length.
+
+39
+00:02:29.370 --> 00:02:33.380
+Add selected pair saves primer features on
+the DNA.
+
+40
+00:02:33.410 --> 00:02:38.500
+Then open Cloning and Assembly and select
+SEAL Golden Gate Sample Assembly
+
+41
+00:02:38.530 --> 00:02:41.400
+to inspect its product and linked input
+parts.
+
+42
+00:02:42.637 --> 00:02:47.767
+Open Alignments and choose the synthetic
+Sanger example with paired reads.
+
+43
+00:02:47.797 --> 00:02:50.827
+Fill the window gives the alignment more
+space.
+
+44
+00:02:50.857 --> 00:02:55.047
+Click Next mismatch to move to a difference
+between the sequences.
+
+45
+00:02:55.077 --> 00:02:59.207
+Restore the alignment’s size, then open a
+read’s chromatogram.
+
+46
+00:02:59.237 --> 00:03:02.917
+Compare the called bases with the signal
+peaks and quality information
+
+47
+00:03:02.947 --> 00:03:05.067
+to examine an uncertain position.
+
+48
+00:03:06.303 --> 00:03:08.873
+In Notebook, create a review note.
+
+49
+00:03:08.903 --> 00:03:12.013
+Write what you checked and what you’d like
+to examine next.
+
+50
+00:03:12.043 --> 00:03:14.273
+SEAL saves the text as you work.
+
+51
+00:03:14.303 --> 00:03:16.313
+Return to the reporter DNA.
+
+52
+00:03:16.343 --> 00:03:19.433
+Press Command K and choose Build report.
+
+53
+00:03:19.463 --> 00:03:23.603
+In Report handoff, check the source block
+and choose your attachments:
+
+54
+00:03:23.633 --> 00:03:27.513
+FASTA, GenBank, or a styled report, for
+example.
+
+55
+00:03:27.543 --> 00:03:31.273
+Expand Package zip preview to inspect the
+file list.
+
+56
+00:03:31.303 --> 00:03:36.133
+Click Download ZIP. Then open Activity in
+the Inspector and find Report
+
+57
+00:03:36.163 --> 00:03:41.183
+package exported. Check its completed
+status and expand the event for details.
+
+58
+00:03:42.437 --> 00:03:46.107
+To get SEAL, give your preferred coding
+agent a SEAL repository you
+
+59
+00:03:46.137 --> 00:03:48.337
+have access to and ask it to set up the app
+on
+
+60
+00:03:48.367 --> 00:03:52.437
+your Mac. The installation guide covers
+source builds and an unnotarized
+
+61
+00:03:52.467 --> 00:03:56.717
+GitHub DMG when available. A Mac App Store
+edition is planned.
+
+62
+00:03:56.747 --> 00:04:00.427
+You can also connect an agent to your
+workspace through the command-line
+
+63
+00:04:00.457 --> 00:04:04.297
+tools or MCP. Press Command K and choose
+Open agent setup for
+
+64
+00:04:04.327 --> 00:04:08.147
+connection instructions. Choose a written
+guide or an individual video
+
+65
+00:04:08.177 --> 00:04:10.617
+lesson to try a workflow yourself.

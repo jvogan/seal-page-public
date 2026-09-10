@@ -1,0 +1,69 @@
+WEBVTT
+
+1
+00:00:00.410 --> 00:00:05.220
+Start with SEAL open. This workspace is
+empty.
+
+2
+00:00:05.250 --> 00:00:10.480
+Select Load demo workspace to add the
+sample sequences, notebook pages,
+
+3
+00:00:10.510 --> 00:00:14.840
+and saved alignments. The examples use
+synthetic data.
+
+4
+00:00:14.870 --> 00:00:21.140
+In the left sidebar, expand SEAL Sample Lab
+and open Synthetic Reporter.
+
+5
+00:00:21.170 --> 00:00:23.800
+The center of the window shows an Entry.
+
+6
+00:00:23.830 --> 00:00:27.740
+An Entry groups related sequence blocks and
+notes.
+
+7
+00:00:27.770 --> 00:00:33.210
+Select Synthetic Reporter DNA. The
+Inspector on the right shows information
+
+8
+00:00:33.240 --> 00:00:38.660
+for that block. In Overview, check the
+sequence length, molecule type,
+
+9
+00:00:38.690 --> 00:00:44.500
+and base composition. The example DNA has
+seven hundred and twenty bases.
+
+10
+00:00:44.530 --> 00:00:48.120
+The sidebar also opens other parts of your
+workspace.
+
+11
+00:00:48.150 --> 00:00:53.420
+Notebook contains lab notes. Alignments
+contains saved sequence comparisons,
+
+12
+00:00:53.450 --> 00:00:56.540
+including examples with Sanger reads.
+
+13
+00:00:56.570 --> 00:01:01.040
+Return to Synthetic Reporter to continue
+working with its sequences.
+
+14
+00:01:01.070 --> 00:01:04.535
+You can move between these pages while
+keeping the same workspace open.

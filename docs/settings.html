@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Settings and backup · SEAL docs</title>
+  <meta name="description" content="Appearance themes, accessibility palettes, portable settings backup, and clearing local data in SEAL." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Settings and backup" />
+  <meta property="og:description" content="Appearance themes, accessibility palettes, portable settings backup, and clearing local data in SEAL." />
+
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>Settings and backup</h1>
+    <p class="edition-note" data-edition-note>This guide includes source and direct-edition features. Check the edition comparison for the first Store release. Screenshots and recordings show the direct edition. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">Appearance, accessibility, and a portable settings backup. Open Settings from the sidebar; the controls below sit in the Appearance and Data and Backup panes.</p>
+
+    <p>Settings opens as a full pane with a category rail on the left: Profile, Appearance, Sequence, Workflow, Models, Data and Backup, Usage, and About. This page covers the Appearance and Data and Backup panes. Every appearance and accessibility choice persists locally and rides along in a settings backup.</p>
+
+    <h2>Appearance</h2>
+    <p>The Appearance pane sets the theme, accent, selection color, contrast, and translucency. Set the theme first.</p>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/settings-appearance.png" alt="The Appearance pane in Settings with a Light, Dark, System theme toggle, a zoom control, an editable theme card for accent, background, foreground, and fonts, a selection-highlight swatch row, and Accessibility toggles for Monochrome, High contrast, and Color amino acids." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">The Appearance pane sets the theme, accent, selection color, fonts, and contrast, with the accessibility toggles beneath.</figcaption>
+    </figure>
+
+    <h3>Theme</h3>
+    <p>Pick <strong>Light</strong>, <strong>Dark</strong>, or <strong>System</strong>. System follows your operating system's light or dark setting. The choice is saved to <code>seal-theme</code> so the app opens in the same theme next time.</p>
+
+    <h3>Accent and selection</h3>
+    <p>The Theme card holds the accent color and the editable theme colors. Accent options are None, Codex, Teal, Blue, Purple, Rose, Orange, and Yellow. The default is Codex. You can also set the Background, Foreground, UI font, and Code font; those edits define a custom theme on top of the active light or dark base.</p>
+    <p>The Selection highlight controls the wash drawn over selected bases: Blue, Amber, Green, Pink, or Charcoal. The default is Blue.</p>
+
+    <h3>Contrast and translucency</h3>
+    <p>The <strong>Contrast</strong> slider (0 to 100) tunes how strong the theme reads. <strong>Translucent sidebar</strong> toggles a glass sidebar, with a translucency amount when it is on.</p>
+
+    <h3>High-contrast terminal theme</h3>
+    <p>Turning on <strong>High contrast</strong> (see Accessibility, below) renders the app as a high-contrast terminal. On the dark theme this is the "Max Mono" appearance: a neutral pure-black background, a single bright-cyan accent, a monospace interface font, and square corners, with no blue tint in the chrome. On the light theme it becomes a black-on-white "paper terminal" with the same monospace, square-cornered treatment. The A, T, G, and C base colors stay as they are in both, because those colors carry data rather than chrome. While High contrast is on, the Contrast slider is fixed, since high contrast sets its own values.</p>
+
+    <figure class="docs-shot">
+      <div class="docs-shot-row" style="margin:0">
+        <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/theme-dark.png" alt="The SEAL workspace in the dark theme, with a dark sidebar, canvas, and inspector." loading="lazy" /></span>
+        <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/theme-high-contrast.png" alt="The SEAL workspace in the high-contrast appearance: black on white, a monospace interface font, and square corners, with the A, T, G, and C base colors unchanged." loading="lazy" /></span>
+      </div>
+      <figcaption class="docs-shot-cap">Left: the workspace in the dark theme. Right: the high-contrast appearance, a black-on-white paper terminal that keeps the A, T, G, and C base colors and switches the chrome to a monospace, square-cornered treatment.</figcaption>
+    </figure>
+
+    <h3>Resetting appearance</h3>
+    <p>The Appearance pane has its own <strong>Reset to defaults</strong>. Click once to arm it (the button reads "Confirm reset?"), then click again within a few seconds to apply. The reset is non-destructive: it changes display preferences only and keeps all of your data. It restores the theme to Light, the accent to Codex, the selection to Blue, and the contrast and sidebar translucency to their defaults; turns off High contrast, Monochrome, and the colorblind-safe palette; returns zoom and detail zoom to 100 percent; turns the translucent sidebar back on; and clears any custom theme and terminal styling.</p>
+
+    <h2>Accessibility</h2>
+    <p>The Accessibility controls live in the Appearance pane. Each is a toggle.</p>
+    <ul>
+      <li><strong>Monochrome</strong> removes the accent and selection hues for a neutral interface.</li>
+      <li><strong>High contrast</strong> switches to the high-contrast terminal appearance described above.</li>
+      <li><strong>Color amino acids</strong> swaps the amino-acid colors for the Wong (2011) colorblind-safe set.</li>
+    </ul>
+
+    <h3>Wong colorblind-safe amino-acid palette</h3>
+    <p>The <strong>Color amino acids</strong> toggle replaces the five amino-acid chemistry-class colors with the Wong (2011) colorblind-safe palette, chosen to stay distinguishable under the common types of color vision deficiency.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Chemistry class</th><th>Default</th><th>Wong palette</th></tr></thead>
+        <tbody>
+          <tr><td>Hydrophobic</td><td><span class="docs-swatch" style="background:#f59e0b"></span><code>#f59e0b</code></td><td><span class="docs-swatch" style="background:#e69f00"></span><code>#e69f00</code></td></tr>
+          <tr><td>Polar</td><td><span class="docs-swatch" style="background:#22c55e"></span><code>#22c55e</code></td><td><span class="docs-swatch" style="background:#009e73"></span><code>#009e73</code></td></tr>
+          <tr><td>Positive</td><td><span class="docs-swatch" style="background:#3b82f6"></span><code>#3b82f6</code></td><td><span class="docs-swatch" style="background:#0072b2"></span><code>#0072b2</code></td></tr>
+          <tr><td>Negative</td><td><span class="docs-swatch" style="background:#f43f5e"></span><code>#f43f5e</code></td><td><span class="docs-swatch" style="background:#d55e00"></span><code>#d55e00</code></td></tr>
+          <tr><td>Special</td><td><span class="docs-swatch" style="background:#9ca3af"></span><code>#9ca3af</code></td><td><span class="docs-swatch" style="background:#cc79a7"></span><code>#cc79a7</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The toggle also retunes the Chou-Fasman secondary-structure bars and the coil color to matching Wong hues, so protein-track structure bars stay readable. It affects amino-acid tracks, the protein inspector, the Chou-Fasman bars, and amino-acid feature pills. It does not change DNA base colors; those follow the light or dark theme. For colorblind-safe DNA bases, use High contrast.</p>
+
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>Appearance toggles announce their state to a screen reader through a polite live region, and each swatch row is a radio group with arrow-key navigation.</p>
+      </div>
+    </div>
+
+    <h2>Settings backup</h2>
+    <p>The Data and Backup pane exports your settings to a single JSON file and imports one back. Use it to move a customized install to another machine. The backup carries your appearance and accessibility choices along with your customization libraries (custom codon tables, colors, style presets, feature templates, primer presets) and your non-secret model endpoint flags. API keys and secrets are not included.</p>
+
+    <h3>Export settings</h3>
+    <p>Click <strong>Export settings</strong>. SEAL writes a file named <code>seal-settings-YYYY-MM-DD.json</code>. The file is a portable backup at version 5 (<code>SETTINGS_VERSION</code> 5): a small envelope with a <code>version</code>, an <code>exportedAt</code> timestamp, and a <code>settings</code> object.</p>
+    <div class="docs-code" data-lang="json" data-title="seal-settings file (excerpt)">
+<pre><code>{
+  "version": 5,
+  "exportedAt": "2026-06-20T12:00:00.000Z",
+  "settings": {
+    "theme": "dark",
+    "accentColor": "codex",
+    "selectionHighlight": "blue",
+    "highContrast": false,
+    "monochrome": false,
+    "colorblindAaPalette": false,
+    "contrast": 50,
+    "zoom": 1,
+    "...": "..."
+  }
+}</code></pre>
+    </div>
+
+    <h3>Import settings</h3>
+    <p>Choose a settings file to import. The imported values apply to the live interface right away: the theme, accent, selection, palettes, and other preferences update in place, with no restart. SEAL validates the file first and reports a clear error if it cannot be applied:</p>
+    <ul>
+      <li>The file must be valid JSON with a <code>settings</code> object.</li>
+      <li><code>version</code> must be an integer of 1 or higher.</li>
+      <li>A <code>version</code> newer than 5 is rejected, since this build does not know how to read it.</li>
+    </ul>
+    <p>Older backups import cleanly. Fields a newer build added are optional, so an older file that omits them leaves the current value in place rather than clearing it. A version 5 file also avoids dropping your customization libraries when read by a build that understands version 5.</p>
+
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>A settings backup holds preferences and customization libraries, not your sequences. To move Entries, blocks, notebooks, features, Activity, and related records, use the workspace backup in the same pane. It writes a full <code>.gcbak.json</code> file that can be imported as a merge or an overwrite. Unsent composer drafts are not included.</p>
+      </div>
+    </div>
+
+    <h2>Clear data</h2>
+    <p>The Data and Backup pane has a <strong>Clear all data</strong> action. It is a two-step confirm: the first click arms it for five seconds, and the second click within that window runs the sweep. If you wait past five seconds, it disarms on its own.</p>
+    <p>The sweep clears every local store in one pass:</p>
+    <ul>
+      <li>The SQLite database, on the desktop build.</li>
+      <li>The browser <code>IndexedDB</code> store.</li>
+      <li>Every <code>seal-</code> and <code>seal_</code> key in local storage, which covers drafts, the last-active conversation, expanded folders, the theme, and the disclosure toggles, so nothing is left half-cleared.</li>
+    </ul>
+    <p>Before clearing the active desktop database, SEAL creates and verifies a <code>seal.db.pre-restore-*.backup</code> recovery copy beside it, retains up to five such copies, and shows the new path. The active workspace, secure-key sidecar, IndexedDB fallback, and SEAL-prefixed local settings are then cleared. On desktop, restart when prompted. Browser fallback clears its local data in place.</p>
+
+    <div class="docs-note is-warn">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2.5 20.5h19L12 3z"/><path d="M12 10v4M12 17.5h.01"/></svg>
+      </span>
+      <div>
+        <p>Clear all data is destructive, but desktop recovery copies deliberately retain the prior SQLite contents. Export a portable workspace backup first. If you require complete erasure, also delete the displayed recovery copy and older adjacent recovery copies after closing SEAL. See <a href="privacy.html">Privacy</a> for both local storage roots and the full removal procedure.</p>
+      </div>
+    </div>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

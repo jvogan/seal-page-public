@@ -1,0 +1,1179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MCP tool reference · SEAL docs</title>
+  <meta name="description" content="Reference for all 61 SEAL MCP tools, grouped by module, with arguments and example invocations." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="MCP tool reference" />
+  <meta property="og:description" content="Reference for all 61 SEAL MCP tools, grouped by module, with arguments and example invocations." />
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>MCP tool reference</h1>
+    <p class="edition-note" data-edition-note>This guide covers source and direct-edition tools. These tools are not bundled with the first Store release. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">All 61 SEAL MCP tools, grouped by module. Each entry lists the tool's purpose, its arguments, and a minimal example invocation as a JSON object matching the input schema.</p>
+
+    <p>After <code>npm ci</code> in a source checkout, run the server with the checkout's absolute <code>node_modules/.bin/tsx</code> and <code>mcp/server.ts</code> paths over stdio. The installed app does not bundle this runtime. For setup and per-client configuration, see <a href="mcp-setup.html">MCP setup</a>. Arguments below are the fields passed in each tool call; required arguments are marked in the Required column.</p>
+
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>Use <code>block_list</code> and <code>block_get</code> to read sequences across the shared SQLite workspace. Workspace and bio tools resolve sequences from the MCP Scratch list. Project and conversation tools operate across the shared database. Scratch name lookup tries an exact ID, a case-insensitive exact name, then a partial name match.</p>
+      </div>
+    </div>
+
+    <h2>Workspace</h2>
+    <p>Seven tools manage the flat in-process sequence list, the MCP scratch workspace. All bio operations resolve sequences by name from this list. Source: <code>mcp/tools/workspace-tools.ts</code>.</p>
+
+    <h3>workspace_add</h3>
+    <p>Add a sequence to the workspace. Accepts raw sequence, FASTA, or GenBank format. Auto-detects type and optionally auto-annotates.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>sequence</code></td><td>string</td><td>yes</td><td>Sequence content (raw, FASTA, or GenBank).</td></tr>
+          <tr><td><code>name</code></td><td>string</td><td>no</td><td>Name for the entry; auto-generated if omitted.</td></tr>
+          <tr><td><code>type</code></td><td>enum</td><td>no</td><td><code>dna</code>, <code>rna</code>, <code>protein</code>, <code>misc</code>, <code>unknown</code>, or <code>mixed</code>. Overrides auto-detection.</td></tr>
+          <tr><td><code>topology</code></td><td>enum</td><td>no</td><td><code>linear</code> (default) or <code>circular</code>.</td></tr>
+          <tr><td><code>notes</code></td><td>string</td><td>no</td><td>Optional notes.</td></tr>
+          <tr><td><code>tags</code></td><td>string[]</td><td>no</td><td>Optional tags for filtering.</td></tr>
+          <tr><td><code>autoAnalyze</code></td><td>boolean</td><td>no</td><td>Run auto-annotation (default: true).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "sequence": "ATGAAAGCGATCGAT...TAA",
+  "name": "MyGene",
+  "topology": "linear",
+  "tags": ["insert", "cds"]
+}</code></pre>
+    </div>
+
+    <h3>workspace_list</h3>
+    <p>List up to 1,000 sequences in MCP Scratch with summary information. Use <code>block_list</code> for sequences in shared projects and entries. Larger lists return an error so you can narrow the request.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>filter</code></td><td>string</td><td>no</td><td>Filter by name (partial match, case-insensitive).</td></tr>
+          <tr><td><code>type</code></td><td>enum</td><td>no</td><td>Filter by sequence type.</td></tr>
+          <tr><td><code>tags</code></td><td>string[]</td><td>no</td><td>Filter by tags (entry must have all specified tags).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "type": "dna",
+  "tags": ["vector"]
+}</code></pre>
+    </div>
+
+    <h3>workspace_get</h3>
+    <p>Get a specific sequence from the workspace by name or ID.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>name</code></td><td>string</td><td>yes</td><td>Name or ID (case-insensitive, partial match supported).</td></tr>
+          <tr><td><code>includeAnalysis</code></td><td>boolean</td><td>no</td><td>Include full analysis data (default: true).</td></tr>
+          <tr><td><code>includeFeatures</code></td><td>boolean</td><td>no</td><td>Include feature annotations (default: true).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "name": "seal-synthetic-backbone",
+  "includeFeatures": true
+}</code></pre>
+    </div>
+
+    <h3>workspace_remove</h3>
+    <p>This tool is disabled until MCP provides a deletion-tombstone list and restore workflow. Every call returns an error and leaves the workspace unchanged. Legacy arguments are optional and ignored.</p>
+    <div class="docs-code" data-lang="json" data-title="Returns a disabled-tool error">
+<pre><code>{}</code></pre>
+    </div>
+
+    <h3>workspace_rename</h3>
+    <p>Rename a sequence in the workspace.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>name</code></td><td>string</td><td>yes</td><td>Current name or ID.</td></tr>
+          <tr><td><code>newName</code></td><td>string</td><td>yes</td><td>New name.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{ "name": "seal-synthetic-backbone", "newName": "seal-synthetic-backbone-backbone" }</code></pre>
+    </div>
+
+    <h3>workspace_update</h3>
+    <p>Update metadata or safely replace sequence content under the same workspace entry ID. Sequence replacement creates a durable pre-change checkpoint, replaces annotations rather than silently reusing old coordinates, and can run auto-analysis on the new content.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>name</code></td><td>string</td><td>yes</td><td>Name or ID of the entry.</td></tr>
+          <tr><td><code>sequence</code></td><td>string</td><td>no</td><td>Replacement raw, FASTA, or GenBank sequence content.</td></tr>
+          <tr><td><code>notes</code></td><td>string</td><td>no</td><td>New notes.</td></tr>
+          <tr><td><code>tags</code></td><td>string[]</td><td>no</td><td>New tags (replaces existing tags).</td></tr>
+          <tr><td><code>topology</code></td><td>enum</td><td>no</td><td><code>linear</code> or <code>circular</code>.</td></tr>
+          <tr><td><code>type</code></td><td>enum</td><td>no</td><td>New sequence type.</td></tr>
+          <tr><td><code>autoAnalyze</code></td><td>boolean</td><td>no</td><td>Re-run auto-annotation after sequence replacement (default: true).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "name": "seal-synthetic-backbone",
+  "notes": "Project-authored synthetic software fixture.",
+  "topology": "circular"
+}</code></pre>
+    </div>
+
+    <h3>workspace_clear</h3>
+    <p>This tool is disabled until MCP provides a deletion-tombstone list and restore workflow. Every call returns an error and leaves the workspace unchanged. Legacy arguments are optional and ignored.</p>
+    <div class="docs-code" data-lang="json" data-title="Returns a disabled-tool error">
+<pre><code>{}</code></pre>
+    </div>
+
+    <h2 id="analyze-tools">Analyze</h2>
+    <p>Three tools for sequence analysis and comparison. Source: <code>mcp/tools/analyze-tools.ts</code>.</p>
+
+    <h3>analyze</h3>
+    <p>Analyze a sequence: GC content, ORFs, restriction sites, composition. Accepts a workspace name or an inline sequence. At least one of <code>name</code> or <code>sequence</code> is required.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>name</code></td><td>string</td><td>no</td><td>Workspace entry name or ID.</td></tr>
+          <tr><td><code>sequence</code></td><td>string</td><td>no</td><td>Inline sequence (alternative to <code>name</code>).</td></tr>
+          <tr><td><code>minOrfAminoAcids</code></td><td>number</td><td>no</td><td>Minimum ORF length in amino acids (default: 30).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "name": "synthetic-reporter",
+  "minOrfAminoAcids": 50
+}</code></pre>
+    </div>
+
+    <h3>compare</h3>
+    <p>Compare two sequences using Needleman-Wunsch alignment and compute a diff.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>seq1</code></td><td>string &#124; {name} &#124; {sequence}</td><td>yes</td><td>First sequence: a workspace name string, <code>{ name: "..." }</code>, or <code>{ sequence: "..." }</code>.</td></tr>
+          <tr><td><code>seq2</code></td><td>string &#124; {name} &#124; {sequence}</td><td>yes</td><td>Second sequence.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "seq1": "synthetic-reporter-reference",
+  "seq2": { "sequence": "ATGGTGAGCAAG..." }
+}</code></pre>
+    </div>
+
+    <h3>find_motif</h3>
+    <p>Search for a motif (with IUPAC support) in a sequence.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>name</code></td><td>string</td><td>no</td><td>Workspace entry name or ID.</td></tr>
+          <tr><td><code>sequence</code></td><td>string</td><td>no</td><td>Inline sequence (alternative to <code>name</code>).</td></tr>
+          <tr><td><code>pattern</code></td><td>string</td><td>yes</td><td>Motif pattern (supports IUPAC ambiguity codes, e.g. <code>GAATTC</code>, <code>RRYY</code>).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "name": "seal-synthetic-backbone",
+  "pattern": "GAATTC"
+}</code></pre>
+    </div>
+
+    <h2 id="transform-tools">Transform</h2>
+    <p>One tool for sequence transformations. Source: <code>mcp/tools/transform-tools.ts</code>.</p>
+
+    <h3>transform</h3>
+    <p>Apply a sequence transformation. Supported types: <code>reverse_complement</code>, <code>complement</code>, <code>translate</code>, <code>translate_all_frames</code>, <code>translate_from_atg</code>, <code>reverse_translate</code>, <code>codon_optimize</code>, <code>calculate_cai</code>.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>name</code></td><td>string</td><td>no</td><td>Workspace entry name or ID.</td></tr>
+          <tr><td><code>sequence</code></td><td>string</td><td>no</td><td>Inline sequence (alternative to <code>name</code>).</td></tr>
+          <tr><td><code>type</code></td><td>enum</td><td>yes</td><td>Transformation type (one of the eight listed above).</td></tr>
+          <tr><td><code>frame</code></td><td>0 &#124; 1 &#124; 2</td><td>no</td><td>Reading frame for <code>translate</code> / <code>codon_optimize</code> (default: 0).</td></tr>
+          <tr><td><code>organism</code></td><td>enum</td><td>no</td><td><code>ecoli</code> (default), <code>human</code>, <code>yeast</code>, <code>pichia</code>, <code>sf9</code>, <code>cho</code>, or <code>bsubtilis</code>. For <code>reverse_translate</code> / <code>codon_optimize</code>.</td></tr>
+          <tr><td><code>optimizer</code></td><td>string</td><td>no</td><td>Codon optimizer profile for <code>codon_optimize</code> (default: <code>max_frequency</code>).</td></tr>
+          <tr><td><code>stopAtFirst</code></td><td>boolean</td><td>no</td><td>Stop translation at first stop codon (default: false).</td></tr>
+          <tr><td><code>table</code></td><td>integer</td><td>no</td><td>NCBI translation table id for <code>translate</code> / <code>codon_optimize</code> / <code>calculate_cai</code> (1, 2, 5, 11, 13, or 22; default: 1).</td></tr>
+          <tr><td><code>saveTo</code></td><td>string</td><td>no</td><td>If provided, save the result to the workspace with this name.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "name": "synthetic-reporter",
+  "type": "codon_optimize",
+  "organism": "ecoli",
+  "saveTo": "synthetic-reporter-ecoli-draft"
+}</code></pre>
+    </div>
+
+    <h2>Restrict</h2>
+    <p>Two tools for restriction site mapping and digestion. Source: <code>mcp/tools/restrict-tools.ts</code>.</p>
+
+    <h3>restriction_sites</h3>
+    <p>Find restriction enzyme sites in a sequence. Modes: <code>all</code>, <code>unique</code> (cut once), <code>non-cutters</code>.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>name</code></td><td>string</td><td>no</td><td>Workspace entry name or ID.</td></tr>
+          <tr><td><code>sequence</code></td><td>string</td><td>no</td><td>Inline sequence (alternative to <code>name</code>).</td></tr>
+          <tr><td><code>enzymes</code></td><td>string[]</td><td>no</td><td>Specific enzyme names to check. If omitted, checks all known enzymes.</td></tr>
+          <tr><td><code>mode</code></td><td>enum</td><td>no</td><td><code>all</code> (default), <code>unique</code>, or <code>non-cutters</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "name": "seal-synthetic-backbone",
+  "mode": "unique"
+}</code></pre>
+    </div>
+
+    <h3>digest</h3>
+    <p>Perform a restriction digest on a sequence. Returns fragments with positions.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>name</code></td><td>string</td><td>no</td><td>Workspace entry name or ID.</td></tr>
+          <tr><td><code>sequence</code></td><td>string</td><td>no</td><td>Inline sequence (alternative to <code>name</code>).</td></tr>
+          <tr><td><code>enzymes</code></td><td>string[]</td><td>yes</td><td>Enzyme names to cut with.</td></tr>
+          <tr><td><code>topology</code></td><td>enum</td><td>no</td><td><code>linear</code> or <code>circular</code>. Overrides entry topology.</td></tr>
+          <tr><td><code>saveFragments</code></td><td>boolean</td><td>no</td><td>If true, add each fragment to the workspace.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "name": "seal-synthetic-backbone",
+  "enzymes": ["EcoRI", "BamHI"],
+  "topology": "circular",
+  "saveFragments": true
+}</code></pre>
+    </div>
+
+    <h2>Clone</h2>
+    <p>Three tools for ligation, primer design, and composite cloning. Source: <code>mcp/tools/clone-tools.ts</code>.</p>
+
+    <h3>ligate</h3>
+    <p>Ligate (join) multiple DNA fragments in order. Features are carried over with shifted coordinates.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>fragments</code></td><td>array</td><td>yes</td><td>Ordered list of fragments; each item has <code>name</code> (workspace lookup) or <code>sequence</code> (inline).</td></tr>
+          <tr><td><code>linker</code></td><td>string</td><td>no</td><td>Optional linker sequence inserted between fragments.</td></tr>
+          <tr><td><code>saveTo</code></td><td>string</td><td>no</td><td>Workspace name for the result.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "fragments": [
+    { "name": "synthetic-backbone_EcoRI_BamHI_frag1" },
+    { "name": "synthetic-insert_EcoRI_BamHI_frag1" }
+  ],
+  "saveTo": "seal-synthetic-assembly"
+}</code></pre>
+    </div>
+
+    <h3>design_primers</h3>
+    <p>Design PCR primers for a target region. Returns forward and/or reverse primer candidates.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>name</code></td><td>string</td><td>no</td><td>Workspace entry name or ID.</td></tr>
+          <tr><td><code>sequence</code></td><td>string</td><td>no</td><td>Inline sequence (alternative to <code>name</code>).</td></tr>
+          <tr><td><code>targetStart</code></td><td>number</td><td>yes</td><td>Start position of target region (0-indexed).</td></tr>
+          <tr><td><code>targetEnd</code></td><td>number</td><td>yes</td><td>End position of target region (exclusive).</td></tr>
+          <tr><td><code>mode</code></td><td>enum</td><td>no</td><td><code>pair</code> (default), <code>forward</code>, or <code>reverse</code>.</td></tr>
+          <tr><td><code>minLength</code></td><td>number</td><td>no</td><td>Minimum primer length (default: 18).</td></tr>
+          <tr><td><code>maxLength</code></td><td>number</td><td>no</td><td>Maximum primer length (default: 28).</td></tr>
+          <tr><td><code>targetTm</code></td><td>number</td><td>no</td><td>Target melting temperature in °C (default: 60).</td></tr>
+          <tr><td><code>tmTolerance</code></td><td>number</td><td>no</td><td>Tm tolerance (default: 3).</td></tr>
+          <tr><td><code>minGC</code></td><td>number</td><td>no</td><td>Minimum GC fraction (default: 0.3).</td></tr>
+          <tr><td><code>maxGC</code></td><td>number</td><td>no</td><td>Maximum GC fraction (default: 0.7).</td></tr>
+          <tr><td><code>flankingWindow</code></td><td>number</td><td>no</td><td>Bases of flanking template a primer may start/end inside, beyond the target boundary (default: 50). Set to 0 to force end-anchored primers.</td></tr>
+          <tr><td><code>enzymeTail</code></td><td>string</td><td>no</td><td>Add an enzyme tail preset (e.g. <code>EcoRI</code>, <code>BamHI</code>, <code>HindIII</code>, <code>NcoI</code>, <code>XhoI</code>, <code>NdeI</code>).</td></tr>
+          <tr><td><code>forwardTail</code></td><td>string</td><td>no</td><td>Custom forward primer 5' tail.</td></tr>
+          <tr><td><code>reverseTail</code></td><td>string</td><td>no</td><td>Custom reverse primer 5' tail.</td></tr>
+          <tr><td><code>saveFeatures</code></td><td>boolean</td><td>no</td><td>If <code>name</code> was provided, save primer features back to the workspace entry.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "name": "synthetic-reporter",
+  "targetStart": 0,
+  "targetEnd": 720,
+  "enzymeTail": "EcoRI",
+  "targetTm": 60,
+  "saveFeatures": true
+}</code></pre>
+    </div>
+
+    <h3>clone_into</h3>
+    <p>Composite cloning: digest both vector and insert with enzymes, then ligate the backbone and insert.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>vector</code></td><td>string</td><td>yes</td><td>Workspace entry name or ID of the vector.</td></tr>
+          <tr><td><code>insert</code></td><td>string</td><td>yes</td><td>Workspace entry name or ID of the insert, or an inline sequence.</td></tr>
+          <tr><td><code>enzymes</code></td><td>string[]</td><td>yes</td><td>Enzyme names to use for cloning (1 or 2 enzymes).</td></tr>
+          <tr><td><code>vectorTopology</code></td><td>enum</td><td>no</td><td><code>linear</code> or <code>circular</code>. Overrides entry topology.</td></tr>
+          <tr><td><code>saveTo</code></td><td>string</td><td>yes</td><td>Workspace name for the cloned construct.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "vector": "seal-synthetic-backbone",
+  "insert": "synthetic-reporter",
+  "enzymes": ["EcoRI", "BamHI"],
+  "vectorTopology": "circular",
+  "saveTo": "seal-synthetic-assembly"
+}</code></pre>
+    </div>
+
+    <h2 id="mutate-tools">Mutate</h2>
+    <p>One tool for point mutations. Source: <code>mcp/tools/mutate-tools.ts</code>.</p>
+
+    <h3>mutate</h3>
+    <p>Apply a mutation (substitution, insertion, or deletion) to a workspace sequence.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>name</code></td><td>string</td><td>yes</td><td>Workspace entry name or ID.</td></tr>
+          <tr><td><code>type</code></td><td>enum</td><td>yes</td><td><code>substitute</code>, <code>insert</code>, or <code>delete</code>.</td></tr>
+          <tr><td><code>position</code></td><td>number</td><td>yes</td><td>0-indexed position in the sequence.</td></tr>
+          <tr><td><code>newBase</code></td><td>string</td><td>no</td><td>Replacement base(s) for <code>substitute</code>.</td></tr>
+          <tr><td><code>bases</code></td><td>string</td><td>no</td><td>Bases to insert (for <code>insert</code> type).</td></tr>
+          <tr><td><code>count</code></td><td>number</td><td>no</td><td>Number of bases to delete starting at <code>position</code> (for <code>delete</code> type).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "name": "synthetic-reporter",
+  "type": "substitute",
+  "position": 42,
+  "newBase": "T"
+}</code></pre>
+    </div>
+
+    <h2>IO</h2>
+    <p>Two tools for parsing and exporting single sequences. Source: <code>mcp/tools/io-tools.ts</code>.</p>
+
+    <h3>parse_sequence</h3>
+    <p>Parse a sequence from FASTA, GenBank, or raw text. Optionally add it to the workspace.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>content</code></td><td>string</td><td>yes</td><td>Sequence content to parse (FASTA, GenBank, or raw).</td></tr>
+          <tr><td><code>name</code></td><td>string</td><td>no</td><td>Override name (uses parsed name if omitted).</td></tr>
+          <tr><td><code>addToWorkspace</code></td><td>boolean</td><td>no</td><td>If true, add the parsed sequence to the workspace (default: false).</td></tr>
+          <tr><td><code>addAllToWorkspace</code></td><td>boolean</td><td>no</td><td>If true, add every parsed record from a multi-record FASTA or GenBank input. Otherwise only the first record is saved.</td></tr>
+          <tr><td><code>autoAnalyze</code></td><td>boolean</td><td>no</td><td>Run auto-annotation when adding to the workspace (default: true).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "content": "&gt;seal-synthetic-backbone\nGCTTCCGGCTCGTATGTTGTGTGGAATTG...",
+  "addToWorkspace": true,
+  "autoAnalyze": true
+}</code></pre>
+    </div>
+
+    <h3>export_sequence</h3>
+    <p>Export a workspace sequence in FASTA, GenBank, GFF3, or raw format.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>name</code></td><td>string</td><td>yes</td><td>Workspace entry name or ID.</td></tr>
+          <tr><td><code>format</code></td><td>enum</td><td>no</td><td><code>fasta</code> (default), <code>genbank</code>, <code>gff3</code>, or <code>raw</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "name": "seal-synthetic-assembly",
+  "format": "genbank"
+}</code></pre>
+    </div>
+
+    <h2>Project</h2>
+    <p>Six tools that operate on the real <code>projects</code> table in the shared SQLite database, not the MCP scratch workspace. Name resolution is fuzzy: exact id, then case-insensitive exact name, then partial match. Source: <code>mcp/tools/project-tools.ts</code>.</p>
+
+    <h3>project_create</h3>
+    <p>Create a new project in the shared database. Returns the created project.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>name</code></td><td>string</td><td>yes</td><td>Name for the project (max 200 chars).</td></tr>
+          <tr><td><code>color</code></td><td>string</td><td>no</td><td>Hex color (e.g. <code>"#6b7280"</code>).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "name": "CRISPR Screen 2026",
+  "color": "#3b82f6"
+}</code></pre>
+    </div>
+
+    <h3>project_rename</h3>
+    <p>Rename an existing project. Resolves by name or id with fuzzy matching.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>name</code></td><td>string</td><td>yes</td><td>Current name or id.</td></tr>
+          <tr><td><code>newName</code></td><td>string</td><td>yes</td><td>New name.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{ "name": "CRISPR Screen 2026", "newName": "CRISPR Screen Q2-2026" }</code></pre>
+    </div>
+
+    <h3>project_delete</h3>
+    <p>Delete a project without deleting its conversations. First read the project, then provide explicit confirmation, the current row revision, and the exact child-conversation set. Name or fuzzy lookup also requires the resolved project id. Child unassignment, the conditional project delete, and the durable audit tombstone commit atomically.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>name</code></td><td>string</td><td>yes</td><td>Name or id of the project to delete.</td></tr>
+          <tr><td><code>confirm</code></td><td>boolean</td><td>yes</td><td>Must be <code>true</code> to confirm deletion and conversation unassignment.</td></tr>
+          <tr><td><code>projectId</code></td><td>string</td><td>conditionally</td><td>Exact id guard; required when <code>name</code> is not already the exact project id.</td></tr>
+          <tr><td><code>expectedUpdatedAt</code></td><td>number</td><td>yes</td><td>Optimistic row-version guard from <code>project_get</code>.</td></tr>
+          <tr><td><code>expectedConversationCount</code></td><td>number</td><td>yes</td><td>Must match both the current child count and <code>expectedConversationIds.length</code>.</td></tr>
+          <tr><td><code>expectedConversationIds</code></td><td>string[]</td><td>yes</td><td>Exact set of child conversation ids that will be unassigned.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "name": "CRISPR Screen 2026",
+  "confirm": true,
+  "projectId": "project-123",
+  "expectedUpdatedAt": 1712345678000,
+  "expectedConversationCount": 2,
+  "expectedConversationIds": ["conversation-a", "conversation-b"]
+}</code></pre>
+    </div>
+
+    <h3>project_list</h3>
+    <p>List all projects, ordered by createdAt ascending, then id ascending. No arguments required.</p>
+    <div class="docs-code" data-lang="json">
+<pre><code>{}</code></pre>
+    </div>
+
+    <h3>project_get</h3>
+    <p>Get a single project by name or id, including its <code>conversationIds</code>.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>name</code></td><td>string</td><td>yes</td><td>Name or id of the project.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{ "name": "CRISPR Screen 2026" }</code></pre>
+    </div>
+
+    <h3>project_set_color</h3>
+    <p>Update the color of a project.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>name</code></td><td>string</td><td>yes</td><td>Name or id of the project.</td></tr>
+          <tr><td><code>color</code></td><td>string</td><td>yes</td><td>New hex color (e.g. <code>"#ff0000"</code>).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{ "name": "CRISPR Screen 2026", "color": "#10b981" }</code></pre>
+    </div>
+
+    <h2>Conversation</h2>
+    <p>Six tools that operate on the real <code>conversations</code> table. ON DELETE CASCADE removes all child <code>sequence_blocks</code> and <code>checkpoints</code> when a conversation is deleted. Source: <code>mcp/tools/conversation-tools.ts</code>.</p>
+
+    <h3>conversation_create</h3>
+    <p>Create a new conversation in the shared database. Optionally assign it to a project.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>title</code></td><td>string</td><td>yes</td><td>Title for the conversation (max 200 chars).</td></tr>
+          <tr><td><code>projectId</code></td><td>string</td><td>no</td><td>Optional project id to assign.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "title": "Initial guide design",
+  "projectId": "proj-uuid-here"
+}</code></pre>
+    </div>
+
+    <h3>conversation_rename</h3>
+    <p>Rename a conversation. Resolves by title or id with fuzzy matching.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>name</code></td><td>string</td><td>yes</td><td>Current title or id.</td></tr>
+          <tr><td><code>newTitle</code></td><td>string</td><td>yes</td><td>New title.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{ "name": "Initial guide design", "newTitle": "Guide library v2" }</code></pre>
+    </div>
+
+    <h3>conversation_delete</h3>
+    <p>Compatibility-only safety gate. This tool always rejects permanent deletion because the external-agent path has no complete crash-safe recovery path. No data changes; archive or restore the Entry in the SEAL app instead.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>name</code></td><td>string</td><td>yes</td><td>Compatibility input. No conversation is deleted.</td></tr>
+          <tr><td><code>confirm</code></td><td>boolean</td><td>no</td><td>Compatibility input. <code>true</code> does not bypass the safety gate.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{ "name": "Initial guide design" }</code></pre>
+    </div>
+
+    <h3>conversation_list</h3>
+    <p>List all conversations, ordered by createdAt ascending, then id ascending. No arguments required.</p>
+    <div class="docs-code" data-lang="json">
+<pre><code>{}</code></pre>
+    </div>
+
+    <h3>conversation_get</h3>
+    <p>Get a single conversation by title or id.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>name</code></td><td>string</td><td>yes</td><td>Title or id.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{ "name": "Guide library v2" }</code></pre>
+    </div>
+
+    <h3>conversation_move</h3>
+    <p>Move a conversation to a different project, or unassign it.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>name</code></td><td>string</td><td>yes</td><td>Title or id of the conversation.</td></tr>
+          <tr><td><code>newProjectId</code></td><td>string &#124; null</td><td>yes</td><td>Target project id, or <code>null</code> to unassign.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{ "name": "Guide library v2", "newProjectId": "proj-uuid-here" }</code></pre>
+    </div>
+
+    <h2>Feature</h2>
+    <p>Four tools that operate on the <code>features</code> array of a sequence block in the MCP scratch workspace. Position validation is topology-aware: on circular blocks, <code>start &gt; end</code> is allowed (wrap-around). All operations are atomic read-modify-upsert. Source: <code>mcp/tools/feature-tools.ts</code>.</p>
+
+    <h3>feature_add</h3>
+    <p>Add a feature annotation to a sequence block. The feature id is auto-generated if not provided.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>block</code></td><td>string</td><td>yes</td><td>Block name or id (fuzzy resolved).</td></tr>
+          <tr><td><code>feature</code></td><td>object</td><td>yes</td><td>Feature to add (see sub-fields below).</td></tr>
+          <tr><td><code>feature.type</code></td><td>string</td><td>yes</td><td>Feature type (e.g. <code>gene</code>, <code>CDS</code>, <code>promoter</code>).</td></tr>
+          <tr><td><code>feature.name</code></td><td>string</td><td>yes</td><td>Human-readable feature name.</td></tr>
+          <tr><td><code>feature.start</code></td><td>integer</td><td>yes</td><td>Start position (0-indexed, inclusive).</td></tr>
+          <tr><td><code>feature.end</code></td><td>integer</td><td>yes</td><td>End position (exclusive).</td></tr>
+          <tr><td><code>feature.id</code></td><td>string</td><td>no</td><td>Optional id; auto-generated if absent.</td></tr>
+          <tr><td><code>feature.strand</code></td><td>1 &#124; -1 &#124; 0</td><td>no</td><td>Strand (1=forward, -1=reverse, 0=none).</td></tr>
+          <tr><td><code>feature.color</code></td><td>string</td><td>no</td><td>UI color hint (e.g. <code>#ff0000</code>).</td></tr>
+          <tr><td><code>feature.notes</code></td><td>string</td><td>no</td><td>Free-text notes.</td></tr>
+          <tr><td><code>feature.locations</code></td><td>array</td><td>no</td><td>Compound locations for split features.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "block": "seal-synthetic-backbone",
+  "feature": {
+    "type": "restriction_site",
+    "name": "EcoRI",
+    "start": 396,
+    "end": 402,
+    "strand": 1,
+    "color": "#ef4444"
+  }
+}</code></pre>
+    </div>
+
+    <h3>feature_update</h3>
+    <p>Merge a partial patch into an existing feature. Only the provided fields are changed; others are preserved.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>block</code></td><td>string</td><td>yes</td><td>Block name or id.</td></tr>
+          <tr><td><code>featureId</code></td><td>string</td><td>yes</td><td>Id of the feature to update.</td></tr>
+          <tr><td><code>patch</code></td><td>object</td><td>yes</td><td>Fields to merge (all optional: <code>type</code>, <code>name</code>, <code>start</code>, <code>end</code>, <code>strand</code>, <code>color</code>, <code>notes</code>, <code>locations</code>).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "block": "seal-synthetic-backbone",
+  "featureId": "feat-uuid",
+  "patch": { "color": "#22c55e", "notes": "Confirmed by sequencing" }
+}</code></pre>
+    </div>
+
+    <h3>feature_delete</h3>
+    <p>Remove a feature from a sequence block by id.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>block</code></td><td>string</td><td>yes</td><td>Block name or id.</td></tr>
+          <tr><td><code>featureId</code></td><td>string</td><td>yes</td><td>Id of the feature to delete.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{ "block": "seal-synthetic-backbone", "featureId": "feat-uuid" }</code></pre>
+    </div>
+
+    <h3>feature_list</h3>
+    <p>List all feature annotations on a sequence block.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>block</code></td><td>string</td><td>yes</td><td>Block name or id.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{ "block": "seal-synthetic-backbone" }</code></pre>
+    </div>
+
+    <h2>Simulate</h2>
+    <p>Eight tools for in-silico bench simulations. Source: <code>mcp/tools/simulate-tools.ts</code>.</p>
+
+    <h3>pcr</h3>
+    <p>Simulate a PCR amplification. Resolves the template block by name, finds primer binding sites, and returns the product.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>template</code></td><td>string</td><td>yes</td><td>Workspace entry name or ID to use as PCR template.</td></tr>
+          <tr><td><code>forwardPrimer</code></td><td>string</td><td>yes</td><td>Forward primer sequence 5'→3'.</td></tr>
+          <tr><td><code>reversePrimer</code></td><td>string</td><td>yes</td><td>Reverse primer sequence 5'→3'.</td></tr>
+          <tr><td><code>minTm</code></td><td>number</td><td>no</td><td>Minimum acceptable Tm in °C for each primer binding region (default: 45).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "template": "seal-synthetic-backbone",
+  "forwardPrimer": "CGCCAGGGTTTTCCCAGTCACGAC",
+  "reversePrimer": "AGCGGATAACAATTTCACACAGGA"
+}</code></pre>
+    </div>
+
+    <h3>gel</h3>
+    <p>Simulate agarose gel electrophoresis. Accepts either explicit fragment sizes or a block plus enzyme list for an in-silico digest first.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>fragments</code></td><td>array &#124; object</td><td>yes</td><td>Either an array of <code>{ name, length }</code> explicit fragments, or <code>{ block, enzymes }</code> to digest a workspace block first.</td></tr>
+          <tr><td><code>agarosePercent</code></td><td>number</td><td>no</td><td>Agarose gel percentage: <code>0.8</code>, <code>1.0</code> (default), <code>1.5</code>, or <code>2.0</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "fragments": { "block": "seal-synthetic-backbone", "enzymes": ["EcoRI", "BamHI"] },
+  "agarosePercent": 1.0
+}</code></pre>
+    </div>
+
+    <h3>golden_gate</h3>
+    <p>Simulate Golden Gate Assembly. Each fragment block must contain flanking BsaI (or the specified Type IIS enzyme) recognition sites.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>fragments</code></td><td>string[]</td><td>yes</td><td>Array of workspace entry names or IDs to assemble (order matters for linear).</td></tr>
+          <tr><td><code>enzyme</code></td><td>string</td><td>no</td><td>Type IIS restriction enzyme (default: <code>BsaI</code>).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "fragments": ["part-A", "part-B", "part-C"],
+  "enzyme": "BsaI"
+}</code></pre>
+    </div>
+
+    <h3>codon_usage</h3>
+    <p>Analyze codon usage for a DNA block. Returns per-codon counts, CAI, rare-codon positions, and per-amino-acid frequencies.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>block</code></td><td>string</td><td>yes</td><td>Workspace entry name or ID (must be a DNA sequence).</td></tr>
+          <tr><td><code>organism</code></td><td>enum</td><td>no</td><td><code>ecoli</code> (default), <code>human</code>, <code>yeast</code>, <code>pichia</code>, <code>sf9</code>, <code>cho</code>, or <code>bsubtilis</code>. Reference codon usage table.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{ "block": "synthetic-reporter", "organism": "ecoli" }</code></pre>
+    </div>
+
+    <h3>quality_report</h3>
+    <p>Generate a comprehensive quality report for a sequence block: GC content, ORFs, restriction sites, homopolymer runs, repeats, and cloning warnings.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>block</code></td><td>string</td><td>yes</td><td>Workspace entry name or ID.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{ "block": "synthetic-reporter" }</code></pre>
+    </div>
+
+    <h3>mutation_impact</h3>
+    <p>Compute the protein-level impact of a single-nucleotide substitution: codon change, amino acid change, silent/missense/nonsense classification, and restriction site gain or loss.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>block</code></td><td>string</td><td>yes</td><td>Workspace entry name or ID (must be a DNA sequence).</td></tr>
+          <tr><td><code>position</code></td><td>number</td><td>yes</td><td>0-indexed position of the base to mutate.</td></tr>
+          <tr><td><code>newBase</code></td><td>string</td><td>yes</td><td>New base at the position (A, T, G, or C).</td></tr>
+          <tr><td><code>frame</code></td><td>0 &#124; 1 &#124; 2</td><td>no</td><td>Reading frame offset (default: 0).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "block": "synthetic-reporter",
+  "position": 200,
+  "newBase": "A",
+  "frame": 0
+}</code></pre>
+    </div>
+
+    <h3>protein_features</h3>
+    <p>Detect protein features in a protein block: purification tags, epitope tags, protease cleavage sites, signal peptides, localization signals, and functional motifs. The result is persisted back to the block.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>block</code></td><td>string</td><td>yes</td><td>Workspace entry name or ID (must be a protein/amino acid sequence).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{ "block": "Synthetic Tagged Protein" }</code></pre>
+    </div>
+
+    <h3>align_msa</h3>
+    <p>Compute a multiple sequence alignment for two or more blocks. The default is the built-in SEAL preview. <code>muscle</code> and <code>clustal-omega</code> run validated local binaries. An unavailable engine returns <code>engine_unavailable</code>; SEAL preserves the requested engine instead of substituting another. Successful calls return aligned sequences and per-column conservation.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>blocks</code></td><td>string[]</td><td>yes</td><td>Array of workspace entry names or IDs to align (at least 2).</td></tr>
+          <tr><td><code>method</code></td><td>enum</td><td>no</td><td><code>simple</code>, <code>progressive</code>, <code>seal-progressive</code>, <code>muscle</code>, <code>clustal-omega</code>, <code>clustalo</code>, or <code>clustal</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "blocks": ["synthetic-reporter-reference", "synthetic-reporter-recoded", "synthetic-reporter-variant-c"],
+  "method": "muscle"
+}</code></pre>
+    </div>
+
+    <h2>AI Config</h2>
+    <p>Three compatibility tools read provider settings and select a provider or model. Credential reads return a <code>hasKey</code> presence map; MCP exposes no API-key write tool. Configure your external agent in its own client, then connect it through <a href="mcp-setup.html">MCP setup</a>.</p>
+
+    <h3>ai_config_get</h3>
+    <p>Read the current AI provider configuration. Returns <code>activeProvider</code>, <code>activeModel</code>, a <code>hasKey</code> map. No arguments required.</p>
+    <div class="docs-code" data-lang="json">
+<pre><code>{}</code></pre>
+    </div>
+
+    <h3>ai_config_set_provider</h3>
+    <p>Set the active AI provider.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>provider</code></td><td>enum</td><td>yes</td><td><code>claude</code>, <code>openai</code>, <code>gemini</code>, or <code>kimi</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{ "provider": "claude" }</code></pre>
+    </div>
+
+    <h3>ai_config_set_model</h3>
+    <p>Set the active AI model for a given provider. The <code>modelId</code> must be a known model for that provider.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>provider</code></td><td>enum</td><td>yes</td><td>The provider the model belongs to.</td></tr>
+          <tr><td><code>modelId</code></td><td>string</td><td>yes</td><td>The model ID string (e.g. <code>"claude-opus-4-6"</code>).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{ "provider": "claude", "modelId": "claude-opus-4-6" }</code></pre>
+    </div>
+
+    <h2>Checkpoint</h2>
+    <p>Five tools that snapshot and restore blocks in the MCP scratch workspace. Restore is transactional. All writes stamp <code>writeSource: 'mcp'</code>. Diff operates in memory and does not modify the database. Source: <code>mcp/tools/checkpoint-tools.ts</code>.</p>
+
+    <h3>checkpoint_save</h3>
+    <p>Snapshot a block into a new checkpoint row. Captures raw sequence, features, mutation scars, topology, and type.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>block</code></td><td>string</td><td>yes</td><td>Block name or id (fuzzy resolved in the MCP workspace).</td></tr>
+          <tr><td><code>label</code></td><td>string</td><td>no</td><td>Human-readable label (auto-generated if absent).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{ "block": "seal-synthetic-backbone", "label": "Before EcoRI digestion" }</code></pre>
+    </div>
+
+    <h3>checkpoint_restore</h3>
+    <p>Transactionally restore a block from a saved checkpoint. The checkpoint must belong to the resolved block, and the current block revision must still match. When content differs, SEAL first creates an exact recovery checkpoint.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>block</code></td><td>string</td><td>yes</td><td>Block name or id.</td></tr>
+          <tr><td><code>checkpointId</code></td><td>string</td><td>yes</td><td>Id of the checkpoint to restore from.</td></tr>
+          <tr><td><code>expectedUpdatedAt</code></td><td>integer</td><td>yes</td><td>Optimistic revision guard from <code>workspace_get</code> or <code>checkpoint_list</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "block": "seal-synthetic-backbone",
+  "checkpointId": "cp-uuid-here",
+  "expectedUpdatedAt": 1785261600000
+}</code></pre>
+    </div>
+
+    <h3>checkpoint_delete</h3>
+    <p>Permanently delete a checkpoint owned by the MCP scratch workspace. The exact checkpoint revision and explicit confirmation are required; the guarded delete and durable audit tombstone commit atomically.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>checkpointId</code></td><td>string</td><td>yes</td><td>Id of the checkpoint to delete.</td></tr>
+          <tr><td><code>confirm</code></td><td>boolean</td><td>yes</td><td>Must be <code>true</code> to confirm permanent deletion.</td></tr>
+          <tr><td><code>expectedUpdatedAt</code></td><td>integer</td><td>yes</td><td>Exact checkpoint revision returned by <code>checkpoint_list</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "checkpointId": "cp-uuid-here",
+  "confirm": true,
+  "expectedUpdatedAt": 1785261600000
+}</code></pre>
+    </div>
+
+    <h3>checkpoint_list</h3>
+    <p>List all checkpoints for a block, ordered newest-first.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>block</code></td><td>string</td><td>yes</td><td>Block name or id.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{ "block": "seal-synthetic-backbone" }</code></pre>
+    </div>
+
+    <h3>checkpoint_diff</h3>
+    <p>Compute a structured diff between two checkpoints. Both must belong to the same block. Features are matched by id: present in B but not A is added; present in A but not B is removed; present in both with changed fields is changed.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>checkpointA</code></td><td>string</td><td>yes</td><td>Id of the "before" checkpoint.</td></tr>
+          <tr><td><code>checkpointB</code></td><td>string</td><td>yes</td><td>Id of the "after" checkpoint.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "checkpointA": "cp-uuid-before",
+  "checkpointB": "cp-uuid-after"
+}</code></pre>
+    </div>
+
+    <h2>Export</h2>
+    <p>Five tools that read from the MCP scratch workspace. When a <code>blocks</code> filter is supplied, each element is resolved via the workspace fuzzy resolver. Source: <code>mcp/tools/export-tools.ts</code>.</p>
+
+    <h3>export_csv</h3>
+    <p>Export sequence blocks as a CSV table. Returns a UTF-8 CSV string with one row per block: Name, Type, Topology, Length, GC%, AT%, Feature Count, and Notes. Exports all blocks if <code>blocks</code> is omitted.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>blocks</code></td><td>string[]</td><td>no</td><td>Block names or ids to export. Omit to export all.</td></tr>
+          <tr><td><code>includeFeatures</code></td><td>boolean</td><td>no</td><td>Append a second table with one row per feature.</td></tr>
+          <tr><td><code>includeAnalysis</code></td><td>boolean</td><td>no</td><td>Include extra columns: Molecular Weight, Melting Temp, ORF Count.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "blocks": ["seal-synthetic-backbone", "synthetic-reporter"],
+  "includeFeatures": true
+}</code></pre>
+    </div>
+
+    <h3>export_markdown</h3>
+    <p>Export sequence blocks as a Markdown document. One section per block with a summary table of properties, plus a features table if features exist.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>blocks</code></td><td>string[]</td><td>no</td><td>Block names or ids. Omit to export all workspace blocks.</td></tr>
+          <tr><td><code>includeAnalysis</code></td><td>boolean</td><td>no</td><td>Include analysis fields (GC%, MW, Tm, ORFs) in each section.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "blocks": ["seal-synthetic-assembly"],
+  "includeAnalysis": true
+}</code></pre>
+    </div>
+
+    <h3>export_slide_summary</h3>
+    <p>Produce a compact slide-friendly Markdown summary with one bullet per block. Format: <code>**{name}** {length} bp {type} ({topology}) · GC {gc}% · {featureCount} features</code>.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>blocks</code></td><td>string[]</td><td>yes</td><td>Block names or ids to include.</td></tr>
+          <tr><td><code>title</code></td><td>string</td><td>no</td><td>Optional title for the summary document.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "blocks": ["seal-synthetic-backbone", "synthetic-reporter", "seal-synthetic-assembly"],
+  "title": "Cloning Project Summary"
+}</code></pre>
+    </div>
+
+    <h3>export_workspace_json</h3>
+    <p>Full JSON dump of every block in the MCP scratch workspace. Includes id, name, raw, type, topology, features, analysis, scars, tags, notes, parentId, createdAt, and updatedAt. No arguments required.</p>
+    <div class="docs-code" data-lang="json">
+<pre><code>{}</code></pre>
+    </div>
+
+    <h3>export_package</h3>
+    <p>Build a complete report handoff package for agent workflows. Returns a ZIP artifact as base64 plus manifest and validation metadata. The ZIP contains <code>report.md</code>, <code>sequences.fasta</code>, <code>summary.csv</code>, <code>features.csv</code>, per-block GenBank files, <code>validation.md</code>, and <code>manifest.json</code>.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>blocks</code></td><td>string[]</td><td>no</td><td>Block names or ids. Omit to package all workspace blocks.</td></tr>
+          <tr><td><code>includeBase64</code></td><td>boolean</td><td>no</td><td>Set to <code>false</code> to omit the base64 ZIP payload and return only manifest and validation metadata.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "blocks": ["seal-synthetic-assembly"],
+  "includeBase64": true
+}</code></pre>
+    </div>
+
+    <h2>Block</h2>
+    <p>Five tools read and organize sequence blocks. The read tools cover all shared projects and entries. The mutation tools default to MCP Scratch; pass an explicit <code>conversationId</code> to target another entry.</p>
+
+    <h3>block_list</h3>
+    <p>Read summaries of up to 1,000 sequence blocks across all projects and entries. Each result includes a stable block ID. For a larger workspace, filter by an exact <code>conversationId</code>. This call leaves the workspace unchanged.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody><tr><td><code>conversationId</code></td><td>string</td><td>no</td><td>Exact entry ID. Omit to list blocks across the workspace.</td></tr></tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{}</code></pre>
+    </div>
+
+    <h3>block_get</h3>
+    <p>Read one shared-workspace sequence block by its stable ID. Use an ID returned by <code>block_list</code> or <code>seal://blocks</code>. This call leaves the workspace unchanged.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody><tr><td><code>id</code></td><td>string</td><td>yes</td><td>Exact sequence-block ID.</td></tr></tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{ "id": "block-uuid-here" }</code></pre>
+    </div>
+
+    <h3>block_reorder</h3>
+    <p>Reassign the display position of blocks in a conversation. The <code>order</code> array must contain exactly the same set of block ids currently in the conversation. Runs in a single transaction; if validation fails the database is unchanged.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>conversationId</code></td><td>string</td><td>no</td><td>Conversation to reorder (defaults to the MCP scratch conversation).</td></tr>
+          <tr><td><code>order</code></td><td>string[]</td><td>yes</td><td>Complete ordered list of block ids (must be the exact same set as current).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "order": ["block-uuid-1", "block-uuid-2", "block-uuid-3"]
+}</code></pre>
+    </div>
+
+    <h3>block_extract_selection</h3>
+    <p>Extract a sub-sequence from an existing block into a new child block. On linear blocks, <code>start</code> must be <code>&lt;= end</code>. On circular blocks, <code>start &gt; end</code> is allowed (concatenates <code>raw[start:] + raw[:end]</code>). The extracted block always has topology <code>linear</code>.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>block</code></td><td>string</td><td>yes</td><td>Source block name or id (fuzzy resolved).</td></tr>
+          <tr><td><code>start</code></td><td>integer</td><td>yes</td><td>0-indexed start position (inclusive).</td></tr>
+          <tr><td><code>end</code></td><td>integer</td><td>yes</td><td>0-indexed end position (exclusive). For circular wrap-around, pass <code>start &gt; end</code>.</td></tr>
+          <tr><td><code>newName</code></td><td>string</td><td>no</td><td>Name for the new block (defaults to <code>"{sourceName}[{start}..{end}]"</code>).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "block": "seal-synthetic-backbone",
+  "start": 120,
+  "end": 480,
+  "newName": "Synthetic backbone review fragment"
+}</code></pre>
+    </div>
+
+    <h3>block_annotate_selection</h3>
+    <p>Add a feature annotation to a block, pinning it to a specific start and end range. The <code>start</code> and <code>end</code> values override whatever the incoming feature object contains.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Argument</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>block</code></td><td>string</td><td>yes</td><td>Block name or id (fuzzy resolved).</td></tr>
+          <tr><td><code>start</code></td><td>integer</td><td>yes</td><td>Feature start position (0-indexed, inclusive).</td></tr>
+          <tr><td><code>end</code></td><td>integer</td><td>yes</td><td>Feature end position (exclusive).</td></tr>
+          <tr><td><code>feature</code></td><td>object</td><td>yes</td><td>Feature properties (see sub-fields below).</td></tr>
+          <tr><td><code>feature.type</code></td><td>string</td><td>yes</td><td>Feature type (e.g. <code>gene</code>, <code>CDS</code>, <code>promoter</code>).</td></tr>
+          <tr><td><code>feature.name</code></td><td>string</td><td>yes</td><td>Feature label.</td></tr>
+          <tr><td><code>feature.id</code></td><td>string</td><td>no</td><td>Optional feature id (auto-generated if absent).</td></tr>
+          <tr><td><code>feature.strand</code></td><td>1 &#124; -1 &#124; 0</td><td>no</td><td>Strand.</td></tr>
+          <tr><td><code>feature.color</code></td><td>string</td><td>no</td><td>UI color hint.</td></tr>
+          <tr><td><code>feature.notes</code></td><td>string</td><td>no</td><td>Free-text notes.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json">
+<pre><code>{
+  "block": "synthetic-reporter",
+  "start": 0,
+  "end": 720,
+  "feature": {
+    "type": "CDS",
+    "name": "Synthetic Reporter CDS",
+    "strand": 1,
+    "color": "#22c55e"
+  }
+}</code></pre>
+    </div>
+
+    <h2>Resources</h2>
+    <p>Alongside the tools, the server exposes three read-only resources. Clients that support MCP resources can read them directly.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>URI</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>seal://workspace</code></td><td>Full workspace listing (all entries, no raw sequences).</td></tr>
+          <tr><td><code>seal://sequence/&lt;name&gt;</code></td><td>Complete entry including raw sequence, features, and analysis.</td></tr>
+          <tr><td><code>seal://enzymes</code></td><td>Catalog of all restriction enzymes with recognition sequences.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

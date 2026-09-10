@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Privacy · SEAL docs</title>
+  <meta name="description" content="SEAL's local storage, explicit outbound workflows, provider and key handling, data clearing, backup recovery copies, and separate SQLite and Electron userData locations." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Privacy" />
+  <meta property="og:description" content="What stays on your device and what reaches out." />
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>Privacy</h1>
+    <p class="docs-lede">SEAL is local-first. Workspace data stays on your device unless you explicitly start a network-backed fetch, prediction, hosted-model request, source-edition Notion diagnostic, or external-agent action. SEAL sends no background telemetry, analytics, or crash reports.</p>
+
+    <h2>Mac App Store edition</h2>
+    <p>The first Store configuration uses sandbox-managed default storage and user-selected workspace folders. It does not enable terminal launching, external tool runtimes, or hosted-provider credential storage. See the <a href="../privacy.html#mas">Store privacy summary</a> and <a href="editions.html">Edition differences</a>.</p>
+    <h2>Direct and source editions: local data</h2>
+    <p>The implementation details below describe direct and source builds. Do not use their default filesystem paths as the Store edition's storage locations.</p>
+    <ul>
+      <li><strong>SQLite workspace.</strong> Entries, sequence blocks, features, annotations, checkpoints, notebooks, Activity, and database-backed settings are stored in <code>seal.db</code>.</li>
+      <li><strong>Local analysis.</strong> Restriction maps, ORFs, GC windows, local alignment, gel simulation, cloning plans, translation, and ordinary analysis remain local unless you explicitly export or share them.</li>
+      <li><strong>Imported files.</strong> Supported bioinformatics files are read locally and their parsed content is saved to local persistence.</li>
+      <li><strong>Electron userData.</strong> Window state, Chromium storage, UI preferences, and <code>secure-keys.json</code> live in a separate local directory.</li>
+      <li><strong>Browser fallback.</strong> Browser mode uses its own IndexedDB and localStorage profile, separate from both native directories.</li>
+    </ul>
+
+    <h2>Explicit outbound workflows</h2>
+    <p>Every row below requires an action by the user or a separately invoked local tool.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Action</th><th>Destination</th><th>Data sent</th></tr></thead>
+        <tbody>
+          <tr><td>NCBI fetch</td><td><code>eutils.ncbi.nlm.nih.gov</code></td><td>Accession or search term, SEAL tool identifier, and ordinary network metadata. No publisher email is bundled; an optional contact is sent only if you configure it locally.</td></tr>
+          <tr><td>UniProt fetch or feature lookup</td><td><code>rest.uniprot.org</code></td><td>Accession or search term and ordinary network metadata, not unrelated workspace content.</td></tr>
+          <tr><td>Phobius or InterProScan</td><td><code>www.ebi.ac.uk</code></td><td>Submitted protein sequence, analysis parameters, your own contact email, and ordinary network metadata. SEAL asks for the address on first use and stores it locally; it has no publisher or environment fallback. Removing it locally does not delete submitted jobs. See the <a href="../privacy.html#ebi-contact">EMBL-EBI contact and retention details</a>.</td></tr>
+          <tr><td>Hosted ESM scoring or generation</td><td><code>biohub.ai/api/v1/logits</code></td><td>Protein context as token IDs for editing, scoring, or scanning; mask tokens for generation; model ID, request options, provider key, and ordinary network metadata.</td></tr>
+          <tr><td>Notion Team Sync doctor</td><td><code>api.notion.com</code></td><td>Configured database IDs and Notion integration token. It retrieves schema metadata and sends no sequence or workspace records.</td></tr>
+          <tr><td>External agent</td><td>The provider configured in Claude Code, Codex, Gemini CLI, or another client</td><td>Whatever prompt, file, or workspace context that external agent chooses to send under its own privacy terms.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>The source MCP server is local stdio and does not make outbound network calls by itself. An external agent connected to it can still transmit context to its own provider. Native processes and the Rust CLI are governed separately from the renderer Content Security Policy.</p>
+
+    <h2>Provider key storage</h2>
+    <p>The local unsigned package disables in-app provider-key storage because its Chromium keychain mode does not provide secure credential storage. Existing encrypted sidecar data remains untouched. External agents and terminal tools continue to use their own credential stores.</p>
+    <p>Builds with OS-backed Electron <code>safeStorage</code> can encrypt hosted sequence-model keys through macOS Keychain. Ciphertext is stored in <code>secure-keys.json</code> under the separate Electron userData directory, and plaintext is not returned to the renderer.</p>
+
+    <h2>No automatic collection</h2>
+    <ul>
+      <li>No telemetry or usage analytics.</li>
+      <li>No automatic crash-report upload.</li>
+      <li>No background cloud synchronization.</li>
+      <li>No SEAL cloud account or SEAL-hosted workspace service.</li>
+    </ul>
+
+    <h2 id="data-storage-location">Data storage locations</h2>
+    <p>The native app intentionally uses two separate directory trees.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Store</th><th>macOS path</th><th>Contains</th></tr></thead>
+        <tbody>
+          <tr><td>SQLite workspace</td><td><code>~/Library/Application Support/io.github.jvogan.seal/seal.db</code></td><td>Entries, sequences, notebooks, checkpoints, Activity, and database settings.</td></tr>
+          <tr><td>Electron userData</td><td><code>~/Library/Application Support/SEAL/</code></td><td><code>secure-keys.json</code>, window state, Chromium localStorage, and browser-profile data.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Windows and Linux use their platform application-data and config directories. Browser fallback data is in the browser profile that opened SEAL.</p>
+
+    <h2>Clear all local data</h2>
+    <p>The supported path is <strong>Settings → Data → Clear all data</strong>. Before clearing the active SQLite workspace, the desktop app creates a verified <code>seal.db.pre-restore-*.backup</code> recovery copy beside it and retains up to five. Settings reports the new recovery path. Delete those copies separately if you also need retained recovery data removed.</p>
+    <p>Manual removal requires closing every app, browser tab, MCP server, and CLI process using the workspace, then deleting all of the following:</p>
+    <ol>
+      <li>The SQLite workspace directory, including adjacent recovery copies.</li>
+      <li>The separate Electron <code>SEAL</code> userData directory.</li>
+      <li>Any SEAL IndexedDB and localStorage data in browser fallback profiles.</li>
+    </ol>
+    <p>Deleting only <code>seal.db</code> does not remove model-key ciphertext, Chromium preferences, recovery copies, or browser-fallback data.</p>
+
+    <h2>Backup boundary</h2>
+    <p>Keep an independent backup outside both application-data directories and test that it can be restored. Close all processes using SQLite before copying it. Backup and migration checks reduce risk in covered scenarios, but failures remain possible. SEAL is a single-machine research notebook, not a regulated collaborative record system.</p>
+
+    <h2 id="contact">Contact</h2>
+    <p>Email <a href="mailto:kingtelomere@gmail.com">kingtelomere@gmail.com</a> for privacy questions or security reports. See <a href="../support.html">SEAL Support</a> for reporting instructions and <a href="../privacy.html#website-support">website and support email privacy</a>.</p>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

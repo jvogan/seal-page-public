@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Records and signing · SEAL docs</title>
+  <meta name="description" content="How a notebook page becomes a record: status, links to exact base ranges, templates, revisions, restore points, and signing, with the local trust boundary stated in full." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Records and signing" />
+  <meta property="og:description" content="How a notebook page becomes a record: status, links to exact base ranges, templates, revisions, restore points, and signing, with the local trust boundary stated in full." />
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>Records and signing</h1>
+    <p class="edition-note" data-edition-note>Screenshots and recordings show the direct edition. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">A notebook page is a record as well as a document. It carries a status, tags, comments, links to the sequences it describes, and a local revision history. Signing freezes one revision and locks the page, which is tamper-evident local attestation on a single machine.</p>
+
+    <p><a href="notebook.html">Notebook</a> covers writing: the editor, the slash menu, tables, images, and the tree. This page covers what happens to that writing afterwards, and what a signature on it establishes.</p>
+
+    <h2>What a page carries</h2>
+    <p>Notebooks are organised as projects, notebooks, and pages. A page is a standalone rich document, stored in the same on-device workspace as your conversations and sequence blocks, so it is backed up and exported with them.</p>
+    <ul>
+      <li><strong>Rich content.</strong> Headings, lists, checklists, quotes, code blocks, tables, imported spreadsheets, and inline images.</li>
+      <li><strong>A slash menu.</strong> Type <code>/</code> to insert a block at the caret, and filter the list by typing after the slash.</li>
+      <li><strong>An @ picker.</strong> Type <code>@</code> at a word boundary to search for a link target and insert it as an inline chip.</li>
+      <li><strong>Tags.</strong> Freeform labels on a page, used for triage and matched by notebook search.</li>
+      <li><strong>Status.</strong> Draft, In review, or Complete.</li>
+      <li><strong>Comments.</strong> Threads anchored to a span of text, which can be resolved and reopened.</li>
+    </ul>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/notebook.png" alt="A notebook page open in the Notebook view, with a Draft status pill and a Tag control under the page title, the formatting toolbar and Insert menu above the body, and Save version, Sign, and Link an entry controls along the footer." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">The record controls sit around the page body: the status pill and the tag control under the title, and Save version, Sign, and Link an entry along the footer.</figcaption>
+    </figure>
+
+    <h2>Set a page status</h2>
+    <p>Each page carries one of three states: <strong>Draft</strong>, <strong>In review</strong>, and <strong>Complete</strong>. Select the status pill under the page title to change it. A page with no status set yet renders a quiet Draft pill.</p>
+    <p>A status change is written to the page's audit trail as a status event carrying the new value, so a page that moved to Complete has a dated entry saying so. Status is metadata rather than content: it stays editable after a page is signed, and a signature does not cover it. See <a href="#the-trust-boundary">The trust boundary</a>.</p>
+
+    <h2>Link to a sequence or a base range</h2>
+    <p>A link connects a page to the work it describes. One link points at exactly one target, and the target can be any of four things:</p>
+    <ul>
+      <li>An <strong>entry</strong>, which is a conversation in the workspace.</li>
+      <li>A <strong>block</strong> inside an entry, such as one DNA sequence.</li>
+      <li>An <strong>exact base range</strong> inside a block, so a note about a mutation points at the bases it describes.</li>
+      <li>Another <strong>notebook page</strong>.</li>
+    </ul>
+    <p>To link a range, select it in the block first, then open the @ picker. The selected range appears as an option you can pick directly. The link stores the block and the range bounds, so it keeps pointing at those bases rather than at a label.</p>
+
+    <h3>Read a link from either end</h3>
+    <p>Links are stored once and read from both sides, so the two directions cannot drift apart.</p>
+    <ul>
+      <li>On the page, the linked-entries panel lists every target the page points at. An inline chip navigates to its target when you click it, and the chip's label is derived from the live target, so renaming the target updates the chip.</li>
+      <li>On the entry, the workspace inspector's Overview tab shows <strong>Notebook references</strong>: every notebook page that links to this entry or to a block inside it. It appears only when at least one page references the entry.</li>
+    </ul>
+    <p>Deleting an entry, a block, or a page removes the links that targeted it, so neither side keeps a stale reference.</p>
+
+
+    <h2>Start from a template</h2>
+    <p>Open the new-page menu and pick one of five built-in templates. Each drops in real structure, a heading, the reagent or condition tables the protocol needs, a checklist, and a notes stub, and each applies a matching tag.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Template</th><th>Page title</th><th>What it lays out</th></tr></thead>
+        <tbody>
+          <tr><td>PCR setup</td><td>PCR setup</td><td>A 25 µL reaction table, a thermocycler step table, a setup checklist, and a results section</td></tr>
+          <tr><td>Miniprep</td><td>Plasmid miniprep</td><td>A column-prep checklist from pellet to elution, and a yield table with A260/280 and A260/230 columns</td></tr>
+          <tr><td>Transformation</td><td>Transformation</td><td>A heat-shock checklist and a plate table with a no-DNA control row</td></tr>
+          <tr><td>Gel electrophoresis</td><td>Gel electrophoresis</td><td>A lane table with expected and observed sizes, and a pour, load, run checklist</td></tr>
+          <tr><td>Experiment record</td><td>Experiment record</td><td>Objective, materials and references, procedure, deviations, observations, conclusion, and follow-up</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The experiment record is also the template used when you capture an experiment from a sequence. SEAL fills the materials table with the block's label, its identifier, and the checkpoint it was captured from, and records the selected bases as the role when you had a selection. The sequence itself stays in the checkpoint, so a large sequence is never copied into notebook content.</p>
+
+    <h2>Capture a revision</h2>
+    <p>A revision is a snapshot of one page at one moment. It stores the title, the format, and the content as they were, plus the SHA-256 hash of those canonical bytes. Three actions create one:</p>
+    <ul>
+      <li><strong>Save version.</strong> The explicit control in the page footer. It flushes the editor's pending buffer first, so the revision holds the keystroke you just typed rather than the last render.</li>
+      <li><strong>An autosnapshot.</strong> Captured in the background after a pause in editing, one per page, and skipped for a page with no meaningful content and for a locked page.</li>
+      <li><strong>Signing.</strong> A signature always captures the revision it signs, so the signed bytes exist as a record in their own right.</li>
+    </ul>
+    <p>Select <strong>History</strong> on a page to read its signatures, its revisions, and the audit events that concern it. Each row shows the actor, the time, why the revision was captured, and the short form of its content hash.</p>
+    <p>Routine background history is bounded so that autosave cannot crowd out deliberate evidence. The newest 50 autosnapshots per page are kept. Saved versions, signing revisions, and any revision a signature references are retained independently of that limit.</p>
+
+    <h2>Recover with a restore point</h2>
+    <p>A restore point is a snapshot of the whole notebook workspace, captured immediately before a destructive action. SEAL takes one before you delete a page and before you delete a notebook, and shows an Undo control afterwards.</p>
+    <ul>
+      <li>Restore points are held in their own durable setting, separate from the live workspace, so one survives a crash or a restart.</li>
+      <li>The newest 15 are kept.</li>
+      <li>Reverting to a restore point overwrites the live workspace, so SEAL captures the current state as a restore point first. The revert is itself undoable.</li>
+      <li>A restore point carries workspace content and no matching evidence bundle, so a locked page stays locked through a restore. A restore is not a route around a signature.</li>
+    </ul>
+    <p>If the stored notebook data cannot be read, or was written by a newer build, SEAL pauses saving rather than overwrite it, and the Notebook view shows a verification state until the workspace and its evidence pass as one bundle.</p>
+
+    <h2>Sign and lock a revision</h2>
+    <p>Signing is the point where a page stops being a working document and becomes a fixed record. Select <strong>Sign</strong> in the page footer. The dialog asks for two things: the meaning you are attesting, and your name typed twice, the second time matching the first exactly. The four meanings are <strong>Authored</strong>, <strong>Reviewed</strong>, <strong>Approved</strong>, and <strong>Witnessed</strong>.</p>
+    <p>On confirmation SEAL does four things in one transaction:</p>
+    <ol>
+      <li>Captures a revision of the page's exact current content and hashes it.</li>
+      <li>Records a signature holding the entered signer name, the meaning, the time, and that content hash.</li>
+      <li>Appends a signed event to the local hash-chained audit trail.</li>
+      <li>Locks the page.</li>
+    </ol>
+    <p>A locked page shows a lock line naming the meaning, the signer, and the date. Its title and content become read-only, and it cannot be deleted. Status and tags remain editable. Unlocking is a deliberate two-step control, and the unlock is written to the audit trail as its own event, so a page that was reopened for edits says so in its history.</p>
+
+    <figure class="docs-figure">
+      <div class="docs-figure-head">
+        <p class="docs-figure-title">What signing writes, and what links it together</p>
+        <span class="docs-figure-mark">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 7q5 5 0 10 M16 7q-5 5 0 10"/></svg>
+        </span>
+      </div>
+      <svg viewBox="0 0 900 400" role="img" aria-label="Diagram: a notebook page's bytes become a hashed revision, a signature pins that hash, and the page locks. Each audit event folds the previous event's hash into its own, so the events form one chain. Everything shown is stored on your Mac.">
+        <defs>
+          <marker id="d-arrow" markerWidth="10" markerHeight="10" refX="6.5" refY="4.5" orient="auto-start-reverse">
+            <path d="M1 1.5 L6.5 4.5 L1 7.5" fill="none" stroke="currentColor" stroke-width="1.4" />
+          </marker>
+        </defs>
+
+        <rect class="d-group" x="24" y="40" width="852" height="336" rx="16" />
+        <text class="d-grouplabel" x="42" y="66">On your Mac</text>
+
+        <rect class="d-box" x="48" y="88" width="196" height="58" rx="10" />
+        <text class="d-label" x="146" y="114" text-anchor="middle">Page</text>
+        <text class="d-cap" x="146" y="132" text-anchor="middle">title · format · content</text>
+
+        <rect class="d-box" x="270" y="88" width="170" height="58" rx="10" />
+        <text class="d-label" x="355" y="114" text-anchor="middle">Revision</text>
+        <text class="d-cap" x="355" y="132" text-anchor="middle">sha256 of those bytes</text>
+
+        <rect class="d-box" x="466" y="88" width="186" height="58" rx="10" />
+        <text class="d-label" x="559" y="114" text-anchor="middle">Signature</text>
+        <text class="d-cap" x="559" y="132" text-anchor="middle">signer · meaning · time</text>
+
+        <rect class="d-box" x="678" y="88" width="172" height="58" rx="10" />
+        <text class="d-label" x="764" y="114" text-anchor="middle">Page locked</text>
+        <text class="d-cap" x="764" y="132" text-anchor="middle">title + content frozen</text>
+
+        <path class="d-line" d="M244 117 L270 117" marker-end="url(#d-arrow)" />
+        <path class="d-line" d="M440 117 L466 117" marker-end="url(#d-arrow)" />
+        <path class="d-line" d="M652 117 L678 117" marker-end="url(#d-arrow)" />
+
+        <rect class="d-box" x="48" y="252" width="220" height="64" rx="10" />
+        <text class="d-label" x="158" y="280" text-anchor="middle">Event 12</text>
+        <text class="d-cap" x="158" y="298" text-anchor="middle">revision-saved</text>
+
+        <rect class="d-box" x="340" y="252" width="220" height="64" rx="10" />
+        <text class="d-label" x="450" y="280" text-anchor="middle">Event 13</text>
+        <text class="d-cap" x="450" y="298" text-anchor="middle">page-signed</text>
+
+        <rect class="d-box" x="632" y="252" width="220" height="64" rx="10" />
+        <text class="d-label" x="742" y="280" text-anchor="middle">Event 14</text>
+        <text class="d-cap" x="742" y="298" text-anchor="middle">page-unlocked</text>
+
+        <path class="d-line" d="M268 284 L340 284" marker-end="url(#d-arrow)" />
+        <text class="d-cap" x="304" y="276" text-anchor="middle">prevHash</text>
+        <path class="d-line" d="M560 284 L632 284" marker-end="url(#d-arrow)" />
+        <text class="d-cap" x="596" y="276" text-anchor="middle">prevHash</text>
+
+        <path class="d-line" d="M559 146 L559 200 L450 200 L450 252" marker-end="url(#d-arrow)" />
+        <text class="d-cap" x="571" y="176" text-anchor="start">appended to the chain</text>
+
+        <text class="d-grouplabel" x="48" y="348">Audit trail, append-only, one chain for the workspace</text>
+      </svg>
+      <figcaption class="docs-figcaption">A signature pins the hash of exact page bytes, and each audit event folds the previous event's hash into its own. Editing one event in place, or reordering two, breaks every hash after it. Nothing outside the machine has ever seen these hashes.</figcaption>
+    </figure>
+
+    <div class="docs-note is-warn">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 L22 20 H2 Z"/><path d="M12 10v4M12 17h.01"/></svg>
+      </span>
+      <div>
+        <p>The signer name is whatever you type into the dialog, the time comes from your computer's clock, and the evidence lives only on this machine. Read the next section before you rely on a signature for anything beyond your own bench record.</p>
+      </div>
+    </div>
+
+    <h2 id="the-trust-boundary">The trust boundary</h2>
+    <p>The accurate description of a SEAL signature is <strong>tamper-evident local attestation</strong>. Every word of that is load-bearing, so here is what each one means in practice.</p>
+
+    <h3>The signer name is a local assertion</h3>
+    <p>The name recorded in a signature is the text entered in the dialog at signing time. SEAL captures it and pins it to the signed bytes, which is why a later change to the operator identity cannot rewrite an existing signature. It is an assertion by whoever was at the keyboard. There is no certificate authority, organisation directory, or account behind it, and the confirm-your-name step makes the action deliberate rather than authenticated.</p>
+
+    <h3>The time is the local system clock</h3>
+    <p>A signature's timestamp is read from the machine it was made on. It is as accurate as that clock, and no outside service attests to it.</p>
+
+    <h3>There is no external trust anchor</h3>
+    <p>The audit trail detects change rather than preventing it. Each event stores the previous event's hash inside its own hashed payload, so editing a past event in place, or reordering events, breaks every hash after it and the integrity check reports the break. That holds against an accident or an ordinary edit. It does not hold against someone with direct access to the database file, who could rewrite the content and recompute the whole local chain, because nothing outside the machine has ever seen the original hashes.</p>
+
+    <h3>A signature covers the bytes, not the metadata</h3>
+    <p>The hash a signature pins is taken over the page's title, format, and content. Status, tags, comments, and links sit outside it. A page can move from In review to Complete after it is signed, and the signature is unaffected, because it never described the status in the first place.</p>
+
+    <p>What this gives you is durable provenance for your own bench record on one machine, with a verifiable answer to the question of whether a page changed after you froze it. Anything wider, such as an externally anchored identity, an independently attested time, or evidence that survives an untrusted machine, is a different system with its own legal, procedural, and validation requirements.</p>
+
+    <h2>Verify the audit trail</h2>
+    <p>Select <strong>History</strong> on any page, then <strong>Verify integrity</strong>. SEAL re-walks the entire hash chain and reports either that the audit trail is intact, with the number of events, or the sequence number of the first event where the chain breaks.</p>
+    <p>Each event records a monotonic sequence number, a timestamp, the actor, the action, the page it concerns, a short summary, the previous event's hash, and its own SHA-256 over that canonical payload. The actions recorded are:</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Event</th><th>When it is written</th></tr></thead>
+        <tbody>
+          <tr><td>Page created</td><td>A new page is added to a notebook</td></tr>
+          <tr><td>Page deleted</td><td>A page is deleted</td></tr>
+          <tr><td>Page restored</td><td>A page comes back through a restore point</td></tr>
+          <tr><td>Status changed</td><td>A page moves between Draft, In review, and Complete</td></tr>
+          <tr><td>Revision saved</td><td>A version is captured, manually or in the background</td></tr>
+          <tr><td>Signed</td><td>A signature is recorded against an exact revision</td></tr>
+          <tr><td>Locked</td><td>The page is frozen by that signature</td></tr>
+          <tr><td>Unlocked</td><td>A locked page is reopened for edits</td></tr>
+          <tr><td>Operator changed</td><td>The default local signer identity changes</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <h2>Keep an independent backup</h2>
+    <p>SEAL's release gates test supported migrations, backup integrity, restore round trips, and verification of the local audit chain. The goal those tests support is preventing <strong>silent</strong> data loss in covered scenarios, meaning a failure that takes your data without telling you. Hardware failure, disk exhaustion, malware, losing the account or the machine, and deleting every copy all sit outside that.</p>
+    <p>Keep a backup outside the application data directory, and confirm that it restores before you rely on SEAL for work you cannot repeat. <a href="settings.html">Settings and backup</a> covers portable workspace backups, and <a href="privacy.html#data-storage-location">Privacy</a> lists where the database file lives on disk.</p>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

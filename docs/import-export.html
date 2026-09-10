@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Import and export · SEAL docs</title>
+  <meta name="description" content="Read and write FASTA, GenBank, and GFF3 from the desktop app and the seal CLI." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Import and export" />
+  <meta property="og:description" content="Read and write FASTA, GenBank, and GFF3 from the desktop app and the seal CLI." />
+
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>Import and export</h1>
+    <p class="docs-lede">Read eleven formats, write FASTA, GenBank, and GFF3. Bring sequences into your workspace by file, paste, or drag, and write them back out from the CLI or the desktop app.</p>
+
+    <h2>Supported formats</h2>
+    <p>SEAL reads and writes three sequence formats. The parser detects the format from the file contents, so you do not pass a format flag on import.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Format</th><th>Read</th><th>Write</th><th>Carries features</th></tr></thead>
+        <tbody>
+          <tr><td>FASTA</td><td>Yes</td><td>Yes</td><td>No</td></tr>
+          <tr><td>GenBank (<code>.gb</code>, <code>.gp</code>, <code>.gbff</code>)</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+          <tr><td>GFF3 (<code>.gff</code>, <code>.gff3</code>, <code>.gtf</code>)</td><td>Yes (parser round-trips)</td><td>Yes</td><td>Yes</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Auto-detection keys off the file contents: a FASTA <code>&gt;</code> header, a GenBank <code>LOCUS</code> line, or a GFF3 <code>##gff-version 3</code> directive. A file with multiple <code>&gt;</code> headers or multiple <code>LOCUS</code> blocks is a multi-record file, and import splits it into one block per record.</p>
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>FASTA records hold sequence only. To preserve features, names, and topology in a round trip, use GenBank or GFF3.</p>
+      </div>
+    </div>
+
+    <h2>More formats you can import</h2>
+    <p>Beyond the three formats above, the desktop app reads several more formats and detects each one from the file contents. These are import only. To write a sequence back out, export it as FASTA, GenBank, or GFF3.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Format</th><th>Detected from</th><th>Imports as</th></tr></thead>
+        <tbody>
+          <tr><td>FASTQ</td><td><code>@id</code>, sequence, <code>+</code>, and quality lines</td><td>One DNA block per read, with Phred quality</td></tr>
+          <tr><td>EMBL / ENA</td><td>An <code>ID</code> line with a <code>BP</code> length token</td><td>DNA block with features</td></tr>
+          <tr><td>SBOL</td><td>RDF/XML or JSON component definitions</td><td>DNA or protein block</td></tr>
+          <tr><td>PDB / mmCIF (<code>.pdb</code>, <code>.cif</code>, <code>.ent</code>, <code>.mmcif</code>)</td><td><code>SEQRES</code>, <code>ATOM</code>, or <code>_entity_poly</code> records</td><td>One block per chain</td></tr>
+          <tr><td>Binary annotated DNA (<code>.dna</code>)</td><td>The binary <code>.dna</code> file you upload</td><td>DNA block with features</td></tr>
+          <tr><td>ABI (<code>.ab1</code>, <code>.abi</code>)</td><td>The binary chromatogram file you upload</td><td>DNA block with quality</td></tr>
+          <tr><td>CSV</td><td>A delimited header row, file upload only</td><td>One block per row</td></tr>
+          <tr><td>Structured sequence JSON</td><td>A supported annotated-sequence object or array</td><td>DNA block with annotations</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Detection keys off the content, so you do not pass a format flag. Upload <code>.dna</code> and <code>.ab1</code> as files; their data is binary and cannot be pasted as text. CSV imports by file upload.</p>
+
+    <h2>Import</h2>
+    <p>Use <code>seal import</code> to read one or more FASTA or GenBank files, supported sequence directories, or recognized structured workspace exports into the shared workspace. Multi-record files are split into separate blocks automatically. Recognized inventory database layouts are detected as structured exports.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Import files into the workspace">
+<pre><code>seal import plasmid.gb
+seal import primers.fa vector.gb insert.fa
+seal import seqs.fa --conversation-id conv-abc123</code></pre>
+    </div>
+
+    <p>Pass <code>--dry-run</code> to parse and report records without writing any blocks. This is the safe way to inspect a large directory before committing to it.</p>
+    <div class="docs-code" data-lang="bash" data-title="Inspect a directory before importing">
+<pre><code>seal import /path/to/workspace-export --recursive --dry-run --format text</code></pre>
+    </div>
+
+    <h3>Flags</h3>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>&lt;paths&gt;</code></td><td>required</td><td>One or more file or directory paths to import.</td></tr>
+          <tr><td><code>--recursive</code></td><td>false</td><td>Recursively import supported files from ordinary directories.</td></tr>
+          <tr><td><code>--conversation-id &lt;id&gt;</code></td><td>CLI scratch</td><td>Target conversation id.</td></tr>
+          <tr><td><code>--dry-run</code></td><td>false</td><td>Parse and report records without writing blocks.</td></tr>
+          <tr><td><code>--repair-existing</code></td><td>false</td><td>Update matching existing blocks instead of creating duplicates.</td></tr>
+          <tr><td><code>--import-missing</code></td><td>false</td><td>With <code>--repair-existing</code>, create records that do not match.</td></tr>
+          <tr><td><code>--overwrite-features</code></td><td>false</td><td>With <code>--repair-existing</code>, replace non-empty feature arrays.</td></tr>
+          <tr><td><code>--format json|text</code></td><td>json</td><td>Output format.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>JSON output reports each imported block with its <code>id</code>, <code>name</code>, <code>length</code>, <code>format</code>, <code>featureCount</code>, <code>topology</code>, and an <code>action</code> of <code>created</code> or, with <code>--repair-existing</code>, an update.</p>
+    <div class="docs-code" data-lang="json" data-title="seal import --format json">
+<pre><code>{
+  "ok": true,
+  "imported": [
+    {
+      "id": "block-abc",
+      "name": "SEAL_SYNTH_CLONE",
+      "length": 860,
+      "format": "genbank",
+      "featureCount": 5,
+      "topology": "circular",
+      "accession": "unknown",
+      "action": "created"
+    }
+  ],
+  "count": 1,
+  "dryRun": false,
+  "warnings": []
+}</code></pre>
+    </div>
+
+    <h3>Paste or drag in the desktop app</h3>
+    <p>You do not need a file to start. In the desktop app, paste raw sequence or FASTA, GenBank, EMBL, FASTQ, GFF3, SBOL, PDB/mmCIF, or supported annotated-sequence JSON text into the intake field, or drag a sequence file onto the window. CSV is recognized on paste but routes you to the file picker. The same parser runs, so format detection and multi-record splitting behave the same as the CLI. SEAL adds the new blocks to the active Entry.</p>
+    <p>To fetch a record straight from NCBI instead of importing a local file, see <a href="sequence-sources.html">Sequence sources</a> and the <code>seal fetch</code> command in the <a href="cli.html">CLI reference</a>.</p>
+
+    <h2>Export</h2>
+    <p>Use <code>seal export</code> to write blocks from the shared workspace. The subcommand selects the format: a CSV summary, a Markdown document, a slide-friendly Markdown summary, GenBank, or a full JSON dump.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Subcommand</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>csv</code></td><td>CSV summary table, one row per block.</td></tr>
+          <tr><td><code>markdown</code></td><td>Markdown document, one section per block.</td></tr>
+          <tr><td><code>slide-summary</code></td><td>Compact slide-friendly Markdown, one bullet per block.</td></tr>
+          <tr><td><code>genbank</code></td><td>GenBank export for one block, all blocks, or one file per block.</td></tr>
+          <tr><td><code>workspace-json</code></td><td>Full JSON dump of every block in the scratch workspace.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Every subcommand accepts <code>--output &lt;path&gt;</code> to write a file instead of printing to stdout. When you write to a file, the command returns a small JSON envelope with the format, the block <code>count</code>, and the <code>path</code>.</p>
+    <div class="docs-code" data-lang="bash" data-title="Export the workspace">
+<pre><code>seal export csv --include-features --output report.csv
+seal export markdown --include-analysis --output summary.md
+seal export workspace-json --output workspace.json</code></pre>
+    </div>
+
+    <h3>GenBank export</h3>
+    <p>The <code>genbank</code> subcommand writes GenBank flat files, which preserve features and topology. Export one block, every block into a single multi-record file, or one <code>.gb</code> file per block.</p>
+    <div class="docs-code" data-lang="bash" data-title="Export GenBank">
+<pre><code>seal export genbank --output all-blocks.gb
+seal export genbank --block block-abc --output plasmid.gb
+seal export genbank --output-dir genbank-export</code></pre>
+    </div>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--block &lt;id&gt;</code></td><td>none</td><td>Export only one block; omit to export all blocks.</td></tr>
+          <tr><td><code>--output &lt;path&gt;</code></td><td>none</td><td>Write a single GenBank file, possibly multi-record.</td></tr>
+          <tr><td><code>--output-dir &lt;dir&gt;</code></td><td>none</td><td>Write one <code>.gb</code> file per exported block.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The desktop app shows the same GenBank flat file in a read-only export view before you save it, so you can confirm the record and its features.</p>
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>To convert a single sequence between formats without going through the workspace, use <code>seal convert myseq.gb --to fasta</code>. See <a href="cli.html">CLI reference</a>.</p>
+      </div>
+    </div>
+
+    <h3>Native Save As in the desktop app</h3>
+    <p>The desktop app saves through a native Save As dialog, so you choose the destination with the system file picker. The path you pick is recorded with the export, which means the most recent file you wrote shows up under <strong>Reveal Latest Export</strong>. Use that to open the saved file in Finder right after a save, without retracing the path by hand.</p>
+
+    <h2>GFF3</h2>
+    <p>SEAL writes spec-compliant GFF3. Every file starts with the <code>##gff-version 3</code> directive, and the parser round-trips its own output.</p>
+    <p>A feature whose location is split into several segments, such as a multi-exon CDS, is written as joined features: the segments share one <code>ID=</code>, and each segment carries a <code>Parent=</code> pointing at that shared id. This keeps a joined feature intact across an export and re-import.</p>
+    <div class="docs-code" data-lang="text" data-title="A joined CDS in GFF3">
+<pre><code>##gff-version 3
+chr1  SEAL  CDS  100  300  .  +  0  ID=cds1;Parent=gene1
+chr1  SEAL  CDS  450  600  .  +  0  ID=cds1;Parent=gene1</code></pre>
+    </div>
+    <p>The two rows above share <code>ID=cds1</code>, so they describe the two segments of one joined CDS rather than two separate features.</p>
+
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>For the exact JSON shapes that import and export emit across the CLI, MCP, and the app, see the <a href="io-contract.html">IO contract</a>.</p>
+      </div>
+    </div>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

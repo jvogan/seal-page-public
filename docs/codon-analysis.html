@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Codon analysis · SEAL docs</title>
+  <meta name="description" content="Inspect codon usage, GC content, and host comparison for a coding sequence from the seal CLI." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Codon analysis" />
+  <meta property="og:description" content="Inspect codon usage, GC content, and host comparison for a coding sequence." />
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>Codon analysis</h1>
+    <p class="edition-note" data-edition-note>Screenshots and recordings show the direct edition. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">Inspect codon usage, GC content, and host comparison for a coding sequence. This page covers reading an existing CDS. To create a nucleotide draft from a protein, start with <a href="translation.html#reverse-translate-a-protein">reverse translation</a>; to recode an existing CDS for a host, see <a href="codon-optimizers.html">Codon optimizers</a>.</p>
+
+    <h2>Codon usage</h2>
+    <p>Run <code>seal codons</code> to count every codon in a sequence and compute per-amino-acid frequencies. The command always reads frame 0 from the start of the sequence. Output is grouped by amino acid, most-used codons first, with stop codons reported last.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Codon usage table">
+<pre><code>seal codons myseq.fa</code></pre>
+    </div>
+
+    <p>The sequence can come from an argument, a file path, the <code>--file</code> flag, or stdin. RNA input is accepted and normalized to DNA before counting.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="From stdin">
+<pre><code>echo ATGAAATAG | seal codons</code></pre>
+    </div>
+
+    <p>Choose the output with <code>--format</code>. The default <code>table</code> is human-readable, with a bar showing each codon's relative frequency within its amino acid. <code>json</code> and <code>tsv</code> are for scripting.</p>
+
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Format</th><th>Output</th></tr></thead>
+        <tbody>
+          <tr><td><code>table</code></td><td>Grouped by amino acid with a frequency bar. Default.</td></tr>
+          <tr><td><code>json</code></td><td>An object with <code>totalCodons</code> and a <code>codons</code> array.</td></tr>
+          <tr><td><code>tsv</code></td><td>Header row plus one row per codon: <code>codon</code>, <code>amino_acid</code>, <code>count</code>, <code>fraction</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="docs-code" data-lang="bash" data-title="JSON output">
+<pre><code>seal codons ATGAAATAG --format json</code></pre>
+    </div>
+
+    <p>Each JSON entry carries the <code>codon</code>, its single-letter <code>aminoAcid</code> (<code>*</code> for stops), the raw <code>count</code>, and the <code>fraction</code> of that amino acid's codons it accounts for.</p>
+
+    <div class="docs-code" data-lang="json" data-title="codons --format json">
+<pre><code>{
+  "totalCodons": 3,
+  "codons": [
+    { "codon": "AAA", "aminoAcid": "K", "count": 1, "fraction": 1.0 },
+    { "codon": "ATG", "aminoAcid": "M", "count": 1, "fraction": 1.0 },
+    { "codon": "TAG", "aminoAcid": "*", "count": 1, "fraction": 1.0 }
+  ]
+}</code></pre>
+    </div>
+
+    <p>Entries are sorted alphabetically by amino acid, stop codons last, then by descending count within each amino acid. The <code>fraction</code> is the usage share within one amino acid, so the fractions for a given amino acid sum to 1.</p>
+
+    <h2>GC content</h2>
+    <p>For GC content on its own, use <code>seal info</code>. It reports the name, sequence type, length, GC content, format, and validation status.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Sequence metadata with GC">
+<pre><code>seal info myseq.fa --json</code></pre>
+    </div>
+
+    <p>The <code>info</code> JSON returns <code>gcContent</code> as a raw fraction from 0 to 1, and <code>null</code> for protein input.</p>
+
+    <div class="docs-code" data-lang="json" data-title="info --json">
+<pre><code>{
+  "name": "myseq",
+  "sequenceType": "dna",
+  "length": 8,
+  "gcContent": 0.5,
+  "format": "fasta",
+  "valid": true,
+  "invalidChars": []
+}</code></pre>
+    </div>
+
+    <p>To get GC content alongside composition, molecular weight, melting temperature, ORFs, and restriction sites in one call, run <code>seal analyze</code>. There <code>gcContent</code> and <code>atContent</code> are formatted as percentage strings, such as <code>"52.38%"</code>.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Full analysis">
+<pre><code>seal analyze myseq.fa --json</code></pre>
+    </div>
+
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p><code>info</code> reports <code>gcContent</code> as a 0 to 1 fraction; <code>analyze</code> reports it as a percentage string. Read the field in the format the command emits rather than assuming one shape. See the <a href="io-contract.html">IO contract</a> for both.</p>
+      </div>
+    </div>
+
+    <h2>Host comparison</h2>
+    <p>To compare a sequence's codon usage against a target host, score its Codon Adaptation Index (CAI) with <code>seal optimize --cai</code>. CAI scores how closely the existing codons match the host's preferred codons, on a 0 to 1 scale. Pick the host with <code>--organism</code>. The CLI accepts <code>ecoli</code>, <code>human</code>, and <code>yeast</code>.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Score CAI against a host">
+<pre><code>seal optimize myseq.fa --organism ecoli --cai</code></pre>
+    </div>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/codon-optimize.png" alt="The Codon Optimize dialog with a host organism and optimization profile selected, before and after sequences, and a summary showing how many codons changed and the resulting codon-adaptation figures." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">In the desktop app, the codon optimize dialog scores a sequence against a host codon table and previews the recoded result, including its codon-adaptation summary.</figcaption>
+    </figure>
+
+    <p>The host codon usage tables come from the same registry the optimizer uses. For the list of built-in hosts (<code>ecoli</code>, <code>human</code>, <code>yeast</code>, <code>pichia</code>, <code>sf9</code>, <code>cho</code>, <code>bsubtilis</code>) and how the host table, genetic code, and strategy are separated, see <a href="codon-optimizers.html">Codon optimizers</a>.</p>
+
+    <p>To read both sequences side by side, compare the codon usage of the original and a host-matched version. Run <code>seal codons</code> on each, or rewrite the CDS first and compare the result.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Compare usage before and after optimization">
+<pre><code>seal codons myseq.fa --format tsv &gt; before.tsv
+seal optimize myseq.fa --organism ecoli | seal codons --format tsv &gt; after.tsv</code></pre>
+    </div>
+
+    <h2>Over the CLI</h2>
+    <p>The codon-analysis commands are stateless: they read a sequence and print a result. Pipe them together or into other tools.</p>
+
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Command</th><th>What it returns</th></tr></thead>
+        <tbody>
+          <tr><td><code>seal codons</code></td><td>Per-codon counts and per-amino-acid frequencies.</td></tr>
+          <tr><td><code>seal info</code></td><td>Name, type, length, GC content, format, validity.</td></tr>
+          <tr><td><code>seal analyze</code></td><td>GC and AT content, composition, molecular weight, Tm, ORFs, sites.</td></tr>
+          <tr><td><code>seal optimize --cai</code></td><td>A host-optimized CDS plus its CAI against the host.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Every command here accepts a sequence argument, a file path, or stdin, and most support <code>--json</code> for machine-readable output. The <code>codons</code> command uses <code>--format json</code> instead.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Read the most-used codon from a file">
+<pre><code>cat cds.fa | seal codons --format json | jq '.codons[0]'</code></pre>
+    </div>
+
+    <div class="docs-note is-warn">
+      <span class="docs-note-icon" aria-hidden="true">!</span>
+      <div>
+        <p>CAI, host tables, reverse translation, and codon optimization provide host-profile comparisons and nucleotide drafts. Review the generated sequence against the selected host profile and synthesis requirements.</p>
+      </div>
+    </div>
+
+    <p>For the exact field shapes across the CLI, MCP, and the app, see the <a href="io-contract.html">IO contract</a>. For the full command list, see the <a href="cli.html">CLI reference</a>.</p>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

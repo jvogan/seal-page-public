@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Install SEAL · SEAL docs</title>
+  <meta name="description" content="SEAL is coming to the Mac App Store first. Source and direct downloads will follow later." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Install SEAL" />
+  <meta property="og:description" content="Check Store availability and learn how SEAL editions differ." />
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>Install SEAL</h1>
+    <p class="docs-lede">Coming to the Mac App Store. SEAL will launch there first; the source repository and direct-download edition will follow later.</p>
+    <h2 id="mac-app-store">Mac App Store</h2>
+    <p>The Store edition is not available yet. A link to its listing will appear on the <a href="../index.html#install">SEAL home page</a> when it is ready to download.</p>
+    <p>Read <a href="editions.html">Edition differences</a> for the first Store release's tools, workspace permissions, and agent-tool boundary.</p>
+    <h2 id="build-from-source">Source distribution</h2>
+    <p>The source repository has not launched publicly. Source-build instructions will be added when that distribution is available.</p>
+    <h2 id="install-the-unsigned-release">Direct downloads</h2>
+    <p>The GitHub app distribution will launch after the Store edition. No public DMG download is offered here yet.</p>
+    <h2 id="set-up-with-your-agent">Agent-assisted installation</h2>
+    <p>Agent-assisted source installation belongs to the later source distribution. It is not required to install the Store edition.</p>
+    <h2 id="agent-setup">External MCP and CLI tools</h2>
+    <p>The source MCP server and Rust CLI are separate from the Store app. The initial Store configuration does not launch agents or include a terminal. Shared-folder interoperability with separately installed tools remains experimental.</p>
+    <p><a href="editions.html#source-tools">Read the source-tool boundary</a> before using developer setup guides.</p>
+    <h2>Workspace storage</h2>
+    <p>The Store edition uses its own sandbox-managed workspace by default. A folder chosen through <strong>File → Workspace</strong> contains the workspace database at <code>.seal/seal.db</code>. Direct and source editions use separate defaults.</p>
+    <p>See <a href="../privacy.html">Privacy</a> for storage, network requests, and support contact information.</p>
+    <h2>Get help</h2>
+    <p>Contact <a href="../support.html">SEAL Support</a> with installation questions.</p>
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SEAL overview · SEAL docs</title>
+  <meta name="description" content="Explore SEAL’s Sample Lab, sequence editing, analysis, notebook, report exports, and agent setup." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="SEAL overview" />
+  <meta property="og:description" content="Explore SEAL’s Sample Lab, sequence editing, analysis, notebook, report exports, and agent setup." />
+
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+  <link rel="stylesheet" href="../assets/tutorials.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>SEAL overview</h1>
+    <p class="edition-note" data-edition-note>Screenshots and recordings show the direct edition. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">Explore the Sample Lab, edit a sequence, inspect analyses, and export a report. This overview connects the main parts of SEAL in one desktop walkthrough.</p>
+
+    <h2 id="watch">Watch the overview</h2>
+    <section class="tutorial-video" aria-label="Video: SEAL overview">
+      <video id="lesson-video" controls playsinline preload="none" width="1440" height="900" poster="../assets/img/tutorials/00-seal-overview.jpg" aria-label="SEAL overview: sequences, analysis, and lab notes">
+        <source src="../assets/videos/00-seal-overview.mp4?v=20260908" type="video/mp4" />
+        <track kind="captions" src="../assets/videos/00-seal-overview.vtt?v=20260908" srclang="en" label="English" default />
+        <p><a href="../assets/videos/00-seal-overview.mp4">Download the SEAL overview video</a> to watch the walkthrough.</p>
+      </video>
+      <p class="video-links"><span>4:12 · AI narration · Synthetic sample data</span><a href="../assets/videos/00-seal-overview.mp4" download>Download video</a><a href="../assets/videos/00-seal-overview.vtt" download>English captions</a></p>
+      <ul class="lesson-chapters" aria-label="Video chapters" hidden>
+        <li><button type="button" data-seek="0" aria-controls="lesson-video">0:00 · Open the Sample Lab</button></li>
+        <li><button type="button" data-seek="30.333" aria-controls="lesson-video">0:30 · Add and edit a sequence</button></li>
+        <li><button type="button" data-seek="59.2" aria-controls="lesson-video">0:59 · Inspect translation</button></li>
+        <li><button type="button" data-seek="98.867" aria-controls="lesson-video">1:38 · Reuse parts and inspect a plasmid</button></li>
+        <li><button type="button" data-seek="134.6" aria-controls="lesson-video">2:14 · Compare primers and assembly inputs</button></li>
+        <li><button type="button" data-seek="162.267" aria-controls="lesson-video">2:42 · Review alignments and Sanger reads</button></li>
+        <li><button type="button" data-seek="185.933" aria-controls="lesson-video">3:05 · Keep notes and export a report</button></li>
+        <li><button type="button" data-seek="222.067" aria-controls="lesson-video">3:42 · Get SEAL and connect an agent</button></li>
+      </ul>
+      <details id="transcript">
+        <summary>Read the transcript</summary>
+        <p>SEAL is a workbench for editing and analyzing DNA, RNA, and protein on your Mac. Start with the built-in Sample Lab. These synthetic examples are included in the app, so you can follow along with the same sequences.</p>
+        <p>In the sidebar, open Synthetic Reporter. A project groups related Entries, and each Entry holds sequence blocks and notes. Click Synthetic Reporter DNA. The Inspector now shows its name, length, and base composition.</p>
+        <p>For a sequence of your own, choose New entry and give it a name. Paste a FASTA record into the sequence input. Here, the preview shows FASTA and eighty base pairs. Submit it and check the new block’s name, DNA label, and length.</p>
+        <p>Drag across some bases to select a range for analysis or annotation. To change one base, click to place the cursor and check substitution mode. Type a replacement, then press Command Z to undo. The original base is restored.</p>
+        <p>Return to the reporter DNA and open Translate in the Inspector. Choose Whole sequence to compare all six reading frames. Each frame shows its peptide sequence and any internal stops.</p>
+        <p>Click Detail, then Translate to protein. Amino-acid letters appear alongside the DNA, aligned with their codons. Open ORFs to inspect candidate coding regions.</p>
+        <p>Now select Synthetic Reporter Protein and open Codons. Back-translation preview shows a proposed coding sequence marked Draft. Review the target host and codon strategy; different codon choices can encode the same protein.</p>
+        <p>Open Sequence library to reuse a part. Choose Vectors, then SEAL Synthetic Cloning Backbone, and click Add to workspace.</p>
+        <p>Next, open Cloning and Assembly and select SEAL Demo Plasmid. Click Map to inspect its circular sequence and annotated features. Selecting a feature highlights the corresponding region.</p>
+        <p>Under Actions, open Restriction digest. Choose Cutters, select AluI, and review the predicted fragments. Their lengths add up to the original plasmid. Click Digest to add each fragment as a sequence block.</p>
+        <p>On the reporter DNA, open Actions and choose Design primers. Set the target to bases fifty-one through five hundred fifty. Compare the sequences, melting temperatures, and predicted product length. Add selected pair saves primer features on the DNA.</p>
+        <p>Then open Cloning and Assembly and select SEAL Golden Gate Sample Assembly to inspect its product and linked input parts.</p>
+        <p>Open Alignments and choose the synthetic Sanger example with paired reads. Fill the window gives the alignment more space. Click Next mismatch to move to a difference between the sequences.</p>
+        <p>Restore the alignment’s size, then open a read’s chromatogram. Compare the called bases with the signal peaks and quality information to examine an uncertain position.</p>
+        <p>In Notebook, create a review note. Write what you checked and what you’d like to examine next. SEAL saves the text as you work.</p>
+        <p>Return to the reporter DNA. Press Command K and choose Build report. In Report handoff, check the source block and choose your attachments: FASTA, GenBank, or a styled report, for example. Expand Package zip preview to inspect the file list.</p>
+        <p>Click Download ZIP. Then open Activity in the Inspector and find Report package exported. Check its completed status and expand the event for details.</p>
+        <p>To get SEAL, give your preferred coding agent a SEAL repository you have access to and ask it to set up the app on your Mac. The installation guide covers source builds and an unnotarized GitHub DMG when available. A Mac App Store edition is planned.</p>
+        <p>You can also connect an agent to your workspace through the command-line tools or MCP. Press Command K and choose Open agent setup for connection instructions. Choose a written guide or an individual video lesson to try a workflow yourself.</p>
+      </details>
+    </section>
+
+    <h2>Follow along</h2>
+    <p><a href="install.html">Install SEAL</a> and open the desktop app. The <a href="first-workspace.html">first workspace guide</a> explains how to load the built-in Sample Lab.</p>
+    <ol>
+      <li>Open <strong>SEAL Sample Lab → Synthetic Reporter</strong> and select <strong>Synthetic Reporter DNA</strong>. Check the block’s name, length, and composition in the Inspector.</li>
+      <li>Create an Entry and <a href="import-first-sequence.html">paste a FASTA record</a>. Check its preview before adding the block. To practice editing, replace a base and press <kbd>⌘Z</kbd> to undo.</li>
+      <li>Return to the reporter DNA and <a href="translation.html">compare its reading frames</a>. Inspect ORFs, then select the reporter protein to review its back-translation draft.</li>
+      <li>Open <strong>Sequence library</strong> to add a reusable part. In a sample plasmid, inspect the <a href="plasmid-map.html">map</a> and run a <a href="restriction-digest.html">restriction digest</a>.</li>
+      <li><a href="primer-design.html">Compare primer candidates</a> for the reporter DNA. Open <a href="cloning.html">Cloning and Assembly</a> to inspect the sample Golden Gate product and its input parts.</li>
+      <li>Open a saved <a href="sanger-traces.html">Sanger alignment</a>. Use <strong>Next mismatch</strong> to move through differences, then inspect a read’s chromatogram.</li>
+      <li>Record your observations in <a href="notebook.html">Notebook</a>. Use <strong>Build report</strong> to choose attachments, preview the ZIP, and <a href="reports.html">export a report</a>. Confirm the export in Activity.</li>
+      <li>Open <a href="agents.html">agent setup</a> to connect a coding agent through the CLI or MCP.</li>
+    </ol>
+    <h2>Choose a lesson</h2>
+    <p>The <a href="tutorials.html">video tutorials</a> cover individual tasks with shorter recordings and detailed written steps. Start with <a href="quickstart.html">Quickstart</a> to try a sequence of your own.</p>
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/tutorials.js" defer></script>
+</body>
+</html>

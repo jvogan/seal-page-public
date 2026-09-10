@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Protein analysis · SEAL docs</title>
+  <meta name="description" content="Read a protein's biophysical profile in SEAL: molecular weight, isoelectric point, net charge, hydropathy, aliphatic index, and aromaticity, with optional UniProt annotations and EBI predictions." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Protein analysis" />
+  <meta property="og:description" content="Molecular weight, charge, hydropathy, and stability for a protein, with optional curated annotations and predictions." />
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>Protein analysis</h1>
+    <p class="edition-note" data-edition-note>This guide includes source and direct-edition features. Check the edition comparison for the first Store release. Screenshots and recordings show the direct edition. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">Read the biophysical profile of a protein: molecular weight, charge, hydropathy, and stability. The Protein tab in the Inspector computes these readouts on your device, and reaches the network only when you ask it to load curated annotations or run a prediction.</p>
+
+    <h2>Open the Protein tab</h2>
+    <p>The Protein tab appears in the Inspector for a protein block. A block becomes a protein block when you import a protein sequence, paste protein letters, or translate a coding region and keep the result as protein. To translate a DNA coding region first, see <a href="translation.html">Translation and ORFs</a>.</p>
+    <p>Select a protein block and open the Inspector. The tab gathers every readout below in one place, from the single-value metrics to the hydropathy plot.</p>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/protein-analysis.png" alt="The Inspector Protein tab for a protein block, showing molecular weight, isoelectric point, GRAVY, net charge, aliphatic index, and aromaticity, then a predicted secondary-structure breakdown, a Kyte-Doolittle hydropathy plot with a Window control, and the EBI prediction controls for Phobius and InterProScan." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">The Protein tab gathers the biophysical readouts in one place. The hydropathy plot uses a Kyte-Doolittle sliding window, and it plots the same per-residue values that GRAVY averages.</figcaption>
+    </figure>
+
+    <h2>Biophysical readouts</h2>
+    <p>The top of the tab reports single-value metrics computed from the residue composition. They are all local, and they update as you edit the sequence.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Readout</th><th>What it means</th></tr></thead>
+        <tbody>
+          <tr><td>Molecular weight</td><td>Mass in daltons, summed from the residues.</td></tr>
+          <tr><td>Isoelectric point (pI)</td><td>The pH at which the predicted net charge is zero.</td></tr>
+          <tr><td>GRAVY</td><td>Grand average of hydropathy, the mean of the per-residue Kyte-Doolittle values across the whole sequence. The plot below smooths those same values with a sliding window, so the plot's average shifts with the window setting.</td></tr>
+          <tr><td>Net charge at pH 7</td><td>Net charge predicted from a Henderson-Hasselbalch model. Open the disclosure next to it for the full titration curve.</td></tr>
+          <tr><td>Extinction coefficient</td><td>Predicted molar extinction at 280 nm, used to turn an absorbance reading into a concentration.</td></tr>
+          <tr><td>Instability index</td><td>An estimate of how stable the protein is likely to be in the test tube.</td></tr>
+          <tr><td>Aliphatic index</td><td>Relative volume taken up by aliphatic side chains (alanine, valine, isoleucine, leucine). Often read as a thermostability proxy, after Ikai (1980).</td></tr>
+          <tr><td>Aromaticity</td><td>Fraction of aromatic residues (phenylalanine, tryptophan, tyrosine).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Secondary structure</h2>
+    <p>Below the single-value readouts, the Protein tab shows a predicted secondary-structure breakdown: the fraction of residues in alpha-helix, beta-sheet, and coil, estimated from Chou-Fasman propensities. Treat it as a rough estimate. It can be far off for non-globular folds such as membrane helices and beta-barrels, and is not a substitute for a dedicated predictor such as JPred or DSSP.</p>
+
+    <h2>Hydropathy across the sequence</h2>
+    <p>SEAL draws a Kyte-Doolittle hydropathy profile for any protein of at least five residues. Each point is the average hydropathy of a window centered on that residue. Positive values are hydrophobic and negative values are hydrophilic, so a broad positive stretch often marks a buried or membrane-spanning segment.</p>
+    <p>The <strong>Window</strong> control sets the window size, from 3 to 31 residues in steps of 2, with a default of 9. A wider window smooths the trace and a narrower one shows more local detail. GRAVY above is the mean of the same per-residue values, taken before this windowing.</p>
+
+    <h2>Net charge across pH</h2>
+    <p>The <strong>Net charge at pH 7</strong> row has a disclosure button. Open it to see net charge across the full pH range, from 0 to 14, computed with the same model. The curve crosses zero at the isoelectric point, which is marked on the track. It is a quick way to see how charge shifts with buffer pH before you choose conditions for a column or a gel.</p>
+
+    <h2>When a translation is in the wrong frame</h2>
+    <p>SEAL ignores a single trailing stop codon when it computes the readouts above. If the sequence still contains stop codons inside it, those readouts describe something that is not a continuous protein. When that happens, the Protein tab shows a notice at the top: it reports how many internal stop codons it found, and warns that the analysis ignores them. That usually means the block was translated in the wrong frame, or was never trimmed.</p>
+    <p>The DNA-side version of this check lives in <a href="quality.html">Quality checks</a>. This one runs on the translated protein, so the two together cover both ends of a coding sequence.</p>
+
+    <h2>Curated annotations from UniProt</h2>
+    <p>When a block is mapped to a UniProt entry, the Protein tab adds a <strong>UniProt annotations</strong> section with a <strong>Load curated features from UniProt</strong> button. It fetches curated features for that accession, such as active sites, binding sites, and domains, and keeps the result while the block stays selected.</p>
+    <p>This lookup sends only the accession, not your sequence. For the endpoint and the full network picture, see <a href="privacy.html">Privacy</a>.</p>
+
+    <h2>Predictions from EBI</h2>
+    <p>The Protein tab can run two predictions through the EBI Job Dispatcher. <strong>Phobius</strong> predicts a signal peptide and transmembrane topology. <strong>InterProScan</strong> predicts domains and GO terms from member databases such as Pfam and PANTHER, and can take a minute or two. Each runs only when you select <strong>Run</strong>, and both report predictions, not curated annotations.</p>
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>Unlike the UniProt lookup, an EBI prediction sends the full protein sequence off your device to <code>www.ebi.ac.uk</code>. No account or key is needed. See <a href="privacy.html">Privacy</a> for the endpoint and how the request is made.</p>
+      </div>
+    </div>
+
+    <p>To translate a coding sequence into a protein in the first place, see <a href="translation.html">Translation and ORFs</a>. For the DNA-side quality checks, see <a href="quality.html">Quality checks</a>. For what each network lookup sends, see <a href="privacy.html">Privacy</a>.</p>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Add your first sequence · SEAL docs</title>
+  <meta name="description" content="Paste or import a synthetic 80 bp FASTA record, check its molecule type and length, and recover from common input mistakes." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Add your first sequence" />
+  <meta property="og:description" content="Paste or import a synthetic 80 bp FASTA record, check its molecule type and length, and recover from common input mistakes." />
+
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+  <link rel="stylesheet" href="../assets/tutorials.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>Add your first sequence</h1>
+    <p class="edition-note" data-edition-note>Screenshots and recordings show the direct edition. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">Paste a short FASTA record into a new entry and verify its name, molecule type, and length. Then learn how to import the same record from a file.</p>
+
+    <!-- Tutorial player -->
+    <h2 id="watch">Watch the walkthrough</h2>
+    <section class="tutorial-video" aria-label="Video lesson: Add a sequence">
+      <p>Follow the paste workflow with the 80 bp FASTA in this guide. The written steps also explain how to import it from a file.</p>
+      <video id="lesson-video" controls playsinline preload="none" width="1440" height="900" poster="../assets/img/tutorials/02-first-sequence.jpg" aria-label="Add a sequence">
+        <source src="../assets/videos/02-first-sequence.mp4" type="video/mp4" />
+        <track kind="captions" src="../assets/videos/02-first-sequence.vtt" srclang="en" label="English" default />
+        <p><a href="../assets/videos/02-first-sequence.mp4">Download this video</a> to watch the lesson.</p>
+      </video>
+      <p class="video-links"><span>0:55 · AI narration</span><a href="../assets/videos/02-first-sequence.mp4" download>Download video (8.8 MB)</a><a href="../assets/videos/02-first-sequence.vtt" download>English captions</a></p>
+      <ul class="lesson-chapters" aria-label="Video chapters" hidden>
+        <li><button type="button" data-seek="0" aria-controls="lesson-video">0:00 · Create an Entry</button></li>
+        <li><button type="button" data-seek="11.1" aria-controls="lesson-video">0:11 · Paste the FASTA</button></li>
+        <li><button type="button" data-seek="23" aria-controls="lesson-video">0:23 · Check and submit</button></li>
+        <li><button type="button" data-seek="39.9" aria-controls="lesson-video">0:39 · Verify the result</button></li>
+      </ul>
+      <details>
+        <summary>Read the transcript</summary>
+        <p>This exercise adds a short synthetic DNA record to a new Entry. In the sidebar, click New entry. Type FASTA practice in the name field and press Enter.</p>
+        <p>Click Paste a sequence and paste the complete example from the guide. Include the first line beginning with a greater-than sign. That line supplies the name; the four sequence lines supply eighty bases.</p>
+        <p>Check the preview before submitting. It says FASTA and eighty base pairs. The upward-arrow button now says Add FASTA, eighty base pairs. Click it once.</p>
+        <p>The new block is named SEAL beginner practice. Its header identifies DNA and eighty base pairs. Select the block and open Overview in the Inspector. Check the same name and length there. The example has no ambiguous bases and no feature annotations. If your length differs, compare your input with the guide before continuing.</p>
+      </details>
+    </section>
+    <!-- End tutorial player -->
+
+
+    <h2>Before you start</h2>
+    <p>Open the SEAL desktop app. If you are new to its layout, follow <a href="first-workspace.html">Your first workspace</a> first. This exercise writes one practice block to your local workspace.</p>
+    <p>Use this synthetic 80 bp record to practice the FASTA format.</p>
+
+    <h2>1. Copy the practice FASTA</h2>
+    <p>Copy the entire record, including the first line that starts with <code>&gt;</code>. That line names the record. The four remaining lines contain 80 DNA bases; line breaks do not count toward the length.</p>
+    <div class="docs-code" data-lang="text" data-title="Synthetic practice record — 80 bp">
+<pre><code>&gt;SEAL_beginner_practice
+ACGTTGCAAGTCCTGATCGA
+TGACCTAGGATCGTACCAAT
+CGATTCAGGCTAACGTTCGA
+TACGAGCTTAGCATGACCTG</code></pre>
+    </div>
+
+    <h2>2. Paste it into a new entry</h2>
+    <ol>
+      <li>Click <strong>New entry</strong> in the sidebar.</li>
+      <li>When the entry-name field opens, enter <strong>FASTA practice</strong> and press <kbd>Enter</kbd>.</li>
+      <li>Click <strong>Paste a sequence…</strong> in the composer and paste the complete record.</li>
+      <li>Read the input preview. It should identify <strong>FASTA</strong> and <strong>80 bp</strong>.</li>
+      <li>Click the upward-arrow submit button, or press <kbd>⌘Enter</kbd>. The button’s tooltip names the format and length being added.</li>
+    </ol>
+    <p>A clean record can be added directly. If <strong>Review import</strong> opens, check the record name, DNA type, and 80 bp length, then click <strong>Import 1 record</strong>. Use <strong>Cancel</strong> if these values differ from the example.</p>
+    <p><strong>Expected result:</strong> a sequence block named <strong>SEAL_beginner_practice</strong> appears in the entry. The composer clears after a successful addition.</p>
+
+    <h2>3. Verify the imported block</h2>
+    <ol>
+      <li>Find <strong>SEAL_beginner_practice</strong> in the block header. Confirm that its molecule type is <strong>DNA</strong> and its length is <strong>80 bp</strong>.</li>
+      <li>Click inside the block, then open <strong>Overview</strong> in the Inspector. Use <strong>Show inspector</strong> in the workspace header if the panel is hidden.</li>
+      <li>Check that the Inspector names the same block and reports <strong>80 bp</strong>.</li>
+      <li>Compare the beginning and end of the sequence with the example: it starts with <code>ACGTTGCAAG</code> and ends with <code>GCATGACCTG</code>.</li>
+    </ol>
+    <p><strong>Expected result:</strong> one DNA block contains all 80 bases. FASTA supplies a name and sequence; this example carries no feature annotations.</p>
+
+    <h2>4. Import a file instead</h2>
+    <p>This is an alternative to pasting. To try both routes, use another new entry named <strong>FASTA file practice</strong>. A second import can report <strong>Exact sequence already exists</strong>; that is expected when you deliberately add the same practice sequence again.</p>
+    <ol>
+      <li>In a text editor, save the complete example as a plain-text file named <code>seal-beginner-practice.fasta</code>.</li>
+      <li>Open your empty practice entry in SEAL and click <strong>Import file</strong>. Select the saved file. You can also drag the file into the workspace.</li>
+      <li>If <strong>Review import</strong> opens, confirm <strong>FASTA</strong>, one record, the record name, DNA type, and <strong>80 bp</strong>. Click <strong>Import 1 record</strong>.</li>
+      <li>Repeat the block and Inspector checks from step 3.</li>
+    </ol>
+    <p><strong>Expected result:</strong> the file produces the same name, sequence type, and 80 bp length as the pasted record.</p>
+
+    <h2>Fix an input problem</h2>
+    <ul>
+      <li><strong>The preview says text or Unknown:</strong> replace the composer contents with the complete FASTA example. Include the <code>&gt;</code> header and exclude surrounding instructions.</li>
+      <li><strong>The length differs from 80 bp:</strong> cancel an open import review and compare all four sequence lines. If a block was already added, use a fresh practice entry for the corrected record so you can compare the two.</li>
+      <li><strong>SEAL asks you to choose DNA or RNA:</strong> check for an accidental <code>U</code>. This example contains only A, C, G, and T. Correct the pasted text before submitting.</li>
+      <li><strong>A name already exists in this entry:</strong> change the incoming record name in the review or cancel and create a fresh practice entry. An exact-sequence warning can still appear because SEAL also checks other entries. Replacing a record changes an existing block.</li>
+      <li><strong>The import fails:</strong> confirm the saved file is plain text. After a failed paste, the composer keeps its contents so you can correct them and try again.</li>
+    </ul>
+
+    <h2>Continue</h2>
+    <ul>
+      <li><a href="import-export.html">Import and export</a> covers other file formats and multi-record imports.</li>
+      <li><a href="editing.html">Editing and annotation</a> explains selection and sequence changes.</li>
+      <li><a href="reports.html">Reports and packages</a> shows how to export workspace records.</li>
+    </ul>
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+  <script src="../assets/tutorials.js" defer></script>
+</body>
+</html>

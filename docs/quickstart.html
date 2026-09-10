@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quickstart · SEAL docs</title>
+  <meta name="description" content="Load a sequence in the SEAL desktop app, inspect its features, run an analysis, and export a report." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Quickstart" />
+  <meta property="og:description" content="Load a sequence in the SEAL desktop app, inspect its features, run an analysis, and export a report." />
+
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>Quickstart</h1>
+    <p class="edition-note" data-edition-note>This guide includes source and direct-edition features. Check the edition comparison for the first Store release. Screenshots and recordings show the direct edition. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">Load a sequence in SEAL, inspect its features, run an analysis, and export a report.</p>
+    <p>First, <a href="install.html">install SEAL</a> and open the app. This walkthrough uses the desktop app. For a guided introduction, start with <a href="first-workspace.html">Your first workspace</a> or the <a href="tutorials.html">video tutorials</a>.</p>
+
+    <h2>1. Load a sequence</h2>
+    <p>In the sidebar, expand <strong>SEAL Sample Lab</strong> and open <strong>Synthetic Reporter</strong>. If the project is missing, click <strong>New entry</strong>, press <kbd>Escape</kbd> to leave its name field, then click <strong>Load demo workspace</strong>. To use a pasted or imported sequence instead, follow <a href="import-first-sequence.html">Add your first sequence</a>.</p>
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/empty-start.png" alt="The current SEAL empty workspace with options to paste a sequence, try the synthetic reporter, load the Sample Lab, import a file, fetch a record, or browse synthetic vector fixtures." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">The empty workspace. Paste or type a sequence, import a file, fetch a record, or load the demo workspace to follow along.</figcaption>
+    </figure>
+    <p>To retrieve a public record, open <strong>Sequence library</strong> in the sidebar and click <strong>Fetch database</strong> in its toolbar. Fetching sends a request to the selected database; the synthetic samples work offline. See <a href="sequence-sources.html">Sequence sources</a>.</p>
+
+    <h2>2. Inspect the sequence</h2>
+    <p>Click inside <strong>Synthetic Reporter DNA</strong>. Its header shows DNA, 720 bp, and linear. Open <strong>Overview</strong> in the Inspector to compare its name and length. If the panel is hidden, click <strong>Show inspector</strong> in the workspace header. Open <strong>Features</strong> to inspect the annotations.</p>
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/workbench.png" alt="A sequence block selected in the workspace with the Inspector open on the Overview tab, showing length, GC content, molecular weight, ORF count, base composition, and provenance." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">A sequence block with its Inspector open. The Overview tab carries length, GC, molecular weight, ORFs, composition, and provenance.</figcaption>
+    </figure>
+    <p>To find a tool by name, press <kbd>⌘K</kbd> to open the command palette, type its name, and select the matching result.</p>
+
+    <h2>3. Preview a restriction digest</h2>
+    <p>Open <strong>Actions</strong> beneath the DNA sequence and choose <strong>Restriction digest</strong>. In the dialog, select an enzyme and read the cut count and fragment preview. The preview updates as you change enzymes. Click <strong>Cancel</strong> when you finish inspecting; <strong>Digest</strong> creates fragment blocks. See the <a href="restriction-digest.html">digest guide</a> for a complete example.</p>
+
+    <h2>4. Inspect translation</h2>
+    <p>Drag across a short DNA range. In the Inspector, open <strong>Overview</strong> and scroll to the <strong>Selection</strong> card to read its translation. Open the Inspector’s <strong>Translate</strong> tab to compare all six frames over the selection or the whole block.</p>
+    <p>For a protein block, open <strong>Codons → Back-translation preview</strong> for a DNA or RNA draft. Review the host table and any unknown-residue or internal-stop notices before saving. See <a href="translation.html">Translation and ORFs</a>.</p>
+
+    <h2>5. Review and export</h2>
+    <p>With a sequence block active, open the Inspector’s <strong>Activity</strong> tab to review recorded operations. Previewing a digest or translation leaves the sequence unchanged.</p>
+    <p>Click the block you want to report on, press <kbd>⌘K</kbd>, type <strong>Build report</strong>, and select that command. In <strong>Report handoff</strong>, review the source block and choose files under <strong>Attachments</strong>. Click <strong>Download ZIP</strong> to save the package, which includes a manifest and validation file. Use GenBank when feature annotations and topology need to survive export.</p>
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/report-handoff.png" alt="The Report handoff dialog listing source blocks, format notes, and selectable attachments (FASTA, CSV, styled report, GenBank), with Export Markdown and Download ZIP actions." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">Report handoff lists attachments and report sections. Download ZIP saves the selected contents with a manifest and validation file.</figcaption>
+    </figure>
+
+    <h2>Optional: try the CLI in a scratch workspace</h2>
+    <p>The CLI requires a source checkout and a separate build. Follow the <a href="cli.html">CLI setup instructions</a> first.</p>
+    <p>In your checkout, run this example in a subshell. It creates a temporary database for the synthetic fixture and leaves your shell's workspace setting unchanged:</p>
+    <div class="docs-code" data-lang="bash" data-title="Analyze a synthetic fixture">
+<pre><code>(
+  export SEAL_DB_PATH="$(mktemp -d)/quickstart.db"
+  DEMO=tests/fixtures/release-bio/seal-synthetic-reporter.gb
+  seal import "$DEMO"
+  seal info "$DEMO"
+  seal analyze "$DEMO" --min-orf-aa 50 --json
+  seal sites "$DEMO" --unique
+  seal digest "$DEMO" --enzymes EcoRI,BamHI --preview
+  seal export markdown --include-analysis --output report.md
+)</code></pre>
+    </div>
+    <p>This exercise writes to a separate database. Its imported blocks and Activity records appear there, not in the desktop workspace. The report is saved as <code>report.md</code> in the working directory.</p>
+    <p>To work with the desktop workspace, set <code>SEAL_DB_PATH</code> to the active path supplied by SEAL. Press <kbd>⌘K</kbd>, type <strong>Open agent setup</strong>, and select the command to find it. Verify the connection with a read-only block listing before importing or editing data.</p>
+
+    <h2>Next steps</h2>
+    <ul>
+      <li><a href="concepts.html">Core concepts</a>: projects, Entries, blocks, features, checkpoints, and Activity.</li>
+      <li><a href="primer-design.html">Primer design</a>: design and rank primers.</li>
+      <li><a href="mcp-setup.html">MCP setup</a>: connect an agent to your workspace.</li>
+    </ul>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

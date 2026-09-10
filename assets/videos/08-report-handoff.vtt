@@ -1,0 +1,60 @@
+WEBVTT
+
+1
+00:00:00.380 --> 00:00:04.670
+Open Synthetic Reporter and select
+Synthetic Reporter DNA.
+
+2
+00:00:04.700 --> 00:00:08.450
+Press Command K to open the command
+palette, type Build report, and
+
+3
+00:00:08.480 --> 00:00:13.990
+choose that command. Report handoff opens
+for the selected source block.
+
+4
+00:00:14.020 --> 00:00:16.470
+Start by checking the name at the top.
+
+5
+00:00:16.500 --> 00:00:20.920
+Then review Attachments. This example
+includes the selected sequence as
+
+6
+00:00:20.950 --> 00:00:27.150
+FASTA, a block-summary CSV, a styled
+sequence report, and a GenBank file.
+
+7
+00:00:27.180 --> 00:00:30.510
+The dialog describes what each format
+preserves.
+
+8
+00:00:30.540 --> 00:00:34.990
+Expand Package zip preview to inspect the
+files that will be included.
+
+9
+00:00:35.020 --> 00:00:39.160
+The package brings the report, selected
+attachments, and supporting metadata
+
+10
+00:00:39.190 --> 00:00:43.675
+together in one download. Review the
+selection before clicking Download
+
+11
+00:00:43.705 --> 00:00:47.490
+ZIP. After the download, open Activity in
+the Inspector.
+
+12
+00:00:47.520 --> 00:00:51.905
+Find Report package exported and confirm
+that the event is marked completed.

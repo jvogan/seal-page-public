@@ -1,0 +1,76 @@
+WEBVTT
+
+1
+00:00:00.360 --> 00:00:03.170
+Click Alignments in the sidebar.
+
+2
+00:00:03.200 --> 00:00:06.730
+The demo workspace includes six saved
+examples.
+
+3
+00:00:06.760 --> 00:00:11.130
+Open Synthetic Sanger, primer pair and
+overlapping reads.
+
+4
+00:00:11.160 --> 00:00:15.290
+This example contains a twelve-hundred-base
+template and two overlapping
+
+5
+00:00:15.320 --> 00:00:18.290
+reads, each with eight hundred base calls.
+
+6
+00:00:18.320 --> 00:00:21.090
+Expand the alignment to fill the workspace.
+
+7
+00:00:21.120 --> 00:00:25.010
+The rows keep the template and reads in a
+common coordinate view.
+
+8
+00:00:25.040 --> 00:00:29.430
+Click Next mismatch to jump to a difference
+instead of searching through
+
+9
+00:00:29.460 --> 00:00:33.580
+every column. Compare the letters in the
+highlighted region with the surrounding
+
+10
+00:00:33.610 --> 00:00:35.650
+trace peaks and consensus row.
+
+11
+00:00:35.680 --> 00:00:39.970
+Return from the filled alignment view, then
+click Open chromatogram.
+
+12
+00:00:40.000 --> 00:00:43.730
+The original read opens with its base
+calls, colored peaks, and quality
+
+13
+00:00:43.760 --> 00:00:48.170
+information. Use the read name to confirm
+which trace you are reviewing.
+
+14
+00:00:48.200 --> 00:00:53.170
+The trace panel also reports retained calls
+at the selected quality threshold.
+
+15
+00:00:53.200 --> 00:00:56.710
+You can move between this original-read
+view and the saved alignment when
+
+16
+00:00:56.740 --> 00:00:58.162
+checking a discrepancy.

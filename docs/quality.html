@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quality checks · SEAL docs</title>
+  <meta name="description" content="Flag homopolymers, ambiguous bases, and internal stops in a sequence, and jump from each flag to the offending range." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Quality checks" />
+  <meta property="og:description" content="Flag homopolymers, ambiguous bases, and internal stops in a sequence." />
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>Quality checks</h1>
+    <p class="edition-note" data-edition-note>Screenshots and recordings show the direct edition. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">Flag homopolymers, ambiguous bases, low-complexity regions, and internal stops. Compute base metrics with the CLI, and review flagged regions in the desktop app.</p>
+
+    <h2>Run quality checks</h2>
+    <p>Run <code>seal quality</code> to compute quality metrics for a sequence: length, GC content, a complexity score, homopolymer runs, direct and inverted repeats, and windowed GC.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Quality metrics">
+<pre><code>seal quality myseq.fa</code></pre>
+    </div>
+
+    <p>The sequence can be an inline string, a file path, or stdin. Add <code>--json</code> for structured output.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Quality metrics as JSON">
+<pre><code>seal quality myseq.fa --json</code></pre>
+    </div>
+
+    <p>A low complexity score, a long homopolymer run, or a detected repeat points to a sequence worth a closer look before you order or assemble it.</p>
+
+    <h2>What gets flagged</h2>
+    <p>In the desktop app, the Quality section in the Inspector Overview flags regions that tend to cause trouble in synthesis, cloning, and expression. The rows depend on the block type.</p>
+    <p>For a DNA or RNA block it flags:</p>
+    <ul>
+      <li><strong>Homopolymers</strong>: runs of a single base, which can be hard to synthesize and sequence accurately.</li>
+      <li><strong>Ambiguous bases</strong>: IUPAC degenerate codes and <code>N</code> positions that are not a single defined base.</li>
+      <li><strong>Entropy</strong>: dinucleotide sequence complexity, flagged when low to mark repetitive or low-information regions.</li>
+    </ul>
+    <p>For a protein block it flags:</p>
+    <ul>
+      <li><strong>Internal stops</strong>: stop codons inside a region you expect to translate as a coding sequence.</li>
+    </ul>
+
+    <p>When you analyze a translated protein, the Protein tab raises the same kind of internal-stop advisory on the protein side. See <a href="protein-analysis.html">Protein analysis</a>.</p>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/inspector-quality.png" alt="The Inspector Overview for an Synthetic Reporter DNA block, with a Metrics block above a Quality section that flags a homopolymer run of five C bases as Minor, next to a Jump control." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">The Quality section sits in the Inspector Overview. Here it flags a five-base C homopolymer in Synthetic Reporter as minor, with a Jump control that moves the selection to that range.</figcaption>
+    </figure>
+
+    <p>To back-translate a protein into a degenerate DNA sequence built from IUPAC ambiguity codes, use <code>seal degenerate</code>.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Back-translate a protein to degenerate DNA">
+<pre><code>seal degenerate MAR --organism ecoli</code></pre>
+    </div>
+
+    <h2>Jump to a problem</h2>
+    <p>The Quality section links each flagged region to the offending range. Select a homopolymer, an ambiguous-base, or an internal-stop entry, and the app jumps to that range in the sequence so you can read it in context and fix it.</p>
+
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>To avoid homopolymers and other synthesis hazards while rewriting a coding sequence, use the <code>synthesis_guarded</code> optimizer profile, which scores host preference while avoiding rare codons, local GC extremes, homopolymers, common cloning sites, and simple internal motifs. See <a href="codon-optimizers.html">Codon optimizers</a>.</p>
+      </div>
+    </div>
+
+    <h2>Over the CLI</h2>
+    <p>The CLI commands that report on sequence quality are stateless and accept a sequence argument, a file path, or stdin.</p>
+
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Command</th><th>What it reports</th></tr></thead>
+        <tbody>
+          <tr><td><code>seal quality</code></td><td>Length, GC content, complexity score, homopolymer runs, direct and inverted repeats, windowed GC.</td></tr>
+          <tr><td><code>seal degenerate</code></td><td>Back-translates a protein into a degenerate DNA sequence and reports total degeneracy. Add <code>--organism</code> for an organism-minimized sequence.</td></tr>
+          <tr><td><code>seal frames</code></td><td>All six reading frames, which surface in-frame stop codons.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Translate a candidate coding region to check for internal stops before you treat it as a CDS. See <a href="translation.html">Translation and ORFs</a>. For the exact field shapes, see the <a href="io-contract.html">IO contract</a>.</p>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

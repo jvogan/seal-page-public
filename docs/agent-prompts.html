@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prompts and safety · SEAL docs</title>
+  <meta name="description" content="Safety prompts and review patterns for agent edits in SEAL: a read-first session prompt, a prompt pack, and the Activity and checkpoint patterns that keep changes recoverable." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Prompts and safety" />
+  <meta property="og:description" content="Safety prompts and review patterns for agent edits in SEAL: a read-first session prompt, a prompt pack, and the Activity and checkpoint patterns that keep changes recoverable." />
+
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>Prompts and safety</h1>
+    <p class="edition-note" data-edition-note>This guide covers source and direct-edition tools. These tools are not bundled with the first Store release. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">Safety prompts and review patterns for agent edits. Use these with Claude Code, Codex, Gemini CLI, or any other MCP-capable local agent working in your SEAL workspace.</p>
+
+    <h2>Before you hand off</h2>
+    <p>Get the workspace ready, then ask for a read-only pass before any write.</p>
+    <ol>
+      <li>Open SEAL and go to Start Panel, then Agent Control Plane.</li>
+      <li>Copy the active SQLite database path or the MCP config snippet.</li>
+      <li>Run Agent Doctor and fix any failed database path check before asking the agent to write.</li>
+      <li>Tell the agent to use the configured SEAL MCP server, or the Rust <code>seal</code> CLI with the same <code>SEAL_DB_PATH</code>.</li>
+      <li>Ask for a read-only inventory first. Move to writes only after the agent has named the target blocks, projects, or conversations.</li>
+    </ol>
+    <p>For the config itself, see <a href="mcp-setup.html">MCP setup</a> and the per-client pages: <a href="agents-claude-code.html">Claude Code</a>, <a href="agents-codex.html">Codex</a>, and <a href="agents-gemini-cli.html">Gemini CLI</a>.</p>
+
+    <h2>Safe starter prompt</h2>
+    <p>Paste this at the start of an agent session. It sets the read-first order, the confirmation rule for destructive edits, and the summary an agent should return after every write.</p>
+
+    <div class="docs-code" data-lang="text" data-title="Session prompt">
+<pre><code>You are working with SEAL through the configured SEAL MCP server or Rust seal CLI.
+
+Use the active SQLite workspace only. Start read-only: use block_list to inventory shared sequence blocks, then list projects, conversations, and recent Activity. Then propose a short plan before writing.
+
+Do not delete, overwrite, rename, reorder, or mutate existing blocks unless I explicitly confirm the target and action. Before destructive edits, create or identify a checkpoint. After every write, summarize the affected block names, IDs when available, write source, and any warnings I should verify in SEAL Activity.</code></pre>
+    </div>
+
+    <h2>Review patterns</h2>
+    <p>Two surfaces let you review what an agent did and recover from it: the Activity trail and checkpoints.</p>
+
+    <h3>Activity trail</h3>
+    <p>Activity records external writes alongside changes made in the desktop app. Each mutation records its source (<code>writeSource</code> is <code>mcp</code> or <code>cli</code>), the tool or command name, and the affected project, conversation, and block IDs in structured metadata. Collapsed rows use block names and source labels; raw IDs remain in the metadata for debugging and export round trips.</p>
+    <p>Ask the agent to end each write with a summary you can check against Activity: affected block names, IDs when available, the write source, and any warnings. Then confirm in SEAL that the source label and target names match what you expected.</p>
+
+    <h3>Checkpoints</h3>
+    <p>Before a destructive edit, have the agent create or identify a checkpoint so a recoverable change can be restored. Where a checkpoint would cascade away with the thing being deleted, SEAL records a metadata snapshot instead. The behavior is per operation; see <a href="mutation-matrix.html">what agents can change</a> for the checkpoint result of each mutation.</p>
+
+    <h2>Guardrails</h2>
+    <p>Agent writes go directly into SQLite. SEAL does not put them behind an approval queue; it makes them observable and recoverable instead. Hold the agent to these norms:</p>
+    <ul>
+      <li><strong>Read before write.</strong> Require a read-only inventory and a short plan before any mutation. Writes start only after the agent names its targets.</li>
+      <li><strong>Confirm destructive actions.</strong> Do not let the agent delete, overwrite, rename, reorder, or mutate existing blocks, or delete a conversation, without your explicit confirmation of the target and the action.</li>
+      <li><strong>Checkpoint first.</strong> Before a destructive edit, create or identify a checkpoint, or capture a snapshot where a checkpoint cannot survive the deletion.</li>
+      <li><strong>Summarize and verify.</strong> After each write, get the affected names, IDs, write source, and warnings, and verify them in Activity.</li>
+      <li><strong>Stay on the intended workspace.</strong> Confirm the agent uses the same database path shown in Agent Setup. To keep agent or test work off your live workspace, set <code>SEAL_DB_PATH</code> to a scratch file first.</li>
+    </ul>
+
+    <h2>Prompt pack</h2>
+    <p>Copyable prompts for common requests. Each one keeps the read-first, confirm-before-write order.</p>
+
+    <h3>Inventory the workspace</h3>
+    <div class="docs-code" data-lang="text" data-title="Inventory">
+<pre><code>Use SEAL MCP/CLI read-only tools to inventory my current workspace. List sequences, projects, conversations, feature counts, topology, and any obvious metadata gaps. Do not write yet. End with the next safest actions.</code></pre>
+    </div>
+
+    <h3>Import and inspect a sequence</h3>
+    <div class="docs-code" data-lang="text" data-title="Import and inspect">
+<pre><code>Import the attached or referenced FASTA/GenBank record into SEAL. Preserve source metadata, topology, features, and provenance where possible. After import, inspect length, GC, ORFs, restriction sites, feature coordinates, and parse warnings. Do not mutate the sequence. Summarize what changed and what I should verify in Activity.</code></pre>
+    </div>
+
+    <h3>Plan a restriction digest</h3>
+    <div class="docs-code" data-lang="text" data-title="Plan a digest">
+<pre><code>For the active SEAL block, plan a restriction digest and verification workflow. Show candidate enzymes, expected fragments, unique-site risks, methylation or ambiguity issues if detectable, and a gel/checkpoint plan. Do not add or edit features until I confirm the enzymes and target block.</code></pre>
+    </div>
+
+    <h3>Add verified restriction features</h3>
+    <div class="docs-code" data-lang="text" data-title="Add features">
+<pre><code>Using the confirmed target block and enzyme list, find restriction sites and add feature annotations for the verified sites only. Keep feature names readable, preserve exact coordinates, and summarize every added feature with start/end, strand, and affected block ID.</code></pre>
+    </div>
+
+    <h3>Design primers with scope</h3>
+    <div class="docs-code" data-lang="text" data-title="Design primers">
+<pre><code>Design primers for the active SEAL block or selected range. State assumptions, target coordinates, expected product size, Tm/GC ranges, tails or overhangs, and any off-target or ambiguity risks. Do not write primer features or mutate the block until I confirm the design.</code></pre>
+    </div>
+
+    <h3>Prepare a report</h3>
+    <div class="docs-code" data-lang="text" data-title="Prepare a report">
+<pre><code>Build a SEAL report plan for this conversation. Include selected blocks, provenance, analysis status, warnings, lossy export notes, suggested attachments, and the Activity events or block IDs that support each result.</code></pre>
+    </div>
+
+    <h3>Review failed writes</h3>
+    <div class="docs-code" data-lang="text" data-title="Review failed writes">
+<pre><code>Review failed, partial, or blocked external-agent writes in this SEAL workspace. Explain what was attempted, what changed, what did not change, affected blocks, available checkpoints, and the safest retry or recovery path.</code></pre>
+    </div>
+
+    <h2>Choosing MCP or CLI</h2>
+    <p>Both paths write to the same SQLite database when <code>SEAL_DB_PATH</code> is set correctly, and both appear in Activity with their write source.</p>
+    <ul>
+      <li>Use <strong>MCP</strong> when the agent is already reasoning over the workspace and should call structured tools such as <code>block_list</code> and <code>block_get</code>, <code>parse_sequence</code>, <code>restriction_sites</code>, <code>feature_add</code>, <code>checkpoint_save</code>, and the export tools.</li>
+      <li>Use the <strong>Rust <code>seal</code> CLI</strong> when the work is script-like: batch imports, shell pipelines, repeatable checks, or commands that should be easy to paste into a terminal.</li>
+    </ul>
+
+    <h2>What to verify in SEAL</h2>
+    <p>After an agent works, check these in the app:</p>
+    <ul>
+      <li>The agent used the same database path shown in Agent Setup.</li>
+      <li>The target block, project, and conversation names match what you expected.</li>
+      <li>Activity shows the external write source after MCP or CLI writes.</li>
+      <li>Checkpoints exist before destructive edits.</li>
+      <li>Imported features stay within sequence bounds and use the expected topology.</li>
+      <li>Exports mention any lossy format limitations.</li>
+    </ul>
+    <p>For the full set of surfaces an agent can read and mutate, and the checkpoint behavior of each, see <a href="mutation-matrix.html">what agents can change</a>. For how agent writes flow through the workspace and into Activity, see the <a href="agents.html">agent control plane</a>.</p>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

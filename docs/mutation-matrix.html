@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>What agents can change · SEAL docs</title>
+  <meta name="description" content="The workspace surfaces an external agent can read and mutate over MCP and the CLI, with Activity and checkpoint behavior for each." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="What agents can change" />
+  <meta property="og:description" content="The workspace surfaces an external agent can read and mutate over MCP and the CLI, with Activity and checkpoint behavior for each." />
+
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>What agents can change</h1>
+    <p class="edition-note" data-edition-note>This guide covers source and direct-edition tools. These tools are not bundled with the first Store release. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">This is the surface an external agent can read and mutate. External MCP and Rust CLI writes go directly into SQLite. SEAL does not add an approval queue; it makes those writes observable through <code>writeSource</code>, Activity, provenance metadata, checkpoints where recoverable, and live UI sync.</p>
+
+    <h2>Activity contract</h2>
+    <p>Each canonical external mutation should record:</p>
+    <ul>
+      <li><code>writeSource</code>: <code>mcp</code> or <code>cli</code></li>
+      <li>command or tool name in metadata</li>
+      <li>target project, conversation, or block ID in structured metadata</li>
+      <li>target block ID when there is one</li>
+      <li>affected project, conversation, and block IDs in structured metadata</li>
+      <li>completed or failed status</li>
+      <li>checkpoint ID before destructive block mutation when the existing schema can keep that checkpoint alive</li>
+    </ul>
+    <p>Collapsed Activity text uses human names and source labels. Raw IDs belong in metadata, JSON, and debug exports.</p>
+    <p>Conversation-scoped rows live in <code>workflow_events</code>. Workspace, project, and conversation-level rows that must survive conversation deletion live in the durable <code>workspace_events</code> table and appear through the Activity filter labeled <strong>Workspace / agent writes</strong>.</p>
+
+    <h2>MCP writes</h2>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Path</th><th>Source</th><th>Activity</th><th>Checkpoint behavior</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><code>workspace_add</code> / scratch create</td><td><code>mcp</code></td><td>Yes</td><td>Not needed for create</td><td>Creates scratch block and records created block IDs.</td></tr>
+          <tr><td><code>workspace_update</code> / scratch overwrite</td><td><code>mcp</code></td><td>Yes</td><td>Auto checkpoint before sequence, features, topology, or scar changes</td><td>Metadata includes affected block and checkpoint IDs.</td></tr>
+          <tr><td><code>workspace_remove</code></td><td><code>mcp</code></td><td>No write</td><td>No mutation</td><td>Disabled until deletion tombstones have a list and restore workflow. Every call leaves data unchanged.</td></tr>
+          <tr><td><code>workspace_clear</code></td><td><code>mcp</code></td><td>No write</td><td>No mutation</td><td>Disabled until deletion tombstones have a list and restore workflow. Every call leaves data unchanged.</td></tr>
+          <tr><td><code>checkpoint_save</code></td><td><code>mcp</code></td><td>Checkpoint row is durable</td><td>Creates user-requested checkpoint</td><td>Activity is available through the checkpoint and recovery UI.</td></tr>
+          <tr><td><code>checkpoint_restore</code></td><td><code>mcp</code></td><td>Via block write and recovery UI</td><td>Requires checkpoint ID + current revision; creates a recovery checkpoint when content differs</td><td>Restore is transactional.</td></tr>
+          <tr><td><code>conversation_create</code> / <code>conversation_rename</code> / <code>conversation_move</code></td><td><code>mcp</code></td><td>Yes via durable <code>workspace_events</code>; conversation rows can also appear where a timeline exists</td><td>Not block destructive</td><td>Metadata includes affected conversation and project IDs.</td></tr>
+          <tr><td><code>conversation_delete</code></td><td><code>mcp</code></td><td>No write</td><td>Disabled</td><td>Always rejects because permanent external-agent deletion has no complete crash-safe recovery path. Use Archive and Restore in the app.</td></tr>
+          <tr><td><code>project_create</code> / <code>project_rename</code> / <code>project_set_color</code> / <code>project_delete</code></td><td><code>mcp</code></td><td>Yes via durable <code>workspace_events</code></td><td>Not block destructive</td><td>Project delete requires confirmation, the current project revision, and the exact child ID set; it records a tombstone and unassigns conversations without deleting them.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Rust CLI writes</h2>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Path</th><th>Source</th><th>Activity</th><th>Checkpoint behavior</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><code>seal import</code></td><td><code>cli</code></td><td>Yes via CLI scratch workspace</td><td>Not needed for create</td><td>Each imported record creates a scratch block Activity row.</td></tr>
+          <tr><td>CLI scratch <code>add</code> existing ID</td><td><code>cli</code></td><td>Yes</td><td>Auto checkpoint before sequence, features, topology, or scar changes</td><td>Used by import and library migration and future workspace writes.</td></tr>
+          <tr><td>CLI scratch <code>remove</code> / <code>clear</code></td><td><code>cli</code></td><td>No command</td><td>None</td><td>Internal workspace methods exist; the Rust CLI exposes neither operation.</td></tr>
+          <tr><td><code>seal features add/update/delete</code></td><td><code>cli</code></td><td>Yes</td><td>Auto checkpoint before feature mutation</td><td>Activity metadata includes feature name and feature ID.</td></tr>
+          <tr><td><code>seal blocks annotate-selection</code></td><td><code>cli</code></td><td>Yes</td><td>Auto checkpoint before feature mutation</td><td>Metadata includes the inserted feature JSON.</td></tr>
+          <tr><td><code>seal blocks extract-selection</code></td><td><code>cli</code></td><td>Yes via scratch create</td><td>Not needed for create</td><td>Child block records parent ID in structured block data.</td></tr>
+          <tr><td><code>seal blocks reorder</code></td><td><code>cli</code></td><td>Yes</td><td>Not needed</td><td>Position-only mutation, no sequence payload change.</td></tr>
+          <tr><td><code>seal checkpoints save</code></td><td><code>cli</code></td><td>Yes</td><td>Creates checkpoint</td><td>Activity points at the saved checkpoint.</td></tr>
+          <tr><td><code>seal checkpoints restore</code></td><td><code>cli</code></td><td>Yes</td><td>Auto checkpoint before restore; source checkpoint also recorded</td><td>Recovery path points at the pre-restore checkpoint.</td></tr>
+          <tr><td><code>seal checkpoints delete</code></td><td><code>cli</code></td><td>No write</td><td>Disabled</td><td>Registered for script compatibility; always rejects until recoverable checkpoint trash exists.</td></tr>
+          <tr><td><code>seal conversations create/rename/move</code></td><td><code>cli</code></td><td>Yes via conversation timeline and durable <code>workspace_events</code></td><td>Not block destructive</td><td>Workspace event survives project moves and later conversation deletion.</td></tr>
+          <tr><td><code>seal conversations delete</code></td><td><code>cli</code></td><td>No write</td><td>Disabled</td><td>Always rejects; use Archive and Restore in the app.</td></tr>
+          <tr><td><code>seal projects create/rename/set-color/delete</code></td><td><code>cli</code></td><td>Yes via durable <code>workspace_events</code></td><td>Not block destructive</td><td>Delete requires confirmation, the current project revision, and exact child count and IDs; all writes use <code>writeSource: cli</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>"Not recoverable in current schema" means there is no restore path today, not that the write is silent. The deletion still records affected IDs in Activity before the rows cascade away. To work against a disposable copy, set <code>SEAL_DB_PATH</code> to a scratch file. See <a href="agents.html">the agent control plane</a>.</p>
+      </div>
+    </div>
+
+    <h2>Read access</h2>
+    <p>Beyond the mutations above, agents read the same workspace through the MCP tools and CLI query commands. For the full set of operations an agent can call, see the <a href="mcp-reference.html">MCP tool reference</a> and the <a href="cli.html">CLI reference</a>.</p>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

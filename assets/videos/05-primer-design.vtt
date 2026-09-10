@@ -1,0 +1,84 @@
+WEBVTT
+
+1
+00:00:00.380 --> 00:00:04.890
+Open Synthetic Reporter and select
+Synthetic Reporter DNA.
+
+2
+00:00:04.920 --> 00:00:08.590
+Use the block's Actions menu and choose
+Design primers.
+
+3
+00:00:08.620 --> 00:00:12.670
+The dialog calculates candidate pairs for
+the selected target.
+
+4
+00:00:12.700 --> 00:00:14.830
+Check the target coordinates first.
+
+5
+00:00:14.860 --> 00:00:19.030
+This example uses bases fifty-one through
+five hundred fifty.
+
+6
+00:00:19.060 --> 00:00:22.860
+The primer length range is eighteen to
+twenty-eight bases, and the target
+
+7
+00:00:22.890 --> 00:00:25.950
+melting temperature is sixty degrees
+Celsius.
+
+8
+00:00:25.980 --> 00:00:29.170
+These settings appear above the ranked
+results.
+
+9
+00:00:29.200 --> 00:00:33.745
+Read Pair one. Its forward and reverse
+sequences are shown in the
+
+10
+00:00:33.775 --> 00:00:37.750
+five-prime to three-prime direction.
+Compare their melting temperatures
+
+11
+00:00:37.780 --> 00:00:41.710
+and GC percentages, and check the predicted
+amplicon length.
+
+12
+00:00:41.740 --> 00:00:45.870
+This pair produces a five hundred fourteen
+base-pair amplicon.
+
+13
+00:00:45.900 --> 00:00:51.150
+Click Add selected pair. The dialog closes
+after adding the annotations.
+
+14
+00:00:51.180 --> 00:00:54.670
+Open Features in the Inspector to verify
+the result.
+
+15
+00:00:54.700 --> 00:00:58.720
+The source DNA now includes a named forward
+primer and reverse primer
+
+16
+00:00:58.750 --> 00:01:02.770
+alongside its existing annotations. You can
+use those feature names and
+
+17
+00:01:02.800 --> 00:01:05.164
+coordinates to revisit the selected pair.

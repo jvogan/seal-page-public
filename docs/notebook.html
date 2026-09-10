@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Notebook · SEAL docs</title>
+  <meta name="description" content="A persistent, live-syncing lab notebook that references your sequences, stored in the same local workspace as the rest of SEAL." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Notebook" />
+  <meta property="og:description" content="A persistent, live-syncing lab notebook that references your sequences, stored in the same local workspace as the rest of SEAL." />
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+  <link rel="stylesheet" href="../assets/tutorials.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>Notebook</h1>
+    <p class="edition-note" data-edition-note>Screenshots and recordings show the direct edition. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">A persistent, live-syncing lab notebook that references your sequences. Notebooks live in the same local workspace as your conversations and blocks, so notes stay with the data they describe.</p>
+
+    <!-- Tutorial player -->
+    <h2 id="watch">Watch the walkthrough</h2>
+    <section class="tutorial-video" aria-label="Video lesson: Write notebook notes">
+      <p>Open a notebook page and record a note about the work in your workspace.</p>
+      <video id="lesson-video" controls playsinline preload="none" width="1440" height="900" poster="../assets/img/tutorials/07-notebook.jpg" aria-label="Write notebook notes">
+        <source src="../assets/videos/07-notebook.mp4" type="video/mp4" />
+        <track kind="captions" src="../assets/videos/07-notebook.vtt" srclang="en" label="English" default />
+        <p><a href="../assets/videos/07-notebook.mp4">Download this video</a> to watch the lesson.</p>
+      </video>
+      <p class="video-links"><span>0:50 · AI narration</span><a href="../assets/videos/07-notebook.mp4" download>Download video (7.5 MB)</a><a href="../assets/videos/07-notebook.vtt" download>English captions</a></p>
+      <ul class="lesson-chapters" aria-label="Video chapters" hidden>
+        <li><button type="button" data-seek="0" aria-controls="lesson-video">0:00 · Open Notebook</button></li>
+        <li><button type="button" data-seek="10.4" aria-controls="lesson-video">0:10 · Create and name a page</button></li>
+        <li><button type="button" data-seek="20.1" aria-controls="lesson-video">0:20 · Write your review</button></li>
+        <li><button type="button" data-seek="40.4" aria-controls="lesson-video">0:40 · Check the saved note</button></li>
+      </ul>
+      <details>
+        <summary>Read the transcript</summary>
+        <p>Click Notebook in the sidebar. The sample workspace already contains an assembly page, with its notes and linked sequence records. To keep your own observations separate, click the plus button for a new page in SEAL Sample Notebook.</p>
+        <p>Give the page a useful title. Here, type Sequence review practice. Click in the page body and write two short observations: which example you reviewed, and what you checked in Overview.</p>
+        <p>Add a new line for the next action. In this example, the next step is to compare the translation with the protein block. The page remains marked Draft, and the app saves the text locally as you work.</p>
+        <p>Click the assembly page in the page list, then return to Sequence review practice. Your title and review text are still present.</p>
+      </details>
+    </section>
+    <!-- End tutorial player -->
+
+
+    <h2>Create a sequence review note</h2>
+    <p>Write a draft page in the sample notebook, then reopen it to check that the text was saved.</p>
+    <ol>
+      <li>Open <strong>Notebook</strong> in the sidebar. In <strong>SEAL Sample Notebook</strong>, open <strong>SEAL assembly notebook</strong> to inspect its notes and sequence references.</li>
+      <li>Click the plus button beside <strong>SEAL Sample Notebook</strong> to create a page.</li>
+      <li>Set the title to <strong>Sequence review practice</strong>.</li>
+      <li>In the page body, write two observations and a next action. For example:
+        <blockquote>
+          <p>Practice review of the Synthetic Reporter example.</p>
+          <p>Checked the DNA name and length in Overview.</p>
+          <p>Next step: compare the translation with the protein block.</p>
+        </blockquote>
+      </li>
+      <li>Keep the page marked <strong>Draft</strong>. SEAL saves the title and text locally as you work.</li>
+      <li>Open <strong>SEAL assembly notebook</strong>, then return to <strong>Sequence review practice</strong>. Confirm that the title and all three lines are still present.</li>
+    </ol>
+
+    <h2>What the notebook is</h2>
+    <p>The notebook is a full-pane document space for protocols, results, and design rationale. It is organized as a three-level tree:</p>
+    <ul>
+      <li><strong>Projects</strong> group your notebooks, matching the project scope you already use elsewhere in SEAL.</li>
+      <li><strong>Notebooks</strong> hold pages. Each notebook belongs to one project, or to the "No project" bucket.</li>
+      <li><strong>Pages</strong> are individual rich-text documents.</li>
+    </ul>
+    <p>Pages are standalone documents, not text blocks riding inside a conversation. They are stored in the same on-device workspace as the rest of SEAL, so a notebook is backed up and exported together with your conversations, blocks, and features. See <a href="architecture.html">Architecture</a> for how that workspace is laid out.</p>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/notebook.png" alt="The Notebook view with synthetic assembly notes, page status, tags, and links to sequence records." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">The Notebook organizes projects, notebooks, and pages in a tree beside the rest of the workspace, with the selected page open in a rich editor.</figcaption>
+    </figure>
+
+    <h2>Writing notes</h2>
+    <p>Open a page to write in a rich editor. The formatting toolbar covers the common marks and blocks:</p>
+    <ul>
+      <li>Inline formatting: bold, italic, strikethrough, inline code, highlight, link, subscript, and superscript.</li>
+      <li>Headings: heading 1, heading 2, and heading 3.</li>
+      <li>Blocks: bullet list, numbered list, checklist, quote, and code block.</li>
+    </ul>
+    <p>The toolbar collapses to a compact subset when you want more room, and the same actions stay reachable from a floating menu when you select text. Use the <strong>Insert</strong> menu to add a table, import a spreadsheet, add an image, insert a reference, or drop a divider.</p>
+
+    <h3>Tables, spreadsheets, and images</h3>
+    <p>Insert a table from the Insert menu, or paste spreadsheet data (from Excel, Google Sheets, Numbers, or a tab-delimited source) directly into a page to get a clean table. Import a CSV, TSV, or XLSX file the same way. Paste or drop an image to embed it; pasted and dropped images are downscaled before they are stored inline.</p>
+
+    <h3>Comments</h3>
+    <p>Select a span of text and add a comment to start an inline thread anchored to that text. Threads can be edited, resolved, reopened, and deleted. Resolved threads stay attached but render muted and drop out of the open count.</p>
+
+    <h3>Page titles</h3>
+    <p>A page title is optional. When you leave it blank, the title is derived from the first line of the page so the tree does not fill with "Untitled page" entries. Double-click a page in the tree to rename it.</p>
+
+    <h2>Reference a sequence</h2>
+    <p>A page can reference an entry (a conversation), a specific block within an entry, a base range within a block, or another notebook page. References are stored as a link, so they also appear in the page's linked-entries panel and as backlinks on the entry side.</p>
+    <p>To insert a reference inline, type <code>@</code> at a word boundary to open the reference picker, then search for the target. Move through the results with the arrow keys and press <kbd class="docs-kbd">Enter</kbd> to commit the highlighted option. You can also insert a reference from the Insert menu or the slash menu.</p>
+    <p>A reference renders as an inline chip. Click it to navigate to its target. The chip's label is derived from the live entry, block, or page, so renaming the target updates the chip immediately. If the target is deleted, the chip falls back to the label captured when you created it.</p>
+
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>To reference a base range, select the range in a block first, then open the reference picker. The selected range appears as an option you can pick directly.</p>
+      </div>
+    </div>
+
+    <h2>Slash commands</h2>
+    <p>Type <code>/</code> in a page to open the slash menu and insert a block at the caret. The menu offers the same blocks as the toolbar plus a few insert actions:</p>
+    <ul>
+      <li>Headings 1 through 3, bullet list, numbered list, checklist, quote, highlight, code block, and divider.</li>
+      <li>Table, Spreadsheet (import a CSV or Excel file), Image (upload or paste), and Reference (link an entry).</li>
+    </ul>
+    <p>Filter the list by typing after the <code>/</code>. When nothing matches your query, the menu shows a hint row instead of disappearing, and arrow keys, <kbd class="docs-kbd">Enter</kbd>, and <kbd class="docs-kbd">Escape</kbd> still behave as usual.</p>
+
+    <h2>Organize</h2>
+    <p>The tree on the side of the notebook lists every project, notebook, and page. A search box filters by page title and body text, including tags, and highlights the matching text.</p>
+    <ul>
+      <li><strong>Collapse a notebook</strong> with the chevron in its header. Collapse state is saved, so the tree looks the same after you reload.</li>
+      <li><strong>Move a notebook to another project</strong> from the move control in the notebook's header row. The menu lists every project plus "No project" and marks the current one. A notebook moved to a project is appended to the end of that project's order.</li>
+      <li><strong>Reorder notebooks</strong> by dragging a notebook header onto another notebook in the same project. Moving a notebook across projects still uses the move control above.</li>
+      <li><strong>Reorder or move pages</strong> by dragging a page onto another page to place it before that page, or onto a notebook header to move it into that notebook.</li>
+    </ul>
+    <p>You can dock the notebook list on the left, on top as a tab strip, or on the right, and resize the side rail by dragging its divider. Export a single page or a whole notebook as Markdown or HTML, or print a page to PDF, from the export menu under the editor.</p>
+
+    <h2>Persistence and live-sync</h2>
+    <p>Notebook edits are saved automatically to the local workspace. Writes are debounced while you type, and a pending write is flushed when the window closes, so an edit made just before quitting is not dropped.</p>
+    <p>The notebook stays in sync with the rest of the workspace in both directions:</p>
+    <ul>
+      <li>Renaming an entry, block, or page updates every reference chip that points to it.</li>
+      <li>Deleting a conversation, block, or page removes the links that targeted it, so the page panel does not keep a stale reference.</li>
+      <li>Importing a workspace re-reads the notebook tree and its collapse state.</li>
+    </ul>
+
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>Deleting a notebook or page captures a restore point first and shows an Undo control, so an accidental delete is recoverable. If the stored notebook data cannot be read or was written by a newer build, SEAL pauses saving to avoid overwriting it.</p>
+      </div>
+    </div>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+  <script src="../assets/tutorials.js" defer></script>
+</body>
+</html>

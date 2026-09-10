@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Release status · SEAL docs</title>
+  <meta name="description" content="SEAL source capabilities, alignment examples, agent access, and distribution options." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="SEAL release status" />
+  <meta property="og:description" content="SEAL source capabilities and planned macOS distribution options." />
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>Release status</h1>
+    <p class="docs-lede">SEAL is coming to the Mac App Store first. The source repository and direct-download edition will launch later. The details below describe source capabilities, not an approved Store release.</p>
+
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>Read the <a href="editions.html">edition comparison</a> for Store features and source-only tools. Public source installation instructions will follow the source release.</p>
+      </div>
+    </div>
+
+    <h2>Source capabilities</h2>
+    <ul>
+      <li><strong>Live selection translation.</strong> Selecting DNA or RNA updates frame, strand, genetic code, amino-acid count, trailing-base, and internal-stop reporting in the Inspector.</li>
+      <li><strong>Six-frame Translate Inspector.</strong> Compare forward and reverse parent-anchored frames over a selection or whole nucleotide block, then copy, reveal, or create a derived protein block.</li>
+      <li><strong>Reverse-translation drafts.</strong> Protein blocks can produce DNA or RNA candidates with a chosen host table, GC and residue reporting, explicit unknown and stop warnings, and an unoptimized, not-ready-to-order boundary.</li>
+      <li><strong>SEAL Sample Lab.</strong> Project-authored deterministic synthetic fixtures support the documented sequence, cloning, notebook, and Activity workflows.</li>
+      <li><strong>Linked sample maps.</strong> Representative circular DNA, linear DNA, and protein samples open with a linked map above or below the sequence, while other records retain the standard sequence view. Map-only and floating layouts remain available from the same menu.</li>
+      <li><strong>Alignment and trace review.</strong> Identity reporting reserves 100% for exact agreement, separates high-quality from unqualified mismatches, and keeps the last valid alignment visible when a rerun fails.</li>
+      <li><strong>Golden Gate and GoldenBraid sample workflow.</strong> Synthetic parts, backbones, a sample product, an Activity record, and notebook context are linked in the demo workspace.</li>
+      <li><strong>Consistent GoldenBraid naming.</strong> The name remains stable through Activity, Inspector, provenance, reports, exports, and MCP workspace readback.</li>
+      <li><strong>Packaged terminal dock.</strong> Packaged builds enable the environment-sanitized terminal bridge, which <code>SEAL_ENABLE_TERMINAL</code> can turn off.</li>
+      <li><strong>Terminal resilience.</strong> Long line-mode commands remain readable, and a command draft stays available if a terminal write fails.</li>
+      <li><strong>Native analysis expansion.</strong> The native Rust surface covers restriction mapping, ORFs, GC, repeat finding, and alignment or diff.</li>
+
+    </ul>
+
+    <h2>Alignment examples and workspace controls</h2>
+    <ul>
+      <li><strong>Saved alignment examples.</strong> The Alignments page includes six synthetic examples with saved MUSCLE or Clustal Omega results, including primer-linked Sanger reads and a 12-sample DNA panel.</li>
+      <li><strong>Example downloads.</strong> Download FASTA inputs and, for trace examples, AB1 files and primer sequences.</li>
+      <li><strong>Sequence library.</strong> Import files or fetch database records from the library toolbar. Select multiple parts to export or delete them together.</li>
+      <li><strong>Entry selection.</strong> Move, export, or archive selected entries together. Archived entries can be restored or deleted in groups.</li>
+    </ul>
+
+    <h2>Interface and automation</h2>
+    <ul>
+      <li>Entries are the user-facing workspace records. CLI and MCP keep the underlying <code>conversation</code> API term for compatibility.</li>
+      <li>The source MCP server exposes 61 tools and 5 resource types. It requires a source checkout, <code>npm ci</code>, absolute checkout-local <code>tsx</code>, and an explicit <code>SEAL_DB_PATH</code> when sharing the installed app database.</li>
+      <li>Agents use <code>block_list</code> and <code>block_get</code> to read shared sequence blocks. <code>workspace_list</code> reads MCP Scratch. MCP scratch deletion tools are disabled.</li>
+      <li>The separately built Rust <code>seal</code> CLI exposes 35 canonical commands.</li>
+      <li>Notion Team Sync remains alpha schema and policy tooling. Provisioning, publishing, queue processing, OAuth installation, and bidirectional sync remain planned.</li>
+    </ul>
+
+    <h2>Detailed change history</h2>
+    <p>The repository’s <code>CHANGELOG.md</code> records the detailed source history. Source versions and downloadable releases have separate availability; see <a href="install.html">installation options</a>.</p>
+
+    <h2>Related documentation</h2>
+    <ul>
+      <li><a href="install.html">Install</a>: check Store availability and later distribution options.</li>
+      <li><a href="translation.html">Translation</a>: live, six-frame, and reverse-translation workflows.</li>
+      <li><a href="sequence-sources.html">Sequence sources</a>: synthetic fixture provenance.</li>
+      <li><a href="privacy.html">Privacy</a>: local storage, explicit outbound workflows, and clearing data.</li>
+      <li><a href="security.html">Security</a>: trust boundaries and vulnerability reporting.</li>
+    </ul>
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Terminal dock · SEAL docs</title>
+  <meta name="description" content="Launch a local agent CLI from inside SEAL, with the workspace agent context pinned to the shell." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Terminal dock" />
+  <meta property="og:description" content="Launch a local agent CLI from inside SEAL, with the workspace agent context pinned to the shell." />
+
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>Terminal dock</h1>
+    <p class="edition-note" data-edition-note>This guide covers source and direct-edition tools. These tools are not bundled with the first Store release. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">The terminal dock is a center-pane terminal in the SEAL desktop app. Launch a local agent CLI from inside the app, with the workspace agent context pinned to the shell.</p>
+
+    <h2>What the dock is</h2>
+    <p>Electron builds expose a terminal in the center pane that launches a pinned shell. On macOS and Unix it prefers a PTY-backed bridge, so interactive CLIs that expect a real terminal behave normally. The dock is one pinned shell, not a row of per-agent tabs.</p>
+    <p>The terminal runs on the same machine as the desktop app, so anything you start in it can use the same on-device workspace. A CLI or MCP agent launched here writes to SQLite, and Activity records the change. See the <a href="agents.html">agent control plane</a> for setup.</p>
+
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>The terminal dock is desktop-only. Browser builds show a quiet desktop-only terminal state instead of a live shell. See <a href="#desktop-only">Desktop-only behavior</a> below.</p>
+      </div>
+    </div>
+
+    <h2>Pinned context</h2>
+    <p>When the dock starts a session, it pins the SEAL agent context so a fresh agent has the same starting point you would give it by hand:</p>
+    <ul>
+      <li><code>AGENTS.md</code>, the repository rules and high-risk files.</li>
+      <li><code>docs/AI_AGENT_PLAYBOOK.md</code>, instructions for an agent starting without thread history.</li>
+      <li><code>npm run agent:doctor</code>, the read-only readiness check.</li>
+    </ul>
+    <p>Run the doctor first in any new session. It reports repository state, release configuration, live development ports, core scripts, and key documentation.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Read-only readiness check">
+<pre><code>npm run agent:doctor</code></pre>
+    </div>
+
+    <h2>Launch an agent</h2>
+    <p>From the pinned shell, start whichever CLI you use. The dock supports Codex, Claude, Gemini, Grok, or any other local CLI on your machine. The terminal does not wrap or replace these tools; it gives them a shell with the workspace context already pinned.</p>
+    <div class="docs-code" data-lang="bash" data-title="Launch a CLI from the dock">
+<pre><code># start an agent CLI in the pinned shell
+codex
+claude
+gemini</code></pre>
+    </div>
+    <p>To make an MCP agent's writes share the file the running app reads, set <code>SEAL_DB_PATH</code> before you launch it. See <a href="mcp-setup.html">MCP setup</a> for the path and config, and <a href="agents.html">the agent control plane</a> for how the shared workspace fits together.</p>
+
+    <h2>Session lifecycle</h2>
+    <p>The dock owns the sessions it starts. When the dock or the app closes, SEAL kills the attached sessions rather than leaving orphaned processes behind. Treat a dock session as scoped to the app window: close the window and the shell it launched goes with it.</p>
+
+    <h2 id="desktop-only">Desktop-only behavior</h2>
+    <p>The terminal dock needs the Electron shell. In other build and runtime states, the dock reports a clear status instead of a fake terminal:</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Runtime</th><th>What the dock shows</th></tr></thead>
+        <tbody>
+          <tr><td>Browser build</td><td>A quiet desktop-only terminal state. It does not print the pinned agent prompt as fake scrollback.</td></tr>
+          <tr><td>Electron, missing terminal preload</td><td>A reload-needed state.</td></tr>
+          <tr><td>Electron, stale main process</td><td>A SEAL-restart state instead of raw IPC errors.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The pinned intro is reserved for real Electron terminal sessions. To use the dock, run the desktop build. See <a href="install.html">Install SEAL</a>.</p>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

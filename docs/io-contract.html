@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IO contract · SEAL docs</title>
+  <meta name="description" content="The JSON output shapes SEAL emits across the CLI, the MCP server, and the app, with the fields each command returns." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="IO contract" />
+  <meta property="og:description" content="The JSON output shapes SEAL emits across the CLI, the MCP server, and the app, with the fields each command returns." />
+
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>IO contract</h1>
+    <p class="edition-note" data-edition-note>This guide covers source and direct-edition tools. These tools are not bundled with the first Store release. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">The documented JSON shapes used by SEAL's CLI and MCP surfaces. Some overlapping commands intentionally align; the Rust CLI, TypeScript CLI, MCP server, and desktop app are not one universal runtime and have explicit capability boundaries.</p>
+
+    <p>The MCP envelope is the source of truth for MCP tools. Where a Rust or TypeScript CLI command advertises parity, its <code>--json</code> or <code>--format json</code> payload aligns with the corresponding MCP <code>data</code> payload. Do not assume an undocumented command, flag, algorithm, or field is interchangeable across surfaces; see the <a href="cli.html#differences-between-the-rust-and-typescript-clis">CLI differences</a> and each command section.</p>
+
+    <h2>The MCP envelope</h2>
+    <p>Every MCP tool response uses one envelope. On success, the result lives in <code>data</code> and a <code>workspaceSummary</code> reports the current workspace:</p>
+    <div class="docs-code" data-lang="json">
+<pre><code>{ "ok": true, "data": &lt;payload&gt;, "workspaceSummary": { "count": 0, "names": [] } }</code></pre>
+    </div>
+    <p>On failure, the envelope carries an error message and suggestions instead:</p>
+    <div class="docs-code" data-lang="json">
+<pre><code>{ "ok": false, "error": "human-readable message", "suggestions": ["..."] }</code></pre>
+    </div>
+    <p>The CLI emits the <code>&lt;payload&gt;</code> directly, with no envelope, because the CLI tools are shell tools rather than RPC endpoints. To compare shapes, compare the <code>data</code> field of an MCP response against the raw CLI JSON.</p>
+
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>Shared-database commands (projects, conversations, blocks, features, checkpoints, export, import) write to the same SQLite workspace the app uses. The CLI subcommands stamp <code>write_source: "cli"</code> on every write, and the matching MCP tools stamp <code>write_source: "mcp"</code>, so the app file watcher can attribute the change. Each scope except bulk import has an MCP tool equivalent that returns the same shapes as the CLI subcommand. See the <a href="architecture.html">architecture</a> overview.</p>
+      </div>
+    </div>
+
+    <h2>Conventions</h2>
+    <ul>
+      <li><strong>camelCase fields.</strong> Every JSON field name is camelCase, in both CLI and MCP output.</li>
+      <li><strong>Percentages are strings.</strong> <code>gcContent</code> and <code>atContent</code> are formatted to two decimal places with a <code>%</code> suffix, for example <code>"33.33%"</code>.</li>
+      <li><strong>RNA is normalized.</strong> RNA input (U bases) is converted to DNA (U to T) before analysis. The <code>composition</code> field counts T, never U.</li>
+      <li><strong>Arrays may truncate in MCP.</strong> The MCP server may cap large arrays (ORFs over 20, restriction sites over 50) and add a <code>warnings</code> field. The CLI does not truncate.</li>
+      <li><strong>CLI exit codes.</strong> Exit <code>0</code> on success, <code>1</code> on error. The JSON payload goes to stdout; errors go to stderr.</li>
+    </ul>
+
+    <h2>analyze</h2>
+    <p>Full sequence analysis: GC and AT content, molecular weight, melting temperature, nucleotide composition, an ORF summary, and restriction sites. Run it from the CLI or call the <code>analyze</code> MCP tool.</p>
+    <div class="docs-code" data-lang="bash" data-title="Analyze a sequence">
+<pre><code>seal analyze --json ATGAAATAAGAATTC</code></pre>
+    </div>
+    <p>The payload:</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>length</code></td><td>number</td><td>Sequence length in base pairs.</td></tr>
+          <tr><td><code>gcContent</code></td><td>string</td><td>GC fraction as a percentage string, for example <code>"33.33%"</code>.</td></tr>
+          <tr><td><code>atContent</code></td><td>string</td><td>AT fraction as a percentage string.</td></tr>
+          <tr><td><code>molecularWeight</code></td><td>number</td><td>Estimated molecular weight in Daltons (single-stranded DNA).</td></tr>
+          <tr><td><code>meltingTemp</code></td><td>number | null</td><td>Wallace-rule melting temperature in °C; <code>null</code> for an empty sequence.</td></tr>
+          <tr><td><code>composition</code></td><td>object</td><td>Base counts: <code>A</code>, <code>T</code>, <code>G</code>, <code>C</code>, and <code>N</code> for non-canonical or ambiguous bases.</td></tr>
+          <tr><td><code>orfs</code></td><td>object</td><td>ORF summary: <code>count</code>, <code>longest</code> (an <code>OrfRecord</code> or <code>null</code>), and <code>all</code> (an <code>OrfRecord</code> array, capped at 20 in MCP).</td></tr>
+          <tr><td><code>restrictionSites</code></td><td>SiteRecord[]</td><td>Restriction enzyme cut sites found in the sequence.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>An <code>OrfRecord</code> describes one open reading frame:</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>start</code></td><td>number</td><td>0-based start position.</td></tr>
+          <tr><td><code>end</code></td><td>number</td><td>0-based end position (exclusive).</td></tr>
+          <tr><td><code>frame</code></td><td>number</td><td>Reading frame: 0, 1, or 2.</td></tr>
+          <tr><td><code>strand</code></td><td>number</td><td>1 for forward (+), -1 for reverse (-).</td></tr>
+          <tr><td><code>length</code></td><td>number</td><td>Nucleotide length of the ORF.</td></tr>
+          <tr><td><code>aminoAcids</code></td><td>number</td><td>Amino acid count (length / 3, excluding the stop).</td></tr>
+          <tr><td><code>startCodon</code></td><td>string</td><td>Start codon, for example <code>"ATG"</code>.</td></tr>
+          <tr><td><code>stopCodon</code></td><td>string</td><td>Stop codon, for example <code>"TAA"</code>; an empty string for a run-off ORF.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>A <code>SiteRecord</code> describes one restriction cut site:</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>enzyme</code></td><td>string</td><td>Enzyme name, for example <code>"EcoRI"</code>.</td></tr>
+          <tr><td><code>position</code></td><td>number</td><td>0-based position of the recognition sequence.</td></tr>
+          <tr><td><code>cutPosition</code></td><td>number</td><td>0-based absolute position of the cut in the original sequence.</td></tr>
+          <tr><td><code>recognitionSequence</code></td><td>string</td><td>Recognition sequence, for example <code>"GAATTC"</code>.</td></tr>
+          <tr><td><code>overhang</code></td><td>string</td><td>Overhang type: <code>"5prime"</code>, <code>"3prime"</code>, or <code>"blunt"</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The full payload for <code>ATGAAATAAGAATTC</code>:</p>
+    <div class="docs-code" data-lang="json" data-title="analyze output">
+<pre><code>{
+  "length": 15,
+  "gcContent": "13.33%",
+  "atContent": "86.67%",
+  "molecularWeight": 4484.895,
+  "meltingTemp": 26.0,
+  "composition": { "A": 7, "T": 6, "G": 1, "C": 1, "N": 0 },
+  "orfs": {
+    "count": 1,
+    "longest": {
+      "start": 0, "end": 9, "frame": 0, "strand": 1,
+      "length": 9, "aminoAcids": 2, "startCodon": "ATG", "stopCodon": "TAA"
+    },
+    "all": [
+      {
+        "start": 0, "end": 9, "frame": 0, "strand": 1,
+        "length": 9, "aminoAcids": 2, "startCodon": "ATG", "stopCodon": "TAA"
+      }
+    ]
+  },
+  "restrictionSites": [
+    {
+      "enzyme": "EcoRI",
+      "position": 9,
+      "cutPosition": 10,
+      "recognitionSequence": "GAATTC",
+      "overhang": "5prime"
+    }
+  ]
+}</code></pre>
+    </div>
+    <p>The same call as an MCP tool wraps that payload in the envelope:</p>
+    <div class="docs-code" data-lang="json" data-title="analyze over MCP">
+<pre><code>{
+  "ok": true,
+  "data": { "length": 15, "gcContent": "13.33%", "atContent": "86.67%", "...": "..." },
+  "workspaceSummary": { "count": 0, "names": [] }
+}</code></pre>
+    </div>
+
+    <h2>codons</h2>
+    <p>Codon usage analysis: a count of each codon and a per-amino-acid frequency. It reads frame 0 from the start of the sequence and reports stop codons last. There is no dedicated <code>codons</code> MCP tool; use <code>transform</code> with <code>calculate_cai</code> or <code>codon_optimize</code> for related operations.</p>
+    <div class="docs-code" data-lang="bash" data-title="Count codons">
+<pre><code>seal codons ATGAAATAG --format json</code></pre>
+    </div>
+    <p>The payload is <code>totalCodons</code> (the count of complete triplets) and a <code>codons</code> array. Each entry:</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>codon</code></td><td>string</td><td>Three-letter uppercase DNA codon, for example <code>"ATG"</code>.</td></tr>
+          <tr><td><code>aminoAcid</code></td><td>string</td><td>Single-letter amino acid code; <code>"*"</code> for a stop codon.</td></tr>
+          <tr><td><code>count</code></td><td>number</td><td>Raw count of this codon.</td></tr>
+          <tr><td><code>fraction</code></td><td>number</td><td>Usage fraction within this amino acid (0.0 to 1.0).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Entries sort alphabetically by amino acid (stops last), then by descending count, with codon-string ties broken alphabetically. The <code>tsv</code> format emits a header row followed by <code>codon</code>, <code>amino_acid</code>, <code>count</code>, and <code>fraction</code> columns, with <code>fraction</code> to four decimal places.</p>
+    <div class="docs-code" data-lang="json" data-title="codons output">
+<pre><code>{
+  "totalCodons": 3,
+  "codons": [
+    { "codon": "AAA", "aminoAcid": "K", "count": 1, "fraction": 1.0 },
+    { "codon": "ATG", "aminoAcid": "M", "count": 1, "fraction": 1.0 },
+    { "codon": "TAG", "aminoAcid": "*", "count": 1, "fraction": 1.0 }
+  ]
+}</code></pre>
+    </div>
+
+    <h2>fetch</h2>
+    <p>Fetch a record from NCBI E-Utilities by accession. The query hits the nuccore (nucleotide) or protein database. Protein accession prefixes (<code>NP_</code>, <code>XP_</code>, <code>YP_</code>, <code>WP_</code>, <code>AP_</code>) route to the protein database even without <code>--db</code>. With <code>--format genbank</code> (the default) or <code>--format fasta</code>, the output is the raw text NCBI returns. With <code>--format json</code>, the payload is:</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>accession</code></td><td>string</td><td>Accession from the <code>ACCESSION</code> line, or the query value.</td></tr>
+          <tr><td><code>name</code></td><td>string</td><td>Locus name from the <code>LOCUS</code> line.</td></tr>
+          <tr><td><code>definition</code></td><td>string</td><td>The <code>DEFINITION</code> field, joined to one line with spaces.</td></tr>
+          <tr><td><code>organism</code></td><td>string</td><td>Organism name from the <code>ORGANISM</code> line.</td></tr>
+          <tr><td><code>length</code></td><td>number</td><td>Length in base pairs or amino acids, computed from the <code>ORIGIN</code> section.</td></tr>
+          <tr><td><code>sequence</code></td><td>string</td><td>Uppercase sequence letters from the <code>ORIGIN</code> section.</td></tr>
+          <tr><td><code>db</code></td><td>string</td><td>Database queried: <code>"nuccore"</code> or <code>"protein"</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json" data-title="fetch output">
+<pre><code>{
+  "accession": "U49845",
+  "name": "SCU49845",
+  "definition": "Saccharomyces cerevisiae TCP1-beta gene, partial cds.",
+  "organism": "Saccharomyces cerevisiae",
+  "length": 5028,
+  "sequence": "GATCCTCCATATACAACGG...",
+  "db": "nuccore"
+}</code></pre>
+    </div>
+
+    <h2>info</h2>
+    <p>Quick sequence type detection and basic stats. There is no <code>info</code> MCP tool; use <code>analyze</code> for full analysis or <code>parse_sequence</code> to detect an input format.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>name</code></td><td>string</td><td>Sequence name, from a FASTA header or the file stem.</td></tr>
+          <tr><td><code>sequenceType</code></td><td>string</td><td><code>"dna"</code>, <code>"rna"</code>, or <code>"protein"</code>.</td></tr>
+          <tr><td><code>length</code></td><td>number</td><td>Length in bases or amino acids.</td></tr>
+          <tr><td><code>gcContent</code></td><td>number | null</td><td>Raw GC fraction (0 to 1); <code>null</code> for protein.</td></tr>
+          <tr><td><code>format</code></td><td>string</td><td>Input format: <code>"fasta"</code>, <code>"genbank"</code>, <code>"raw"</code>, or <code>"library"</code>.</td></tr>
+          <tr><td><code>valid</code></td><td>boolean</td><td>True if no characters outside the alphabet were found.</td></tr>
+          <tr><td><code>invalidChars</code></td><td>string[]</td><td>Invalid characters found; empty when <code>valid</code> is true.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>The Rust CLI emits <code>sequenceType</code>; the TypeScript CLI emits the shorter key <code>type</code>. Handle either when reading <code>info</code> output.</p>
+      </div>
+    </div>
+    <div class="docs-code" data-lang="json" data-title="info output">
+<pre><code>{
+  "name": "ATGCATGC",
+  "sequenceType": "dna",
+  "length": 8,
+  "gcContent": 0.5,
+  "format": "raw",
+  "valid": true,
+  "invalidChars": []
+}</code></pre>
+    </div>
+
+    <h2>orfs</h2>
+    <p>Find every open reading frame in a DNA sequence. The scan covers all six reading frames (three forward, three reverse) for ATG-to-stop stretches that meet a minimum amino-acid length (<code>--min-aa</code>, default 30). ORFs also appear inside the <code>analyze</code> result.</p>
+    <div class="docs-code" data-lang="bash" data-title="Find ORFs">
+<pre><code>seal orfs ATGAAATAA --min-aa 2 --json</code></pre>
+    </div>
+    <p>With <code>--json</code> the command emits a flat array of ORF objects, each with the same fields as an <code>OrfRecord</code>: <code>start</code>, <code>end</code>, <code>frame</code>, <code>strand</code>, <code>length</code>, <code>aminoAcids</code>, <code>startCodon</code>, and <code>stopCodon</code>.</p>
+    <div class="docs-code" data-lang="json" data-title="orfs output">
+<pre><code>[
+  {
+    "start": 0, "end": 9, "frame": 0, "strand": 1,
+    "length": 9, "aminoAcids": 2, "startCodon": "ATG", "stopCodon": "TAA"
+  }
+]</code></pre>
+    </div>
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>The standalone <code>orfs</code> command returns a flat array. The <code>analyze</code> command wraps the same records in <code>{ count, longest, all }</code> and may cap <code>all</code> at 20 entries in MCP responses.</p>
+      </div>
+    </div>
+
+    <h2>rc</h2>
+    <p>Compute the reverse complement of a DNA or RNA sequence. Pass <code>--rna</code> to complement with U in the output. There is no <code>rc</code> MCP tool.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>input</code></td><td>string</td><td>Original input sequence, as read.</td></tr>
+          <tr><td><code>output</code></td><td>string</td><td>Reverse complement.</td></tr>
+          <tr><td><code>length</code></td><td>number</td><td>Length of the output in bases.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json" data-title="rc output">
+<pre><code>{ "input": "ATGCGT", "output": "ACGCAT", "length": 6 }</code></pre>
+    </div>
+
+    <h2>sites</h2>
+    <p>Find restriction enzyme cut sites in a DNA sequence. The scan covers the default panel unless <code>--enzymes</code> restricts the set or <code>--preset</code> selects a curated panel. See <a href="restriction-digest.html">restriction digest</a> for the workflow. Restriction sites also appear inside the <code>analyze</code> result.</p>
+    <div class="docs-code" data-lang="bash" data-title="Map cut sites">
+<pre><code>seal sites ATGAAAGAATTCGGATCC --enzymes EcoRI --json</code></pre>
+    </div>
+    <p>In normal mode the payload is a <code>SitesOutput</code> object: a <code>sites</code> array plus a <code>count</code>. The <code>sites</code> field names match <code>restrictionSites</code> in the <code>analyze</code> response (<code>enzyme</code>, <code>position</code>, <code>cutPosition</code>, <code>recognitionSequence</code>, <code>overhang</code>).</p>
+    <div class="docs-code" data-lang="json" data-title="sites output">
+<pre><code>{
+  "sites": [
+    {
+      "enzyme": "EcoRI",
+      "position": 6,
+      "cutPosition": 7,
+      "recognitionSequence": "GAATTC",
+      "overhang": "5prime",
+      "strand": 1
+    }
+  ],
+  "count": 1
+}</code></pre>
+    </div>
+    <p>With <code>--non-cutter</code>, the output inverts: a single object listing the enzymes with no recognition site, in the order they were passed to <code>--enzymes</code>.</p>
+    <div class="docs-code" data-lang="json" data-title="sites --non-cutter output">
+<pre><code>{ "enzymes": ["EcoRI"], "count": 1 }</code></pre>
+    </div>
+
+    <h2>digest</h2>
+    <p>Simulate cutting a DNA sequence with the given enzymes and return the resulting fragments. The digest supports linear and circular topology. Use <code>--preview</code> for a dry run that reports cut positions and fragment sizes without emitting full sequences. The <code>digest</code> MCP tool exists, but it returns a restructured payload. Its <code>data</code> object carries <code>enzymes</code>, <code>cutCounts</code>, <code>fragmentCount</code>, and a <code>fragments</code> array whose entries use <code>start</code> and <code>end</code> rather than the CLI's <code>startInOriginal</code> and <code>endInOriginal</code>, so its shape differs from the CLI's flat fragment array.</p>
+    <div class="docs-code" data-lang="bash" data-title="Digest a sequence">
+<pre><code>seal digest ATGAAAGAATTCGGATCC --enzymes EcoRI --json</code></pre>
+    </div>
+    <p>In normal mode the payload is an array of fragment objects:</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>sequence</code></td><td>string</td><td>Fragment sequence (uppercase DNA).</td></tr>
+          <tr><td><code>length</code></td><td>number</td><td>Fragment length in bp.</td></tr>
+          <tr><td><code>startInOriginal</code></td><td>number</td><td>0-based start in the original sequence.</td></tr>
+          <tr><td><code>endInOriginal</code></td><td>number</td><td>0-based end (exclusive) in the original sequence.</td></tr>
+          <tr><td><code>leftEnzyme</code></td><td>string | null</td><td>Enzyme that cut the left end; <code>null</code> for the leftmost fragment.</td></tr>
+          <tr><td><code>rightEnzyme</code></td><td>string | null</td><td>Enzyme that cut the right end; <code>null</code> for the rightmost fragment.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="docs-code" data-lang="json" data-title="digest output">
+<pre><code>[
+  {
+    "sequence": "ATGAAAG",
+    "length": 7,
+    "startInOriginal": 0,
+    "endInOriginal": 7,
+    "leftEnzyme": null,
+    "rightEnzyme": "EcoRI"
+  },
+  {
+    "sequence": "AATTCGGATCC",
+    "length": 11,
+    "startInOriginal": 7,
+    "endInOriginal": 18,
+    "leftEnzyme": "EcoRI",
+    "rightEnzyme": null
+  }
+]</code></pre>
+    </div>
+    <p>With <code>--preview</code>, the output is a single object: the <code>cuts</code> (each with <code>enzyme</code> and <code>cutPosition</code>), the <code>fragmentSizes</code> in order, and a <code>fragmentCount</code>.</p>
+    <div class="docs-code" data-lang="json" data-title="digest --preview output">
+<pre><code>{
+  "cuts": [{ "enzyme": "EcoRI", "cutPosition": 7 }],
+  "fragmentSizes": [7, 11],
+  "fragmentCount": 2
+}</code></pre>
+    </div>
+
+    <h2>Shared-database commands</h2>
+    <p>These commands read and write the SQLite workspace. The CLI subcommands and the MCP tools return the same shapes.</p>
+
+    <h3>projects</h3>
+    <p>CRUD for projects (<code>project_create</code>, <code>project_list</code>, <code>project_get</code>, <code>project_rename</code>, <code>project_set_color</code>, <code>project_delete</code>). A <code>ProjectOutput</code>:</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>id</code></td><td>string</td><td>UUID.</td></tr>
+          <tr><td><code>name</code></td><td>string</td><td>Project name.</td></tr>
+          <tr><td><code>color</code></td><td>string</td><td>Hex color, for example <code>"#6b7280"</code>.</td></tr>
+          <tr><td><code>conversationIds</code></td><td>string[]</td><td>Ids of conversations assigned to this project.</td></tr>
+          <tr><td><code>createdAt</code></td><td>number</td><td>Unix milliseconds.</td></tr>
+          <tr><td><code>updatedAt</code></td><td>number</td><td>Unix milliseconds.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><code>projects list</code> returns an array of these. <code>create</code>, <code>get</code>, and <code>set-color</code> return one. <code>rename</code> returns <code>{ id, oldName, newName }</code>. Guarded <code>delete</code> returns <code>{ deleted, id, unassignedConversationIds }</code>.</p>
+
+    <h3>conversations</h3>
+    <p>Create, list, get, rename, and project assignment are available through <code>conversation_create</code>, <code>conversation_list</code>, <code>conversation_get</code>, <code>conversation_rename</code>, and <code>conversation_move</code>. The registered <code>conversation_delete</code> compatibility surface always rejects because external permanent deletion lacks a complete crash-safe recovery path. A <code>ConversationOutput</code>:</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>id</code></td><td>string</td><td>UUID.</td></tr>
+          <tr><td><code>title</code></td><td>string</td><td>Conversation title.</td></tr>
+          <tr><td><code>projectId</code></td><td>string | null</td><td>Assigned project id, or <code>null</code>.</td></tr>
+          <tr><td><code>sequenceBlockIds</code></td><td>string[]</td><td>Ordered block ids.</td></tr>
+          <tr><td><code>createdAt</code></td><td>number</td><td>Unix milliseconds.</td></tr>
+          <tr><td><code>updatedAt</code></td><td>number</td><td>Unix milliseconds.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><code>list</code> returns an array; <code>create</code>, <code>get</code>, and <code>move</code> return one; <code>rename</code> returns <code>{ id, oldTitle, newTitle }</code>.</p>
+
+    <h3>features</h3>
+    <p>Feature annotation CRUD on a block (<code>feature_add</code>, <code>feature_update</code>, <code>feature_delete</code>, <code>feature_list</code>). A <code>FeatureRecord</code>:</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>id</code></td><td>string</td><td>Feature id, auto-generated if not supplied.</td></tr>
+          <tr><td><code>type</code></td><td>string</td><td>Feature type, for example <code>"gene"</code>, <code>"CDS"</code>, <code>"misc_feature"</code>.</td></tr>
+          <tr><td><code>name</code></td><td>string</td><td>Human-readable name.</td></tr>
+          <tr><td><code>start</code></td><td>number</td><td>0-based start position (inclusive).</td></tr>
+          <tr><td><code>end</code></td><td>number</td><td>0-based end position (exclusive).</td></tr>
+          <tr><td><code>strand</code></td><td>number?</td><td>1 forward, -1 reverse; omitted if absent.</td></tr>
+          <tr><td><code>color</code></td><td>string?</td><td>Hex color; omitted if absent.</td></tr>
+          <tr><td><code>notes</code></td><td>string?</td><td>Free-text notes; omitted if absent.</td></tr>
+          <tr><td><code>locations</code></td><td>array?</td><td>Compound-location sub-parts, each <code>{ start, end }</code>; omitted if absent.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><code>feature_add</code> returns <code>{ feature, totalFeatures }</code>. <code>feature_update</code> returns <code>{ feature }</code>. <code>feature_delete</code> returns <code>{ removed }</code>. <code>feature_list</code> returns <code>{ features, count }</code>.</p>
+
+    <h3>checkpoints</h3>
+    <p>Block checkpoint save, restore, diff, list, and delete (<code>checkpoint_save</code>, <code>checkpoint_restore</code>, <code>checkpoint_delete</code>, <code>checkpoint_list</code>, <code>checkpoint_diff</code>). A checkpoint snapshots a block's <code>raw</code>, <code>topology</code>, <code>type</code>, <code>features</code>, and <code>scars</code>; restore runs in a single transaction.</p>
+    <ul>
+      <li><code>save</code> returns <code>{ id, label, blockId, timestamp }</code>.</li>
+      <li><code>list</code> returns <code>{ blockId, blockName, count, checkpoints }</code>, where each summary carries <code>id</code>, <code>label</code>, <code>blockId</code>, <code>conversationId</code>, <code>timestamp</code>, and <code>writeSource</code>.</li>
+      <li><code>diff</code> returns a <code>DiffOutput</code> with <code>rawChanged</code>, <code>rawLengthDelta</code>, <code>topologyChanged</code>, <code>typeChanged</code>, <code>featuresAdded</code>, <code>featuresRemoved</code>, <code>featuresChanged</code>, and <code>scarsDelta</code>.</li>
+      <li><code>delete</code> returns <code>{ deleted }</code>.</li>
+      <li><code>restore</code> returns the restored block's full record on success, or an error envelope on failure.</li>
+    </ul>
+
+    <h3>blocks</h3>
+    <p>Block manipulation: reorder, extract a sub-sequence, or annotate a selection (<code>block_reorder</code>, <code>block_extract_selection</code>, <code>block_annotate_selection</code>).</p>
+    <ul>
+      <li><code>block_reorder</code> returns <code>{ ok, reordered }</code>.</li>
+      <li><code>block_extract_selection</code> returns <code>{ ok, id, name, length, parentId }</code>.</li>
+      <li><code>block_annotate_selection</code> returns <code>{ ok, feature, totalFeatures }</code>.</li>
+    </ul>
+    <p>On failure, all three return <code>{ ok: false, error, suggestions }</code>.</p>
+
+    <h3>export</h3>
+    <p>Export workspace blocks to CSV, Markdown, or JSON (<code>export_csv</code>, <code>export_markdown</code>, <code>export_slide_summary</code>, <code>export_workspace_json</code>, <code>export_package</code>). See <a href="reports.html">reports and packages</a>. When you pass <code>--output &lt;path&gt;</code>, each subcommand returns <code>{ ok, format, count, path }</code>. Without <code>--output</code>, content goes to stdout with no envelope.</p>
+    <p>The <code>export_package</code> MCP payload describes a zip: a <code>filename</code>, <code>mimeType</code>, <code>byteLength</code>, an optional <code>base64Zip</code>, a <code>manifest</code> (with <code>packageVersion</code>, <code>generatedAt</code>, source ids, and a <code>files</code> list carrying <code>path</code>, <code>mimeType</code>, <code>sizeBytes</code>, <code>crc32</code>, <code>lossless</code>, and <code>verifyByReimport</code>), and a <code>validationMarkdown</code>.</p>
+
+    <h3>import</h3>
+    <p>Import FASTA, GenBank, sequence directories, or recognized structured workspace exports into the workspace. See <a href="import-export.html">import and export</a>. The payload:</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>ok</code></td><td>boolean</td><td>Whether the import succeeded.</td></tr>
+          <tr><td><code>imported</code></td><td>ImportedEntry[]</td><td>One entry per imported record.</td></tr>
+          <tr><td><code>count</code></td><td>number</td><td>Number of records imported.</td></tr>
+          <tr><td><code>dryRun</code></td><td>boolean</td><td>Whether this was a dry run.</td></tr>
+          <tr><td><code>warnings</code></td><td>string[]</td><td>Any warnings raised during import.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Each <code>ImportedEntry</code> carries <code>id</code>, <code>name</code>, <code>length</code>, <code>format</code> (<code>"fasta"</code> or <code>"genbank"</code>), <code>featureCount</code>, <code>topology</code>, and optional <code>accession</code> and <code>action</code> fields.</p>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

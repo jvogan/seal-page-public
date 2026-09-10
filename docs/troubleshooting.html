@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Troubleshooting · SEAL docs</title>
+  <meta name="description" content="Fix MCP connection problems, first-launch issues on macOS, and find runtime diagnostics when an agent and the app disagree." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Troubleshooting" />
+  <meta property="og:description" content="Fix MCP connection problems, first-launch issues, and find runtime diagnostics." />
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>Troubleshooting</h1>
+    <p class="edition-note" data-edition-note>This guide includes source and direct-edition features. Check the edition comparison for the first Store release. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">Fix the problems that come up when you connect an agent, launch the app, or run the CLI. Start by checking the active database path and required dependencies.</p>
+
+    <h2>An MCP client will not connect</h2>
+    <p>Check the source runtime and client configuration in this order:</p>
+    <ul>
+      <li>The server requires a SEAL source checkout. Run <code>npm ci</code>, then configure the client with the checkout's absolute <code>node_modules/.bin/tsx</code> and <code>mcp/server.ts</code> paths. Avoid <code>npx</code> so startup cannot resolve or download an unpinned package.</li>
+      <li>The path in the client's <code>args</code> must point at your checkout's <code>mcp/server.ts</code>. Replace the placeholder path with your own absolute path.</li>
+      <li>Confirm the server starts on its own. Run it from a terminal and read the startup lines, which print to stderr.</li>
+    </ul>
+    <div class="docs-code" data-lang="bash" data-title="Start the server by hand">
+<pre><code>cd /path/to/seal
+./node_modules/.bin/tsx /absolute/path/to/seal/mcp/server.ts</code></pre>
+    </div>
+    <p>It prints the database path, the version, and the tool count. If that works but the client still does not connect, the problem is in the client config, not the server.</p>
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>Restart the client after editing its MCP config. Most clients read the config once at startup, so an edited config does not take effect until the next launch.</p>
+      </div>
+    </div>
+
+    <h2>An agent writes, but the app does not show it</h2>
+    <p>Compare the database path in Agent Setup with <code>SEAL_DB_PATH</code> in your client configuration.</p>
+    <p>A client launched from the SEAL checkout resolves to a repo-local <code>.seal/seal.db</code>, while the installed app reads the application-data database. Set <code>SEAL_DB_PATH</code> in the client's <code>env</code> block to the exact path copied from Agent Setup. The default installed-app path is:</p>
+    <div class="docs-code" data-lang="bash" data-title="Shared database path on macOS">
+<pre><code>~/Library/Application Support/io.github.jvogan.seal/seal.db</code></pre>
+    </div>
+    <p>Writes reach the app through a file watcher that debounces at 300 ms, so allow a moment after a write before the UI updates. For the full path resolution order, see <a href="mcp-setup.html">MCP setup</a>.</p>
+
+    <h2>An agent reports an empty workspace</h2>
+    <p>Ask the agent to call <code>block_list</code> to read sequence blocks across shared projects and entries. <code>workspace_list</code> reads only MCP Scratch. If <code>block_list</code> is also empty, compare the active database paths.</p>
+
+    <h2>Run Agent Doctor</h2>
+    <p>In SEAL, run <strong>Agent Doctor</strong> from Agent Setup or the command palette. It reports the state that connection problems depend on:</p>
+    <ul>
+      <li>the active database path,</li>
+      <li>the file watcher,</li>
+      <li>the schema version,</li>
+      <li>Activity hydration.</li>
+    </ul>
+    <p>A missing database path blocks setup. No recent external write is expected until the first MCP write.</p>
+
+    <h2>Find runtime diagnostics</h2>
+    <p>SEAL does not write a separate log file. To see what a surface is doing:</p>
+    <ul>
+      <li><strong>MCP server.</strong> It logs to stderr. Run the checkout-local <code>node_modules/.bin/tsx</code> with the absolute <code>mcp/server.ts</code> path to inspect startup logs, database path, and tool count.</li>
+      <li><strong>Activity.</strong> Activity records each desktop or agent write with its source. Read it in the app to see what changed and to restore from a checkpoint.</li>
+      <li><strong>Workspace state.</strong> The SQLite workspace and Electron profile use separate directories. Check <a href="privacy.html">data locations</a>, and close SEAL and every agent process using the database before copying it.</li>
+    </ul>
+    <div class="docs-code" data-lang="bash" data-title="Application-data directory on macOS">
+<pre><code>~/Library/Application Support/io.github.jvogan.seal/</code></pre>
+    </div>
+
+    <h2>The app will not open on first launch</h2>
+    <p>The local unsigned package has no Developer ID signature or notarization ticket, so macOS can block its first launch. Open the installed app once. Then open <strong>System Settings → Privacy &amp; Security</strong>, select <strong>Open Anyway</strong>, and confirm <strong>Open</strong>. See <a href="install.html">Install SEAL</a> for download and checksum instructions.</p>
+
+    <h2>The CLI reports "Library not initialized"</h2>
+    <p>The <code>seal lib</code> commands read a local library that you create first. Run <code>seal lib init</code> in your project, then add or import sequences. The <code>seal</code> CLI is a separate binary you build from source; see the <a href="cli.html">CLI reference</a>. The <code>lib</code> library is a folder of files, separate from the SQLite workspace the app and MCP server share.</p>
+
+    <h2>Contact support</h2>
+    <p>If the problem continues, <a href="../support.html">contact SEAL Support</a> with your SEAL version, macOS version, and steps to reproduce it.</p>
+
+    <h2>Next steps</h2>
+    <ul>
+      <li><a href="mcp-setup.html">MCP setup</a>: the full database path resolution order and the client config shape.</li>
+      <li><a href="agents-claude-code.html">Connect Claude Code</a>, <a href="agents-codex.html">Connect Codex</a>, and <a href="agents-gemini-cli.html">Connect Gemini CLI</a> for per-client steps.</li>
+      <li><a href="architecture.html">Architecture</a>: how one workspace is shared across the app, the MCP server, and the CLI.</li>
+    </ul>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

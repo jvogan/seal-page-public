@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cloning and assembly · SEAL docs</title>
+  <meta name="description" content="Plan Gibson, Golden Gate, GoldenBraid, hierarchical MoClo, ligation, and guided clone builds in SEAL, with synthetic examples and assembly lineage." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Cloning and assembly" />
+  <meta property="og:description" content="Plan Gibson, Golden Gate, GoldenBraid, MoClo, ligation, and guided clone builds, and track assembly lineage." />
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>Cloning and assembly</h1>
+    <p class="edition-note" data-edition-note>Screenshots and recordings show the direct edition. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">Plan Gibson, Golden Gate, GoldenBraid, hierarchical MoClo, ligation, and guided clone builds, then record which fragments produced each output. The desktop app is the complete builder surface; the CLI and MCP expose documented subsets.</p>
+
+    <figure class="docs-figure">
+      <div class="docs-figure-head">
+        <p class="docs-figure-title">Fragments into one assembled product</p>
+        <span class="docs-figure-mark">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 7q5 5 0 10 M16 7q-5 5 0 10"/></svg>
+        </span>
+      </div>
+      <svg viewBox="0 0 900 320" role="img" aria-label="Diagram: three input fragments feed an assembly reaction, which produces one assembled product. A lineage edge records the product was built from the three fragments.">
+        <defs>
+          <marker id="d-arrow" markerWidth="10" markerHeight="10" refX="6.5" refY="4.5" orient="auto-start-reverse">
+            <path d="M1 1.5 L6.5 4.5 L1 7.5" fill="none" stroke="currentColor" stroke-width="1.4" />
+          </marker>
+        </defs>
+
+        <!-- Input fragments -->
+        <rect class="d-box" x="40" y="60" width="150" height="44" rx="9" />
+        <text class="d-label" x="115" y="87" text-anchor="middle">Fragment 1</text>
+        <rect class="d-box" x="40" y="118" width="150" height="44" rx="9" />
+        <text class="d-label" x="115" y="145" text-anchor="middle">Fragment 2</text>
+        <rect class="d-box" x="40" y="176" width="150" height="44" rx="9" />
+        <text class="d-label" x="115" y="203" text-anchor="middle">Fragment 3</text>
+
+        <!-- Reaction chevron -->
+        <path class="d-chevron" d="M300 70 L470 70 L520 140 L470 210 L300 210 L350 140 Z" />
+        <text class="d-label" x="408" y="135" text-anchor="middle">Assembly</text>
+        <text class="d-cap" x="408" y="153" text-anchor="middle">reaction</text>
+
+        <!-- Fragments to reaction: horizontal arrows that land on the chevron's concave left edge -->
+        <path class="d-line" d="M190 82 L305 82" marker-end="url(#d-arrow)" />
+        <path class="d-line" d="M190 140 L345 140" marker-end="url(#d-arrow)" />
+        <path class="d-line" d="M190 198 L305 198" marker-end="url(#d-arrow)" />
+
+        <!-- Reaction to product -->
+        <path class="d-line" d="M520 140 L636 140" marker-end="url(#d-arrow)" />
+
+        <!-- Product -->
+        <rect class="d-box d-fill-cream" x="640" y="112" width="218" height="56" rx="10" />
+        <text class="d-label d-on-fill" x="749" y="138" text-anchor="middle">Assembled product</text>
+        <text class="d-cap d-on-fill-cap" x="749" y="156" text-anchor="middle">one block</text>
+
+        <!-- Lineage edge back to the inputs -->
+        <path class="d-line-dim" d="M749 168 L749 268 L115 268 L115 220" marker-end="url(#d-arrow)" />
+        <text class="d-cap" x="430" y="262" text-anchor="middle">lineage: assembled from 3 source blocks</text>
+      </svg>
+      <figcaption class="docs-figcaption">Several fragments feed one assembly reaction and produce one product. SEAL materializes the product as a block and records the lineage edge back to the source fragments, so the workspace can show which parts built it.</figcaption>
+    </figure>
+
+    <h2>Choose an assembly method</h2>
+    <p>The Cloning page exposes six starting points. Pick the one that matches how the fragments join and how much organization the design requires.</p>
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Method</th><th>Joins fragments by</th><th>Automation boundary</th></tr></thead>
+        <tbody>
+          <tr><td>Gibson assembly</td><td>Overlapping homology arms shared between adjacent fragments.</td><td><code>seal gibson</code> and the desktop builder.</td></tr>
+          <tr><td>Golden Gate</td><td>Type IIS enzyme overhangs cut outside the recognition site.</td><td><code>seal golden-gate</code> and the desktop builder.</td></tr>
+          <tr><td>GoldenBraid</td><td>Boundary-aware transcription-unit order and binary alpha/omega stacking.</td><td>Desktop Golden Gate dialog in a GoldenBraid organization mode.</td></tr>
+          <tr><td>Hierarchical / MoClo</td><td>Level-zero parts into transcription units, then higher-level constructs.</td><td>Desktop guided hierarchical builder.</td></tr>
+          <tr><td>Clone Builder</td><td>A chosen vector, insert, and guided junction method.</td><td>Desktop guided builder.</td></tr>
+          <tr><td>Ligation</td><td>Compatible ends from a restriction digest, joined directly.</td><td>Desktop builder and the <code>ligate</code> MCP tool.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The desktop app pulls assembly candidates from across the workspace rather than only the open Entry. Its builders share the same fragment primitives, so part identity, order, ends, warnings, and provenance read consistently across workflows.</p>
+
+    <div class="docs-note is-warn">
+      <span class="docs-note-icon" aria-hidden="true">!</span>
+      <div>
+        <p>Every bundled Sample Lab backbone and part is a project-authored deterministic synthetic fixture. Clone Builder uses these records to demonstrate restriction, ligation, Gibson, Golden Gate, and GoldenBraid workflows.</p>
+      </div>
+    </div>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/part-library.png" alt="The Part Library dialog with a searchable list of workspace parts and vectors tagged by role and overhang, a build-as selector, and a panel showing the selected parts, their order, the enzyme, and the predicted assembly product." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">The Part Library stages parts and vectors from across the workspace, suggests an order, and previews the product. Here four MoClo parts are ordered as a Golden Gate transcription unit.</figcaption>
+    </figure>
+
+    <h2>Gibson assembly</h2>
+    <p>Use <code>seal gibson</code> to assemble two or more fragments that share homology arms. Pass the fragments as positional arguments (raw text, file paths, or library names). SEAL finds the overlap between each adjacent pair and joins them.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Assemble an insert into a vector">
+<pre><code>seal gibson insert.fa vector.fa --min-overlap 25</code></pre>
+    </div>
+
+    <p>The overlap search is bounded by two flags. <code>--min-overlap</code> sets the shortest homology arm that counts as a join; an overlap shorter than this fails. <code>--max-overlap</code> sets the longest overlap length to search. The defaults are 15 bp and 100 bp.</p>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/gibson-assembly.png" alt="The Gibson Assembly dialog with two DNA fragments selected and minimum and maximum overlap fields set." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">The Gibson Assembly builder selects the fragments to join and sets the minimum and maximum overlap before assembling.</figcaption>
+    </figure>
+
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--min-overlap &lt;n&gt;</code></td><td>15</td><td>Minimum homology-arm overlap in bp. A shorter overlap fails.</td></tr>
+          <tr><td><code>--max-overlap &lt;n&gt;</code></td><td>100</td><td>Maximum overlap length to search.</td></tr>
+          <tr><td><code>--circular</code></td><td>false</td><td>Circular assembly. The last fragment must also overlap the first.</td></tr>
+          <tr><td><code>--validate</code></td><td>false</td><td>Validate overlaps only; do not assemble.</td></tr>
+          <tr><td><code>--save &lt;name&gt;</code></td><td>none</td><td>Save the assembled sequence to the local library.</td></tr>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON output.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>For a circular product, add <code>--circular</code>. The last fragment then has to overlap the first to close the seam, and a missing closing overlap is a hard error rather than a silently linear product.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Three parts into a circular product">
+<pre><code>seal gibson part1.fa part2.fa part3.fa --circular --json</code></pre>
+    </div>
+
+    <p>To check that the overlaps are sound before you assemble, run with <code>--validate</code>. This validates the overlaps and stops without producing a product.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Validate overlaps without assembling">
+<pre><code>seal gibson a.fa b.fa --validate --min-overlap 30</code></pre>
+    </div>
+
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>The product length is <code>sum(fragment lengths) - sum(overlap lengths)</code>, because each overlap is shared by two fragments and appears once in the product. Use this to sanity-check an assembled size against what you expect.</p>
+      </div>
+    </div>
+
+    <h2>Golden Gate (Type IIS)</h2>
+    <p>Use <code>seal golden-gate</code> to design overhangs for a set of fragments assembled with a Type IIS enzyme. A Type IIS enzyme cuts outside its recognition site, so the recognition sites drop out of the product and the fragments join at defined overhangs.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Design overhangs for three parts">
+<pre><code>seal golden-gate part1.fa part2.fa part3.fa</code></pre>
+    </div>
+
+    <p>The default enzyme is BsaI. Switch enzymes with <code>--enzyme</code>, which accepts <code>BsaI</code>, <code>BbsI</code>, <code>BsmBI</code>, and <code>Esp3I</code>.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Use BsmBI instead of BsaI">
+<pre><code>seal golden-gate part1.fa part2.fa --enzyme BsmBI --json</code></pre>
+    </div>
+
+    <p>Golden Gate fails when a fragment carries an internal copy of the enzyme's recognition site, because the enzyme would cut inside the part. Screen for those sites first with <code>--check</code>, which reports internal Type IIS sites without assembling.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Screen for internal Type IIS sites">
+<pre><code>seal golden-gate part1.fa part2.fa --check</code></pre>
+    </div>
+
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--enzyme BsaI|BbsI|BsmBI|Esp3I</code></td><td>BsaI</td><td>Type IIS enzyme to use for the assembly.</td></tr>
+          <tr><td><code>--check</code></td><td>false</td><td>Report internal Type IIS sites without assembly.</td></tr>
+          <tr><td><code>--domesticate</code></td><td>false</td><td>Mutate internal recognition sites before output.</td></tr>
+          <tr><td><code>--json</code></td><td>false</td><td>Emit structured JSON output.</td></tr>
+          <tr><td><code>--save &lt;path&gt;</code></td><td>none</td><td>Write output to file.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>If a part does have an internal site, you have two options: domesticate the part, or change the assembly. Pass <code>--domesticate</code> to mutate internal recognition sites before output. To screen the same sites another way, <code>seal sites</code> exposes a curated <code>golden-gate-type-iis</code> preset (see the <a href="cli.html">CLI reference</a>).</p>
+
+    <p>In the desktop app, the Golden Gate builder walks the same flow: select entries, order them as a transcription unit, screen internal Type IIS sites, choose existing sites when they are valid, generate PCR tails when existing sites are absent or invalid, then preview and export the product after the order and overhangs are confirmed.</p>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/golden-gate.png" alt="The Golden Gate Assembly dialog with a Type IIS enzyme selected and the DNA parts to assemble listed below it." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">The Golden Gate builder picks a Type IIS enzyme, then the parts to assemble into one transcription unit.</figcaption>
+    </figure>
+
+    <h2>GoldenBraid and hierarchical MoClo</h2>
+    <p>GoldenBraid is an organization mode inside the desktop Golden Gate surface. A transcription-unit plan assigns boundary-compatible promoter, coding-sequence, and terminator roles; the stack mode accepts exactly two curated transcription-unit products for one binary alpha/omega round. The dialog names the active grammar, shows expected boundaries, and blocks incompatible selections rather than silently reordering them.</p>
+    <p>The separate Hierarchical / MoClo builder guides level-zero parts into transcription units and then into higher-level constructs. These richer organization flows do not currently have standalone Rust CLI commands. Review the complete consequence preview and Activity record in the desktop app.</p>
+
+    <h2>Ligation</h2>
+    <p>Ligation joins fragments by compatible ends from a restriction digest, with no homology arms or Type IIS overhangs. There is no standalone <code>seal</code> ligation subcommand; run ligation from the desktop Ligation builder or over MCP.</p>
+    <p>A typical restriction-cloning sequence is: digest the vector and the insert, take the fragments you want, then ligate them. From the CLI you do the digests with <code>seal digest</code> (see <a href="restriction-digest.html">Restriction digest</a>) and screen ends with <code>seal sites</code>. Over MCP, the <code>ligate</code> tool joins selected digest fragments by name, and <code>clone_into</code> runs the whole vector-plus-insert restriction clone in one call.</p>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/ligation.png" alt="The Ligate Fragments dialog with DNA blocks selected to join, an optional linker sequence field, and a make-plasmid toggle." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">The Ligation builder joins selected blocks, with an optional linker sequence and a circular-topology option.</figcaption>
+    </figure>
+
+    <div class="docs-code" data-lang="json" data-title="Ligate selected fragments over MCP">
+<pre><code>{
+  "tool": "ligate",
+  "arguments": {
+    "fragments": [
+      { "name": "synthetic-backbone_EcoRI_BamHI_frag1" },
+      { "name": "synthetic-insert_EcoRI_BamHI_frag1" }
+    ],
+    "saveTo": "seal-synthetic-assembly"
+  }
+}</code></pre>
+    </div>
+
+    <p>See <a href="mcp-reference.html">MCP tool reference</a> for the full tool list.</p>
+
+    <h2>The Clone Builder</h2>
+    <p>The Clone Builder is the desktop dialog for restriction cloning when you want to choose specific fragments rather than letting an automatic clone take the largest backbone and insert. It shares the same fragment rows as the Gibson, Golden Gate, and Ligation builders, so a digest fragment, an overhang, and a part read the same way across every method.</p>
+    <p>Use it when you need to pick a particular vector backbone fragment or a non-default insert fragment, stage candidates from across the workspace, and review the order before you commit. The Cloning page launches the Clone Builder alongside the other builders.</p>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img height="1800" width="2880" src="assets/img/app/clone-builder.png" alt="The Clone Builder dialog with a vector and insert chosen, a method dropdown, and a consequences panel summarizing the resulting construct size, copied features, and provenance." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">The Clone Builder names a vector, insert, and method, then previews the construct and its consequences, including the output size and which features carry over, before you commit.</figcaption>
+    </figure>
+
+    <h2>Assembly lineage</h2>
+    <p>A multi-fragment assembly cannot be described by a single parent, because the product comes from several source blocks at once. Record that relationship with the TypeScript <code>blocks link-parts</code> command. Prepare the <a href="cli.html">TypeScript CLI</a> first. It writes the lineage edge the desktop app reads to show that a construct was assembled from N source blocks, and stamps the construct's manipulation field.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Record what built a construct">
+<pre><code>npm --silent run dev:cli -- blocks link-parts --construct my-plasmid --parts part1,part2,part3 --manipulation golden_gate_assembly</code></pre>
+    </div>
+
+    <div class="docs-tablewrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--construct &lt;name|id&gt;</code></td><td>none</td><td>The assembled output block (required).</td></tr>
+          <tr><td><code>--parts &lt;list&gt;</code></td><td>none</td><td>Comma-separated source block names or ids, all in the same conversation (required).</td></tr>
+          <tr><td><code>--manipulation &lt;kind&gt;</code></td><td><code>gibson_assembly</code></td><td><code>gibson_assembly</code>, <code>golden_gate_assembly</code>, <code>ligate</code>, or <code>vector_insert</code>.</td></tr>
+          <tr><td><code>--summary &lt;text&gt;</code></td><td>auto</td><td>Human-readable summary stored on the event.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>The Rust assembly commands print a result without saving a workspace block. Gibson's text output includes an assembly summary, so extract the sequence from JSON before passing it to TypeScript <code>blocks add</code>.</p>
+    <p>Replace the example files, Entry ID, and part references with your own. The source parts must already exist as blocks in the target Entry. Set <code>SEAL_DB_PATH</code> to the active path from SEAL's Agent Setup.</p>
+    <div class="docs-code" data-lang="bash" data-title="Save an assembly and record its lineage">
+<pre><code>seal gibson part1.fa part2.fa part3.fa --circular --json &gt; assembly.json
+
+node -e '
+  const fs = require("node:fs");
+  const result = JSON.parse(fs.readFileSync("assembly.json", "utf8"));
+  if (!result.success || !result.sequence) process.exit(1);
+  process.stdout.write(result.sequence + "\n");
+' &gt; assembly.txt
+
+npm --silent run dev:cli -- blocks add assembly.txt \
+  --name "Assembled plasmid" --type dna --topology circular \
+  --conversation-id "assembly-entry-id"
+
+npm --silent run dev:cli -- blocks link-parts --construct "Assembled plasmid" \
+  --parts part1,part2,part3 --manipulation gibson_assembly</code></pre>
+    </div>
+    <p>Run each step after the previous command succeeds. Review <code>assembly.json</code> before adding the construct. The final command links existing blocks; it does not verify that their sequences match the assembly input files.</p>
+
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p>The <code>--parts</code> blocks must already exist in the same conversation as the construct. Add each part as a block first, then run <code>link-parts</code>. These commands read and write the shared SQLite workspace; see <a href="architecture.html">Architecture</a> for how the database path resolves.</p>
+      </div>
+    </div>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

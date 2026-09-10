@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Use Claude Code with SEAL</title>
+  <meta name="description" content="One MCP config that connects Claude Code to the local SEAL workspace. Verify with Agent Doctor, then drive every sequence block from the CLI." />
+
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/img/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="../assets/img/favicon-16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/img/apple-touch-icon.png" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Use Claude Code with SEAL" />
+  <meta property="og:description" content="One copy-paste MCP config that connects Claude Code to the local SEAL workspace." />
+
+
+  <link rel="stylesheet" href="../styles.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Use Claude Code with SEAL",
+  "description": "One copy-paste MCP config that connects Claude Code to the local SEAL workspace.",
+  "image": "../assets/img/og-image.jpg",
+  "datePublished": "2026-05-13",
+  "dateModified": "2026-09-07",
+  "author": {
+    "@type": "Person",
+    "name": "Jacob Vogan",
+    "url": "https://github.com/jvogan"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SEAL"
+  },
+  "about": {
+    "@type": "SoftwareApplication",
+    "name": "SEAL"
+  },
+  "proficiencyLevel": "Beginner",
+  "dependencies": "SEAL 2.2.1, macOS, Claude Code"
+}
+  </script>
+  <link rel="stylesheet" href="../assets/images.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" role="banner">
+    <a class="nav-brand" href="../index.html" aria-label="SEAL home">
+      <span class="nav-mark" aria-hidden="true"><img src="../assets/img/favicon-32.png" width="32" height="32" alt="" /></span>
+      <span class="nav-word">SEAL</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="../index.html#tour">Tour</a>
+      <a href="../index.html#agents">Agents</a>
+      <a href="../index.html#install">Install</a>
+      <a href="../index.html#developers">Developers</a>
+      <a href="../docs/">Docs</a>
+      <a href="../docs/editions.html">Editions</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="theme-toggle" id="theme-toggle" aria-pressed="false" aria-label="Switch to dark theme" title="Toggle dark mode">
+        <svg class="theme-toggle-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21M5.6 5.6l1.1 1.1M17.3 17.3l1.1 1.1M5.6 18.4l1.1-1.1M17.3 6.7l1.1-1.1" stroke-linecap="round" />
+        </svg>
+        <svg class="theme-toggle-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z" />
+        </svg>
+      </button>
+      <a class="btn btn-primary" href="../index.html#install">Get SEAL</a>
+      <button class="nav-burger" id="nav-burger" aria-label="Open menu" aria-expanded="false" aria-controls="nav-mobile-sheet">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16" />
+        </svg>
+      </button>
+    </div>
+
+    <nav class="nav-mobile-sheet" id="nav-mobile-sheet" aria-label="Site navigation" hidden>
+      <a href="../index.html#tour">Tour</a>
+      <a href="../index.html#agents">Agents</a>
+      <a href="../index.html#install">Install</a>
+      <a href="../index.html#developers">Developers</a>
+      <a href="../docs/">Docs</a>
+      <a href="../docs/editions.html">Editions</a>
+      <a href="../try.html">Try these classics</a>
+      <a href="../workflows.html">Workflows</a>
+      <a href="../privacy.html">Privacy</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <p class="edition-note" data-edition-note>This guide covers source and direct-edition tools. These tools are not bundled with the first Store release. <a href="../docs/editions.html">Compare editions</a>.</p>
+
+    <section class="page-hero" id="top">
+      <p class="eyebrow">Agents &middot; Claude Code</p>
+      <h1>Run Claude Code against your local workspace.</h1>
+      <p class="page-lede">Connect Claude Code to the workspace you use in SEAL. Open the app first, then use Agent Setup to configure this optional MCP connection.</p>
+    </section>
+
+    <section class="setup">
+      <ol class="setup-steps">
+        <li>
+          <h3>1. Install SEAL and open the app.</h3>
+          <p>Install SEAL from source or an available DMG. Open the app to create its local workspace.</p>
+          <a class="btn btn-ghost" href="../docs/install.html">Install SEAL</a>
+        </li>
+        <li>
+          <h3>2. Run Agent Doctor.</h3>
+          <p>From the Start Panel choose <strong>Agent Setup &rarr; Agent Doctor</strong>. Doctor verifies the active database path, watcher health, schema version, and Activity hydration.</p>
+        </li>
+        <li>
+          <h3>3. Get the MCP server source.</h3>
+          <p>Use your SEAL source checkout, or clone the repository you have access to. Select the Node.js version in <code>.nvmrc</code>, then install the dependencies:</p>
+          <pre class="code-block"><code>cd /absolute/path/to/seal
+npm ci</code></pre>
+          <p><code>npm ci</code> installs the lockfile-pinned <code>tsx</code> binary used by the local MCP configuration.</p>
+        </li>
+        <li>
+          <h3>4. Paste this MCP config into Claude Code.</h3>
+          <p>Add the configuration to <code>.mcp.json</code> in your project. For user-wide setup and other scopes, see <a href="../docs/agents-claude-code.html">Connect Claude Code</a>.</p>
+          <pre class="code-block"><code>{
+  "mcpServers": {
+    "seal-bio": {
+      "command": "/absolute/path/to/seal/node_modules/.bin/tsx",
+      "args": ["/absolute/path/to/seal/mcp/server.ts"],
+      "env": {
+        "SEAL_DB_PATH": "/absolute/path/to/active/seal.db"
+      }
+    }
+  }
+}</code></pre>
+          <p class="setup-note">Replace <code>/absolute/path/to/seal</code> with your checkout path. Replace <code>/absolute/path/to/active/seal.db</code> with the active database path from Agent Setup. The app can copy a configuration with that path filled in.</p>
+        </li>
+        <li>
+          <h3>5. Verify the connection without writing.</h3>
+          <p>In a project directory with the MCP server configured, open Claude Code and ask:</p>
+          <pre class="code-block"><code>Use block_list to list the sequence blocks in my SEAL workspace, with type and length. Do not change any data.</code></pre>
+          <p><code>block_list</code> reads blocks across your shared projects and Entries. <code>workspace_list</code> lists only MCP Scratch records. Compare the results with the app before requesting a write.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section class="prompt-gallery">
+      <div class="section-header">
+        <p class="eyebrow">Try these prompts</p>
+        <h2><span class="lede-num">Five</span> prompts that exercise the control plane.</h2>
+        <p class="section-lede">
+          Each prompt goes through the MCP server. Reads return workspace data
+          without creating an Activity row. Mutations write the shared SQLite
+          workspace and appear in Activity with the canonical <code>MCP</code>
+          source; a recognizable client label appears only when provider tagging
+          is supplied and accepted.
+        </p>
+      </div>
+
+      <div class="prompt-grid">
+        <article class="prompt-card">
+          <span class="prompt-tag">Inspect</span>
+          <pre class="prompt-text"><code>read the SEAL Synthetic Cloning Backbone and list its explicitly illustrative features</code></pre>
+        </article>
+        <article class="prompt-card">
+          <span class="prompt-tag">Analyse</span>
+          <pre class="prompt-text"><code>run an in-silico restriction digest on the SEAL Synthetic Cloning Backbone with EcoRI, BamHI, and HindIII and call out nearby sites</code></pre>
+        </article>
+        <article class="prompt-card">
+          <span class="prompt-tag">Design</span>
+          <pre class="prompt-text"><code>design forward and reverse primers for Synthetic Reporter DNA at Tm=60, length 18-24, and report dimer warnings</code></pre>
+        </article>
+        <article class="prompt-card">
+          <span class="prompt-tag">Plan</span>
+          <pre class="prompt-text"><code>plan an in-silico Gibson assembly of the synthetic reporter into the SEAL Synthetic Gibson Backbone with 25 bp homology arms</code></pre>
+        </article>
+        <article class="prompt-card">
+          <span class="prompt-tag">Handoff</span>
+          <pre class="prompt-text"><code>build a review report package for the SEAL synthetic sample assembly with manifest.json and validation.md</code></pre>
+        </article>
+      </div>
+    </section>
+
+    <section class="verify">
+      <div class="section-header">
+        <p class="eyebrow">Verify</p>
+        <h2><span class="lede-num">Three</span> ways to confirm Claude Code is wired up.</h2>
+      </div>
+
+      <div class="verify-grid">
+        <div class="verify-item">
+          <h3>Agent Doctor green</h3>
+          <p>Doctor reports the database path, watcher, schema version, Activity hydration, and recent external writes. Run it again after configuration changes or a failed connection.</p>
+        </div>
+        <div class="verify-item">
+          <h3>Activity row tagged with the source</h3>
+          <p>Every external mutation records its canonical source. Claude Code normally writes through <code>MCP</code>; a <code>Claude Code</code> client label appears only when provider tagging is supplied and accepted.</p>
+        </div>
+        <div class="verify-item">
+          <h3>Checkpoint diff before and after</h3>
+          <p>Take a checkpoint, let Claude Code run, take another. The diff between checkpoints shows exactly what changed and lets you accept or roll back.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="cross-links">
+      <p>Other agents:
+        <a href="codex.html">Codex</a>
+        &middot;
+        <a href="gemini-cli.html">Gemini CLI</a>
+      </p>
+      <p>Full reference:
+        <a href="../docs/agents-claude-code.html">Connect Claude Code (docs)</a>
+        &middot;
+        <a href="../docs/mcp-setup.html">MCP setup</a>
+        &middot;
+        <a href="../docs/agents.html" data-repository-path="/blob/main/docs/AGENT_CONTROL_PLANE.md" rel="noopener">Agent control plane architecture</a>
+      </p>
+    </section>
+
+  </main>
+
+  <footer class="footer" role="contentinfo">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="nav-brand" href="../index.html" aria-label="SEAL home">
+          <span class="nav-mark" aria-hidden="true"><img src="../assets/img/favicon-32.png" width="32" height="32" alt="" /></span>
+          <span class="nav-word">SEAL</span>
+        </a>
+        <p class="footer-tag">A local-first workbench for sequences and lab records.</p>
+      </div>
+      <div class="footer-col">
+        <h3 class="footer-col-h">Product</h3>
+        <a href="../index.html#install">Get SEAL</a>
+        <a href="../docs/changelog.html" data-repository-path="/blob/main/CHANGELOG.md" rel="noopener">Changelog</a>
+        <a href="../index.html#team-sync">Team sync (alpha)</a>
+      </div>
+      <div class="footer-col">
+        <h3 class="footer-col-h">Source-edition agents</h3>
+        <a href="claude-code.html">Claude Code</a>
+        <a href="codex.html">Codex</a>
+        <a href="gemini-cli.html">Gemini CLI</a>
+      </div>
+      <div class="footer-col">
+        <h3 class="footer-col-h">Docs</h3>
+        <a href="../docs/quickstart.html">Quickstart</a>
+        <a href="../docs/mcp-setup.html">MCP setup</a>
+        <a href="../docs/cli.html">CLI reference</a>
+        <a href="../privacy.html">Privacy</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 SEAL contributors. MIT licensed.</span>
+      <span class="footer-citation">
+        <a href="../index.html#cite" data-repository-path="/blob/main/CITATION.cff" rel="noopener">Cite this work</a>
+      </span>
+    </div>
+  </footer>
+
+  <script src="../script.js?v=20260907" defer></script>
+  <script src="../assets/images.js" defer></script>
+</body>
+</html>

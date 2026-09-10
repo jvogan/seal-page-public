@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Translation and ORFs · SEAL docs</title>
+  <meta name="description" content="Use SEAL's live selection translation, six-frame Translate inspector, inline Translate action, reverse-translation drafts, ORF finder, CLI, and MCP tools." />
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Translation and ORFs" />
+  <meta property="og:description" content="Live selection translation, six-frame inspection, reverse-translation drafts, ORFs, CLI, and MCP." />
+  <link rel="stylesheet" href="assets/docs.css?v=20260907" />
+  <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/images.css" />
+  <link rel="stylesheet" href="../assets/tutorials.css" />
+</head>
+<body>
+  <article class="docs-article">
+    <h1>Translation and ORFs</h1>
+    <p class="edition-note" data-edition-note>Screenshots and recordings show the direct edition. <a href="editions.html">Compare editions</a>.</p>
+    <p class="docs-lede">SEAL exposes translation at four levels: a live selection readout, an inline Translate action, a six-frame Inspector, and a reverse-translation draft for protein blocks. CLI and MCP tools cover the same core transformations for automation.</p>
+
+    <!-- Tutorial player -->
+    <h2 id="watch">Watch the walkthrough</h2>
+    <section class="tutorial-video" aria-label="Video lesson: Translate and compare reading frames">
+      <p>Compare six frames, show translation beside DNA, and inspect a protein back-translation draft.</p>
+      <video id="lesson-video" controls playsinline preload="none" width="1440" height="900" poster="../assets/img/tutorials/03-translation.jpg" aria-label="Translate and compare reading frames">
+        <source src="../assets/videos/03-translation.mp4" type="video/mp4" />
+        <track kind="captions" src="../assets/videos/03-translation.vtt" srclang="en" label="English" default />
+        <p><a href="../assets/videos/03-translation.mp4">Download this video</a> to watch the lesson.</p>
+      </video>
+      <p class="video-links"><span>1:12 · AI narration</span><a href="../assets/videos/03-translation.mp4" download>Download video (20.4 MB)</a><a href="../assets/videos/03-translation.vtt" download>English captions</a></p>
+      <ul class="lesson-chapters" aria-label="Video chapters" hidden>
+        <li><button type="button" data-seek="0" aria-controls="lesson-video">0:00 · Select the reporter DNA</button></li>
+        <li><button type="button" data-seek="10.4" aria-controls="lesson-video">0:10 · Compare six frames</button></li>
+        <li><button type="button" data-seek="25.2" aria-controls="lesson-video">0:25 · Show inline translation</button></li>
+        <li><button type="button" data-seek="43.2" aria-controls="lesson-video">0:43 · Inspect back-translation</button></li>
+      </ul>
+      <details>
+        <summary>Read the transcript</summary>
+        <p>Open the Synthetic Reporter Entry and select its DNA block. This bundled example contains seven hundred twenty bases. In the Inspector, click Translate. The panel lists the six possible reading frames: three in the forward direction and three on the reverse complement. Compare the frame labels before interpreting a peptide.</p>
+        <p>Next, switch the DNA block to Detail. Turn on its inline translation track. Amino-acid letters now align with the DNA, alongside the sequence coordinates and feature annotations. This view helps you relate a protein position to the underlying bases.</p>
+        <p>Scroll to the existing Synthetic Reporter Protein block and select it. The Inspector changes to Codons and shows a Back-translation preview marked Draft. Review the target host and codon strategy before using this output. Here the preview contains seven hundred seventeen DNA bases. Back-translation proposes one possible coding sequence; it does not recover a unique original DNA sequence.</p>
+      </details>
+    </section>
+    <!-- End tutorial player -->
+
+
+    <h2 id="try-translation">Try translation with the Sample Lab</h2>
+    <p>Start with the <a href="first-workspace.html">Sample Lab loaded</a>. This walkthrough uses the DNA and protein already in its Synthetic Reporter entry.</p>
+    <ol>
+      <li>In the sidebar, open <strong>SEAL Sample Lab → Synthetic Reporter</strong> and click <strong>Synthetic Reporter DNA</strong>. Its header shows <strong>720 bp</strong>.</li>
+      <li>Open <strong>Translate</strong> in the Inspector and choose <strong>Whole sequence</strong>. Compare the six frame labels. Frame <strong>+1</strong> reports <strong>239 aa · terminal stop</strong>.</li>
+      <li>Click <strong>Detail</strong> in the DNA block header. In the icon toolbar below it, click the button labelled <strong>Translate to protein</strong> to show an inline translation layer. Amino-acid letters appear above their DNA codons.</li>
+      <li>Scroll to <strong>Synthetic Reporter Protein</strong> and click its sequence. Open <strong>Codons</strong> in the Inspector, then choose <strong>Whole protein</strong> and <strong>DNA</strong>.</li>
+      <li>In <strong>Back-translation preview</strong>, inspect <strong>Target host</strong> and <strong>Codon strategy</strong>. The example uses <strong>Human</strong> and <strong>Max-frequency</strong>. The 239-residue protein produces a <strong>717 bp</strong> draft.</li>
+    </ol>
+    <p>The source DNA includes a three-base terminal stop codon; the existing protein contains 239 amino acids. Its back-translation encodes those residues in 717 bases. Different codon choices can encode the same protein.</p>
+
+    <h2>Live selection translation</h2>
+    <p>Select any range in a DNA or RNA block. The Inspector Overview immediately reports the active frame, strand, genetic code, selected nucleotide count, translated amino-acid count, trailing bases that do not complete a codon, and internal-stop warnings. The result follows forward, backward, and circular-origin selections and is announced through an accessible live region.</p>
+
+    <h2>Inline Translate action</h2>
+    <p>The block toolbar has a <strong>Translate to protein</strong> button with a dropdown for frame and reverse-strand choices. In compact mode it creates a derived protein block. In Detail mode it can add a saved translation layer to the parent block. The derived result keeps its parent relationship in provenance.</p>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img src="../assets/img/live-translation.png" width="2880" height="1800" alt="DNA with an inline translation layer and the six-frame Translate Inspector." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">A translation layer aligns amino acids with DNA; the Inspector compares all six frames.</figcaption>
+    </figure>
+
+    <h2>Compare all six frames</h2>
+    <p>Open the Inspector <strong>Translate</strong> tab for DNA or RNA. Choose the whole block or the current selection, then compare +1, +2, +3, -1, -2, and -3. Frame labels and coordinates are anchored to the parent sequence, including selections that cross the origin of a circular block.</p>
+    <p>Each row reports its parent range and internal stops. Use <strong>Copy</strong> for the complete translation or <strong>New block</strong> to promote it to a derived protein block. <strong>Show</strong> also reveals the range when the frame maps to one contiguous parent span; it is intentionally omitted for multi-segment origin-crossing selections. Long previews are bounded for rendering, but Copy materializes the complete row.</p>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img src="../assets/img/six-frame-translation.png" width="2880" height="1800" alt="SEAL Translate Inspector comparing all six forward and reverse reading frames with coordinates and actions." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">The Translate Inspector compares six parent-anchored frames over a selection or whole nucleotide block.</figcaption>
+    </figure>
+
+    <h2 id="reverse-translate-a-protein">Back-translate a protein</h2>
+    <p>On a protein block, open <strong>Codons</strong> to see the <strong>Back-translation preview</strong>. Choose the whole protein or a selected residue range, DNA or RNA output, and a target host codon-usage table. Built-in choices include E. coli K-12, human, budding yeast, K. phaffii, Bacillus subtilis, and explicitly labelled aggregate proxies for Sf9 and CHO, plus imported custom tables.</p>
+    <p>Choose a <strong>Codon strategy</strong>: <strong>Max-frequency</strong> selects the most frequent synonymous codon by default; <strong>Balanced codon usage</strong> follows the host frequency distribution; <strong>Synthesis-guarded</strong> also screens sequence patterns. The preview updates in this panel.</p>
+    <p>Under <strong>Avoid sites</strong>, enter enzyme names or motifs, or select saved enzyme sets. All strategies apply this list. Review any unrecognized inputs and sites that remain in the draft.</p>
+    <p>The preview reports nucleotide length, GC percentage, encoded symbols, and symbols represented by <code>NNN</code>. Stop symbols receive stop codons, including internal stops; later residues remain in the draft. Review the highlighted stop codons and notices, then choose <strong>Copy</strong> or <strong>Draft candidate</strong>.</p>
+
+    <div class="docs-note">
+      <span class="docs-note-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      </span>
+      <div>
+        <p><strong>Draft candidate.</strong> Many nucleotide sequences can encode the same protein. The selected strategy and site preferences determine this candidate; review it for your experiment before using it.</p>
+      </div>
+    </div>
+
+    <figure class="docs-shot">
+      <span class="docs-shot-frame"><img src="../assets/img/reverse-translation.png" width="2880" height="1800" alt="SEAL Codons Inspector showing a Back-translation preview with DNA output, host table, Codon strategy, Avoid sites, sequence, and draft metrics." loading="lazy" /></span>
+      <figcaption class="docs-shot-cap">The Codons panel previews a DNA or RNA draft using the selected host, codon strategy, and sites to avoid.</figcaption>
+    </figure>
+
+    <h2>CLI translation and frames</h2>
+    <p>The separately built Rust CLI accepts an inline sequence, file path, or stdin. <code>translate</code> uses frame offsets 0, 1, or 2. <code>frames</code> returns all six frames. Add <code>--json</code> for structured output.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Translate and inspect frames">
+<pre><code>seal translate ATGAAATAG
+echo ATGAAATAG | seal translate --frame 1 --json
+seal frames ATGAAATAG --json</code></pre>
+    </div>
+
+    <h2>MCP translation</h2>
+    <p>The local MCP <code>transform</code> tool supports <code>translate</code>, <code>translate_all_frames</code>, <code>translate_from_atg</code>, and <code>reverse_translate</code>. It also supports codon optimization as a separate transformation. The source MCP currently exposes a smaller set of NCBI table IDs than the desktop app, so clients should validate the tool schema rather than assume every desktop option is available.</p>
+
+    <div class="docs-code" data-lang="json" data-title="Reverse translate over MCP">
+<pre><code>{
+  "sequence": "MSTNPKPQR",
+  "type": "reverse_translate",
+  "saveTo": "Synthetic reverse-translation draft"
+}</code></pre>
+    </div>
+
+    <h2>Find ORFs</h2>
+    <p>Run <code>seal orfs</code> to detect open reading frames in all six frames. Set the shortest result to keep with <code>--min-aa</code>, which defaults to 30. Use <code>seal analyze</code> with <code>--min-orf-aa</code> to include ORFs in a larger sequence summary.</p>
+
+    <div class="docs-code" data-lang="bash" data-title="Find and summarize ORFs">
+<pre><code>seal orfs --file synthetic-region.fa --min-aa 50 --json
+seal analyze --file synthetic-region.fa --min-orf-aa 50 --json</code></pre>
+    </div>
+
+    <p>In the app, the ORFs tab applies the active genetic code and marks an ORF <strong>Annotated</strong> when it overlaps an annotated CDS on the same strand by at least 50 percent, or <strong>Partial</strong> otherwise.</p>
+
+    <h2>Genetic codes</h2>
+    <p>The desktop app includes 22 NCBI translation tables and supports per-block overrides and locally stored custom codes. A custom code starts from a built-in table and can reassign codons or add start codons. The active choice applies consistently to translation, ORF detection, and protein analysis for that block.</p>
+
+    <h2>Next steps</h2>
+    <ul>
+      <li><a href="codon-analysis.html">Codon analysis</a>: review codon usage after creating a draft.</li>
+      <li><a href="codon-optimizers.html">Codon optimizers</a>: run an explicit optimization step and understand its limits.</li>
+      <li><a href="protein-analysis.html">Protein analysis</a>: inspect biophysical metrics and explicitly triggered external predictions.</li>
+      <li><a href="quality.html">Quality checks</a>: review ambiguous bases, homopolymers, and internal stops.</li>
+      <li><a href="mcp-reference.html">MCP reference</a> and <a href="io-contract.html">IO contract</a>: validate automation schemas.</li>
+    </ul>
+
+  </article>
+  <script src="assets/nav.js?v=20260907"></script>
+  <script src="assets/docs.js?v=20260907"></script>
+  <script src="../assets/images.js" defer></script>
+  <script src="../assets/tutorials.js" defer></script>
+</body>
+</html>
